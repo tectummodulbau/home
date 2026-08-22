@@ -1,0 +1,44 @@
+---
+import ModulhausIcon from '../icons/ModulhausIcon.astro';
+---
+
+<button
+  type="button"
+  id="tectum-privacy-widget"
+  class="pw"
+  data-privacy-settings-trigger
+  aria-label="Datenschutz-Einstellungen öffnen"
+  title="Datenschutz-Einstellungen"
+>
+  <ModulhausIcon size={22} />
+</button>
+
+<style>
+  .pw {
+    position: fixed;
+    right: max(1.1rem, env(safe-area-inset-right));
+    bottom: max(1.1rem, env(safe-area-inset-bottom));
+    z-index: 70;
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    border: none;
+    background: var(--ink);
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .pw:hover {
+    background: #000;
+    transform: translateY(-2px);
+  }
+  .pw:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .pw:active { transform: scale(0.96); }
+</style>

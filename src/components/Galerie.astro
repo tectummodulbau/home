@@ -1,0 +1,77 @@
+---
+import { Image } from 'astro:assets';
+import imgWellness from '../assets/galerie-wellness.jpg';
+import imgProduktion from '../assets/galerie-produktion.jpg';
+import imgWohnraum from '../assets/galerie-wohnraum.jpg';
+import imgPool from '../assets/addon-aussenanlage.jpg';
+
+const bilder = [
+  { img: imgWellness, alt: 'Wellnessbereich einer Modulanlage von Tectum Modulbau', caption: 'Wellnessbereich', wide: true },
+  { img: imgWohnraum, alt: 'Innenausbau einer modularen Wohnraumeinheit von Tectum', caption: 'Wohnraumeinheit innen', wide: false },
+  { img: imgProduktion, alt: 'CNC-Fertigung der Modulhäuser in der Tectum Holzwerkstatt', caption: 'Fertigung im Werk', wide: false },
+  { img: imgPool, alt: 'Poolanlage als Außenbereich einer Tectum Moduleinheit', caption: 'Außenanlage mit Pool', wide: true },
+];
+---
+
+<section class="section section--sand" id="galerie">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-kicker">Einblicke</span>
+      <h2>Gebaut im Werk. Gemacht für den Betrieb.</h2>
+    </div>
+
+    <div class="gal-grid">
+      {bilder.map((b) => (
+        <figure class={`gal-item reveal ${b.wide ? 'gal-item--wide' : ''}`}>
+          <Image src={b.img} alt={b.alt} widths={[500, 900]} sizes="(max-width: 720px) 100vw, 60vw" />
+          <figcaption>{b.caption}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .gal-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: clamp(0.9rem, 2vw, 1.4rem);
+  }
+
+  .gal-item {
+    position: relative;
+    margin: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    grid-column: span 2;
+  }
+  .gal-item--wide { grid-column: span 3; }
+
+  .gal-item img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .gal-item:hover img { transform: scale(1.04); }
+
+  .gal-item figcaption {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    font-family: var(--font-head);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--paper);
+    background: rgba(20, 19, 15, 0.72);
+    padding: 0.4rem 0.95rem;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+  }
+
+  @media (max-width: 720px) {
+    .gal-grid { grid-template-columns: 1fr; }
+    .gal-item, .gal-item--wide { grid-column: auto; }
+    .gal-item img { height: 240px; }
+  }
+</style>

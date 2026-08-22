@@ -1,0 +1,262 @@
+---
+// Consent-Banner. Enthält alle Kategorien und Aktionen direkt inline, damit
+// Nutzer:innen die Auswahl treffen können, ohne einen separaten Dialog zu
+// öffnen. Bleibt so kompakt, dass er auf üblichen Viewports vollständig
+// sichtbar bleibt. Wird beim ersten Besuch bzw. bei ungültiger Entscheidung
+// vom Consent-Manager eingeblendet, sonst per hidden ausgeblendet.
+import { CATEGORY_LABELS } from '../../lib/consent/registry';
+
+const optionalCategories = [
+  // „anonym" wäre seit dem Einsatz von Google Analytics 4 falsch: der Dienst
+  // setzt Cookies und arbeitet mit pseudonymen Kennungen.
+  { id: 'analytics', label: CATEGORY_LABELS.analytics, hint: 'Reichweite und Nutzungsverhalten, pseudonym.' },
+  { id: 'marketing', label: CATEGORY_LABELS.marketing, hint: 'Erfolgsmessung von Kampagnen, Remarketing.' },
+  { id: 'externalMedia', label: CATEGORY_LABELS.externalMedia, hint: 'Karten, Videos, eingebettete Inhalte.' },
+] as const;
+---
+
+<div
+  id="tectum-consent-banner"
+  class="cb"
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="cb-title"
+  aria-describedby="cb-desc"
+  hidden
+>
+  <div class="cb__inner">
+    <div class="cb__head">
+      <h2 id="cb-title">Ihre Privatsphäre.</h2>
+      <p id="cb-desc">
+        Notwendige Cookies immer aktiv. Statistik, Marketing und externe Inhalte nur mit Ihrer
+        Zustimmung — jederzeit widerrufbar.
+      </p>
+    </div>
+
+    <ul class="cb__cats" role="list">
+      <li class="cb__cat cb__cat--locked">
+        <div class="cb__cat-main">
+          <span class="cb__cat-name">{CATEGORY_LABELS.necessary}</span>
+          <span class="cb__cat-hint">Für den Betrieb der Website zwingend erforderlich.</span>
+        </div>
+        <span class="cb__cat-lock" aria-hidden="true">Immer aktiv</span>
+      </li>
+      {optionalCategories.map((cat) => (
+        <li class="cb__cat">
+          <label class="cb__cat-main cb__cat-toggle">
+            <input type="checkbox" data-consent-category={cat.id} />
+            <span class="cb__switch" aria-hidden="true"><span class="cb__switch-thumb"></span></span>
+            <span class="cb__cat-text">
+              <span class="cb__cat-name">{cat.label}</span>
+              <span class="cb__cat-hint">{cat.hint}</span>
+            </span>
+          </label>
+        </li>
+      ))}
+    </ul>
+
+    <div class="cb__foot">
+      <div class="cb__actions">
+        <button type="button" class="btn btn--ghost" id="cb-reject-all">Ablehnen</button>
+        <button type="button" class="btn btn--ghost" id="cb-save">Auswahl speichern</button>
+        <button type="button" class="btn btn--primary" id="cb-accept-all">Alle akzeptieren</button>
+      </div>
+      <p class="cb__links">
+        <a href="/datenschutz/">Datenschutz</a>
+        <span aria-hidden="true">·</span>
+        <a href="/impressum/">Impressum</a>
+        <span aria-hidden="true">·</span>
+        <a href="#" data-privacy-settings-trigger>Details</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cb {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 80;
+    margin-inline: auto;
+    max-width: 520px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    /* Höhe nach oben begrenzen, damit das Widget auf jedem Viewport bündig
+       bleibt; interner Scroll nur, falls die Viewport-Höhe wirklich sehr
+       klein wird (< ~560px). */
+    max-height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .cb__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.85rem 0.95rem;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  .cb__head h2 {
+    font-size: 0.95rem;
+    margin: 0 0 0.2rem;
+  }
+  .cb__head p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .cb__cats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .cb__cat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+  }
+  .cb__cat--locked {
+    background: var(--stone, #f5f2ec);
+  }
+
+  .cb__cat-main {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .cb__cat-toggle { cursor: pointer; }
+
+  .cb__cat-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .cb__cat-name {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+  .cb__cat-hint {
+    font-size: 0.7rem;
+    color: var(--muted);
+    line-height: 1.2;
+  }
+  .cb__cat-lock {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  /* Custom Switch statt Standard-Checkbox */
+  .cb__cat-toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+  .cb__switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 18px;
+    background: #cfcac0;
+    border-radius: 999px;
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+  }
+  .cb__switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--paper);
+    transition: transform 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  }
+  .cb__cat-toggle input:checked + .cb__switch {
+    background: var(--ink);
+  }
+  .cb__cat-toggle input:checked + .cb__switch .cb__switch-thumb {
+    transform: translateX(12px);
+  }
+  .cb__cat-toggle input:focus-visible + .cb__switch {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .cb__foot {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .cb__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+  .cb__actions .btn {
+    width: 100%;
+    justify-content: center;
+    padding-block: 0.5rem;
+    font-size: 0.82rem;
+  }
+  #cb-accept-all { grid-column: 1 / -1; }
+
+  .cb__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin: 0;
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+  .cb__links a {
+    font-weight: 600;
+    text-decoration: underline;
+    color: inherit;
+  }
+  .cb__links a:hover { color: var(--ink); }
+
+  @media (min-width: 640px) {
+    .cb {
+      left: auto;
+      right: max(1.25rem, env(safe-area-inset-right));
+      bottom: max(1.25rem, env(safe-area-inset-bottom));
+      margin-inline: 0;
+      width: 440px;
+    }
+    .cb__actions {
+      grid-template-columns: auto auto 1fr;
+    }
+    #cb-accept-all { grid-column: auto; }
+  }
+</style>

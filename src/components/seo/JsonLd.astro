@@ -1,0 +1,39 @@
+---
+/**
+ * Gibt die strukturierten Daten im <head> aus.
+ *
+ * Organization steht auf jeder Seite, FAQPage nur dort, wo die FAQ-Einträge
+ * tatsächlich sichtbar sind (Startseite) — Google verlangt, dass der
+ * ausgezeichnete Inhalt auf der Seite steht. WebSite gehört laut Google
+ * ebenfalls ausschließlich auf die Startseite; die Erkennung läuft über den
+ * Pfad und nicht über eine weitere Prop, damit sie beim Anlegen neuer Seiten
+ * nicht versehentlich mitgesetzt wird.
+ *
+ * Die Inhalte selbst kommen aus src/lib/seo/structured-data.ts.
+ */
+import {
+  buildFaqSchema,
+  buildOrganizationSchema,
+  buildWebSiteSchema,
+  serializeSchema,
+} from '../../lib/seo/structured-data';
+
+interface Props {
+  /** Auf true setzen, wenn die Seite den FAQ-Abschnitt rendert. */
+  faqPage?: boolean;
+}
+
+const { faqPage = false } = Astro.props;
+
+const isHomepage = Astro.url.pathname === '/';
+
+const schemas: Record<string, unknown>[] = [buildOrganizationSchema()];
+if (isHomepage) schemas.push(buildWebSiteSchema());
+if (faqPage) schemas.push(buildFaqSchema());
+---
+
+{
+  schemas.map((schema) => (
+    <script is:inline type="application/ld+json" set:html={serializeSchema(schema)} />
+  ))
+}

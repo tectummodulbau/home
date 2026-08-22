@@ -1,0 +1,57 @@
+---
+// Kennzahlen-Band direkt unter den Grundmodulen
+const stats = [
+  { value: 'GEG', label: 'Bauweise nach den Anforderungen des Gebäudeenergiegesetzes' },
+  { value: '< 0,20', label: 'U-Wert in W/(m²·K) — Dämmung auf Passivhaus-Niveau' },
+  { value: 'Wochen', label: 'Lieferung ab Werk statt 12–24 Monate Bauzeit' },
+  { value: '365 Tage', label: 'Ganzjahresbetrieb dank Wärmepumpe und Klimaanlage' },
+];
+---
+
+<section class="section stats-band">
+  <div class="container stats-band__grid">
+    {stats.map((s) => (
+      <div class="stats-band__item reveal">
+        <strong>{s.value}</strong>
+        <span>{s.label}</span>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .stats-band { padding-block: clamp(2.8rem, 6vw, 4.5rem) clamp(2rem, 4vw, 3rem); }
+
+  .stats-band__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .stats-band__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-left: 1.2rem;
+    border-left: 2px solid var(--accent);
+  }
+
+  .stats-band__item strong {
+    font-family: var(--font-head);
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .stats-band__item span {
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 920px) {
+    .stats-band__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 520px) {
+    .stats-band__grid { grid-template-columns: 1fr; }
+  }
+</style>

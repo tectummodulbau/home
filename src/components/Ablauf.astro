@@ -1,0 +1,110 @@
+---
+const schritte = [
+  {
+    title: 'Bedarfsanalyse',
+    text: 'Sie schildern uns Ihren Bedarf: Anzahl der Einheiten, Standort, Nutzungsart. Wir beraten Sie kostenlos und unverbindlich.',
+  },
+  {
+    title: 'Konfiguration & Angebot',
+    text: 'Gemeinsam wählen wir die passenden Module und Zusatzausstattungen. Sie erhalten ein transparentes Festpreisangebot.',
+  },
+  {
+    title: 'Produktion im Werk',
+    text: 'Ihre Einheiten werden in unserer Fertigung nach DGNB-Standard produziert — parallel zu Ihrer Standortvorbereitung.',
+  },
+  {
+    title: 'Lieferung & Aufstellung',
+    text: 'Wir liefern die fertigen Einheiten direkt auf Ihr Grundstück und koordinieren die Aufstellung. Keine klassische Baustelle.',
+  },
+  {
+    title: 'Übergabe & Betrieb',
+    text: 'Ihre Einheiten sind sofort nutzbar. Auf Wunsch mit Servicevereinbarung und Leasing-Abwicklung.',
+  },
+];
+---
+
+<section class="section section--dark" id="ablauf">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-kicker">Der Ablauf</span>
+      <h2>Von der Anfrage zur gelieferten Einheit — in wenigen Schritten.</h2>
+    </div>
+
+    <ol class="ab-steps">
+      {schritte.map((s, i) => (
+        <li class="ab-step reveal">
+          <span class="ab-step__num">{i + 1}</span>
+          <div>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="ab-cta reveal">
+      <a href="#anfrage" class="btn btn--light">Unverbindliches Angebot</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ab-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 760px;
+    margin-inline: auto;
+    position: relative;
+  }
+
+  .ab-steps::before {
+    content: '';
+    position: absolute;
+    left: 27px;
+    top: 20px;
+    bottom: 20px;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .ab-step {
+    position: relative;
+    display: flex;
+    gap: 1.6rem;
+    padding-bottom: 2.2rem;
+  }
+  .ab-step:last-child { padding-bottom: 0; }
+
+  .ab-step__num {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.25rem;
+    border: 4px solid var(--ink);
+  }
+
+  .ab-step h3 {
+    margin: 0.55rem 0 0.35rem;
+    font-size: 1.2rem;
+  }
+  .ab-step p {
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0;
+  }
+
+  .ab-cta {
+    text-align: center;
+    margin-top: 3rem;
+  }
+</style>

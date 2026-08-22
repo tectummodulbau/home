@@ -1,0 +1,99 @@
+---
+import '@fontsource/urbanist/500.css';
+import '@fontsource/urbanist/600.css';
+import '@fontsource/urbanist/700.css';
+import '@fontsource/urbanist/800.css';
+import '@fontsource/hanken-grotesk/300.css';
+import '@fontsource/hanken-grotesk/400.css';
+import '@fontsource/hanken-grotesk/600.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PrivacyRoot from '../components/privacy/PrivacyRoot.astro';
+import ConsentModeDefaults from '../components/analytics/ConsentModeDefaults.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
+import { OG_IMAGE, SITE_NAME } from '../lib/seo/structured-data';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Seiten, die den FAQ-Abschnitt rendern, geben zusätzlich FAQPage-Schema aus. */
+  faqPage?: boolean;
+  /**
+   * Nimmt die Seite aus dem Suchindex. Für Seiten ohne eigenen Suchwert
+   * (Bestätigungsseiten o. Ä.) — der Admin-Bereich ist bereits über
+   * robots.txt und die Sitemap-Filter ausgeschlossen.
+   */
+  noindex?: boolean;
+}
+
+const { title, description, faqPage = false, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(OG_IMAGE.path, Astro.site);
+
+/**
+ * `max-image-preview:large` erlaubt Google das große Vorschaubild im
+ * Suchergebnis — ohne diese Angabe bleibt es beim Miniaturbild. `max-snippet`
+ * und `max-video-preview` heben die Längenbegrenzung auf, die einige
+ * europäische Rechtsräume sonst als Voreinstellung annehmen.
+ */
+const robots = noindex
+  ? 'noindex, follow'
+  : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Consent Mode v2 (Basic). Muss vor jedem Tag-Skript stehen und
+         wird deshalb als erstes Skript im head gerendert. Lädt selbst nichts
+         nach — siehe ConsentModeDefaults.astro. -->
+    <ConsentModeDefaults />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+
+    <!-- Open Graph. og:site_name ist hier nicht bloß Kosmetik fürs Teilen:
+         Google zieht den Wert als Signal für den „Site name“ im Suchergebnis
+         heran. Fehlt er, leitet Google den Namen selbst her und ersetzt auf
+         der Startseite gern den ganzen Titel damit. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content={OG_IMAGE.type} />
+    <meta property="og:image:width" content={String(OG_IMAGE.width)} />
+    <meta property="og:image:height" content={String(OG_IMAGE.height)} />
+    <meta property="og:image:alt" content={OG_IMAGE.alt} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={OG_IMAGE.alt} />
+
+    <meta name="theme-color" content="#14130f" />
+
+    <JsonLd faqPage={faqPage} />
+
+    <!-- Seitenweites Tracking (CTA-, Kontakt-, Abschnitts- und FAQ-Events).
+         Als Modul deferred geladen, blockiert das Rendering nicht. Sendet
+         nichts ohne Statistik-Zustimmung. -->
+    <script src="../scripts/analytics-init.ts"></script>
+  </head>
+  <body>
+    <Header />
+    <slot />
+    <Footer />
+    <PrivacyRoot />
+  </body>
+</html>

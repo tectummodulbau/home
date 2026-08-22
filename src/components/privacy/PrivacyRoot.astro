@@ -1,0 +1,16 @@
+---
+// Einstiegspunkt der Consent-Lösung — einmal in Layout.astro eingebunden.
+// Entscheidet zur Build-/Request-Zeit anhand der Service-Registry, ob
+// Zustand A (nur notwendig) oder Zustand B (Banner + Kategorien) gilt.
+import PrivacyWidget from './PrivacyWidget.astro';
+import PrivacyBanner from './PrivacyBanner.astro';
+import PrivacyDialog from './PrivacyDialog.astro';
+---
+
+<PrivacyWidget />
+<PrivacyBanner />
+<PrivacyDialog />
+
+<script>
+  import '../../lib/consent/manager';
+</script>

@@ -1,0 +1,23 @@
+{
+  "name": "tectum-modulbau",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource/hanken-grotesk": "^5.3.0",
+    "@fontsource/urbanist": "^5.3.0",
+    "astro": "^7.1.6"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@cloudflare/workers-types": "^5.20260731.1",
+    "typescript": "^6.0.3"
+  }
+}

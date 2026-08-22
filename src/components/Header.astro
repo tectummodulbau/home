@@ -1,0 +1,290 @@
+---
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/#module', label: 'Module' },
+  { href: '/#konfiguration', label: 'Konfiguration' },
+  { href: '/#ablauf', label: 'Ablauf' },
+  { href: '/#kontakt', label: 'Kontakt' },
+];
+---
+
+<header class="site-header" id="site-header">
+  <div class="site-header__inner">
+    <a href="/" class="site-header__brand" aria-label="Tectum Modulbau — Startseite">
+      <span>Tectum <em>Modulbau</em></span>
+    </a>
+
+    <nav class="site-header__nav" id="site-nav" aria-label="Hauptnavigation">
+      {links.map((l) => <a href={l.href}>{l.label}</a>)}
+      <a href="/#anfrage" class="site-header__nav-cta">
+        Unverbindliches Angebot
+        <span class="site-header__nav-cta-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8" /></svg>
+        </span>
+      </a>
+    </nav>
+
+    <div class="site-header__right">
+      <a href="/#anfrage" class="site-header__cta">
+        <span class="site-header__cta-label">Unverbindliches Angebot</span>
+        <span class="site-header__cta-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8" /></svg>
+        </span>
+      </a>
+
+      <button class="site-header__burger" id="nav-toggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="site-nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: clamp(0.8rem, 2vw, 1.5rem);
+    z-index: 60;
+    padding-inline: 20%;
+  }
+
+  @media (max-width: 1180px) {
+    .site-header { padding-inline: 10%; }
+  }
+
+  @media (max-width: 640px) {
+    .site-header { padding-inline: 7%; }
+  }
+
+  .site-header__inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "brand nav right";
+    align-items: center;
+    column-gap: clamp(0.6rem, 2vw, 1.5rem);
+    height: 68px;
+    padding-left: 1.5rem;
+    padding-right: 0.6rem;
+    border-radius: 999px;
+    background: var(--ink);
+    box-shadow: var(--shadow-md);
+  }
+
+  .site-header__brand {
+    grid-area: brand;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+    color: var(--paper);
+  }
+  .site-header__brand em {
+    font-style: normal;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .site-header__nav {
+    grid-area: nav;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.9rem, 1.6vw, 1.3rem);
+  }
+  .site-header__nav a {
+    font-family: var(--font-head);
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.72);
+    transition: color 0.15s ease;
+  }
+  .site-header__nav a:hover { color: var(--paper); }
+  .site-header__nav a[href="/"] { color: var(--paper); }
+
+  .site-header__nav-cta { display: none; }
+
+  .site-header__right {
+    grid-area: right;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .site-header__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-shrink: 0;
+    font-family: var(--font-head);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    border-radius: 999px;
+    padding: 0.4rem 0.4rem 0.4rem 1.1rem;
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .site-header__cta:hover {
+    background: var(--sand);
+    transform: translateY(-1px);
+  }
+  .site-header__cta-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    flex-shrink: 0;
+  }
+
+  .site-header__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .site-header__burger span {
+    display: block;
+    height: 2px;
+    background: var(--paper);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  @media (max-width: 920px) {
+    .site-header__burger { display: flex; }
+
+    .site-header__inner {
+      grid-template-columns: 1fr auto 1fr;
+      grid-template-areas: ". brand right";
+      height: auto;
+      min-height: 54px;
+      padding-left: 0.9rem;
+      padding-right: 0.5rem;
+      column-gap: 0.5rem;
+    }
+
+    .site-header__brand { justify-self: center; }
+    .site-header__right { justify-self: end; }
+
+    /* CTA im Header-Balken auf Mobile ausblenden — wandert ins Overlay */
+    .site-header__cta { display: none; }
+
+    .site-header__burger {
+      width: 36px;
+      height: 36px;
+      padding: 8px;
+      gap: 4px;
+    }
+    .site-header__burger span { height: 1.5px; }
+
+    [aria-expanded='true'] span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+    [aria-expanded='true'] span:nth-child(2) { opacity: 0; }
+    [aria-expanded='true'] span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+    /* Full-Screen Off-Canvas Overlay */
+    .site-header__nav {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 0;
+      padding: clamp(4.5rem, 12vw, 6rem) clamp(1.5rem, 6vw, 2.5rem) clamp(2rem, 6vw, 3rem);
+      background: var(--ink);
+      z-index: 1;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
+      overflow-y: auto;
+    }
+    .site-header__nav.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s;
+    }
+    .site-header__nav a {
+      padding: 1.1rem 0.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 1.25rem;
+      color: var(--paper);
+    }
+
+    .site-header__nav a.site-header__nav-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: clamp(1.5rem, 5vw, 2.2rem);
+      padding: 1rem 1rem 1rem 1.4rem;
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 999px;
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: none;
+    }
+    .site-header__nav-cta-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--paper);
+      flex-shrink: 0;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const nav = document.getElementById('site-nav');
+
+  function setOpen(open: boolean) {
+    if (!nav || !toggle) return;
+    nav.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  toggle?.addEventListener('click', () => {
+    const willOpen = !nav?.classList.contains('is-open');
+    setOpen(willOpen);
+  });
+
+  nav?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) {
+      setOpen(false);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav?.classList.contains('is-open')) setOpen(false);
+  });
+</script>

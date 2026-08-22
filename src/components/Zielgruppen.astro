@@ -1,0 +1,138 @@
+---
+import { Image } from 'astro:assets';
+import imgCamping from '../assets/zielgruppe-camping.jpg';
+import imgKommunen from '../assets/zielgruppe-kommunen.jpg';
+import imgWohnpark from '../assets/zielgruppe-wohnpark.jpg';
+import imgMesse from '../assets/zielgruppe-messe.jpg';
+
+const gruppen = [
+  {
+    img: imgCamping,
+    alt: 'Modulhäuser von Tectum als Glamping-Unterkünfte auf einem Campingplatz',
+    title: 'Campingplatz­betreiber',
+    text: 'Individuell konfigurierte Camping- und Glamping-Units für Ihren Betrieb — ganzjährig nutzbar, anders als klassische Mobilheime. Auf Wunsch mit Sauna, Fitness oder Loungebereich.',
+  },
+  {
+    img: imgWohnpark,
+    alt: 'Wohnpark mit modularen Wohneinheiten von Tectum Modulbau',
+    title: 'Wohnparks & Freizeitparks',
+    text: 'Schlaf-, Wohn- und Luxuseinheiten für den Dauerbetrieb. Erweiterbar. Ertragsstark.',
+  },
+  {
+    img: imgKommunen,
+    alt: 'Modulhäuser als Unterkünfte für Kommunen und Arbeitnehmer',
+    title: 'Kommunen & Arbeitgeber',
+    text: 'Funktionale Einheiten für temporäre oder dauerhafte Nutzung. Flexibel auf- und abbaubar.',
+  },
+  {
+    img: imgMesse,
+    alt: 'Repräsentatives Modulhaus von Tectum für Messen und Ausstellungen',
+    title: 'Messen & Ausstellungen',
+    text: 'Repräsentative Einheiten für temporäre oder dauerhafte Präsenz, flexibel aufstellbar und wieder abbaubar.',
+  },
+];
+---
+
+<section class="section section--dark" id="zielgruppen">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-kicker">Einsatzbereiche</span>
+      <h2>Ihr Projekt. Unsere Einheiten. Fertig geliefert.</h2>
+      <p class="section-lead">
+        Ob Campingplatz, Wohnpark, kommunale Unterkunft oder Messeauftritt: Tectum liefert
+        skalierbare Modulhäuser, die sich exakt an Ihren Bedarf anpassen. Kein langer
+        Planungsvorlauf. Keine Baustelle im klassischen Sinne. Fertig ab Werk.
+      </p>
+    </div>
+
+    <div class="zg-grid">
+      {gruppen.map((g) => (
+        <article class="zg-card reveal">
+          <div class="zg-card__media">
+            <Image src={g.img} alt={g.alt} widths={[400, 700]} sizes="(max-width: 680px) 100vw, 50vw" />
+          </div>
+          <div class="zg-card__body">
+            <h3>{g.title}</h3>
+            <p>{g.text}</p>
+            <a href="#anfrage" class="zg-card__link">Projekt anfragen <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .zg-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.6rem);
+  }
+
+  .zg-card {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--ink);
+  }
+
+  .zg-card__media img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    opacity: 0.92;
+    transition: transform 0.5s ease, opacity 0.4s ease;
+  }
+  .zg-card:hover .zg-card__media img {
+    transform: scale(1.04);
+    opacity: 0.75;
+  }
+
+  .zg-card__body {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 1.6rem 1.8rem;
+    color: var(--paper);
+    background: linear-gradient(to top, rgba(20, 19, 15, 0.92) 20%, rgba(20, 19, 15, 0.55) 65%, transparent);
+    padding-top: 4rem;
+  }
+  .zg-card__body h3 { margin-bottom: 0.35rem; }
+  .zg-card__body p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.98rem;
+    margin-bottom: 0.7rem;
+    max-width: 30rem;
+  }
+
+  .zg-card__link {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+    color: var(--paper);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    padding-bottom: 2px;
+  }
+  .zg-card__link:hover { border-color: var(--paper); }
+  .zg-card__link span {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+  .zg-card__link:hover span { transform: translateX(4px); }
+
+  @media (max-width: 1080px) {
+    .zg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .zg-card__media img { height: 340px; }
+  }
+  @media (max-width: 680px) {
+    .zg-grid { grid-template-columns: 1fr; }
+    .zg-card__media img { height: 280px; }
+  }
+
+  @media (max-width: 920px) {
+    :global(#zielgruppen .section-head--center) {
+      margin-inline: 0;
+      text-align: left;
+    }
+  }
+</style>

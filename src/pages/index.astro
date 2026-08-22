@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Zielgruppen from '../components/Zielgruppen.astro';
+import Vorteile from '../components/Vorteile.astro';
+import StatsBand from '../components/StatsBand.astro';
+import Module from '../components/Module.astro';
+import Werk from '../components/Werk.astro';
+import Galerie from '../components/Galerie.astro';
+import Konfiguration from '../components/Konfiguration.astro';
+import Vergleich from '../components/Vergleich.astro';
+import Rechner from '../components/Rechner.astro';
+import Ablauf from '../components/Ablauf.astro';
+import Faq from '../components/Faq.astro';
+import LeadForm from '../components/LeadForm.astro';
+---
+
+<Layout
+  title="Schlüsselfertige Modulhäuser & Mobilheime | Tectum Modulbau"
+  description="Schlüsselfertige Modulhäuser, Mobilheime & Tiny Houses für Campingplätze, Wohnparks und Kommunen. DGNB-zertifiziert, ab Werk in Wochen. Kauf oder Leasing."
+  faqPage
+>
+  <main>
+    <Hero />
+    <Zielgruppen />
+    <Vorteile />
+    <Module />
+    <StatsBand />
+    <Werk />
+    <Galerie />
+    <Konfiguration />
+    <Vergleich />
+    <Rechner />
+    <Ablauf />
+    <Faq />
+    <LeadForm />
+  </main>
+</Layout>
+
+<script src="../scripts/reveal.ts"></script>

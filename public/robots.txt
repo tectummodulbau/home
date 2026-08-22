@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Admin-Bereich und API (Cloudflare Functions) gehören nicht in den Index
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://tectum-modulbau.de/sitemap-index.xml

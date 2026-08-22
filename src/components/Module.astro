@@ -1,0 +1,175 @@
+---
+import { Image } from 'astro:assets';
+import imgSchlaf from '../assets/modul-schlafeinheit.jpg';
+import imgWohn from '../assets/modul-wohnraumeinheit.jpg';
+import imgLuxus from '../assets/modul-luxuseinheit.jpg';
+
+const module = [
+  {
+    img: imgSchlaf,
+    alt: 'Schlafbereich im Modulhaus Schlafeinheit von Tectum',
+    badge: 'Maximale Belegung',
+    title: 'Schlafeinheit',
+    subtitle: 'Modulare Unterkunft · 4 Personen',
+    text: 'Die kompakte Lösung für maximale Belegung. Zwei Schlafzimmer mit je zwei Betten und einem vollausgestatteten Badezimmer. Ideal für Campingplätze, Wohnparks und Arbeitnehmerunterkünfte.',
+    features: ['2 Schlafzimmer', '4 Betten', 'Vollbad', 'Klimaanlage', 'Wärmepumpe', 'PV optional'],
+  },
+  {
+    img: imgWohn,
+    alt: 'Wohnraum mit Küche im Modulhaus Wohnraumeinheit von Tectum',
+    badge: 'Für Langzeitbelegung',
+    title: 'Wohnraumeinheit',
+    subtitle: 'Modulare Unterkunft · 4 Personen',
+    text: 'Wohnen auf kompakter Fläche — mit allem, was es braucht. Küche, Wohnraum, Schlafbereich und Badezimmer unter einem Dach. Für Familien, Langzeitbelegung und gehobene Freizeitanlagen.',
+    features: ['Küche', 'Wohnbereich', 'Schlafbereich', 'Vollbad', 'Klimaanlage', 'Wärmepumpe', 'PV optional'],
+  },
+  {
+    img: imgLuxus,
+    alt: 'Luxuseinheit von Tectum — Premium-Modulhaus für Glamping-Anlagen',
+    badge: 'Premium',
+    title: 'Luxuseinheit',
+    subtitle: 'Modulare Unterkunft · 4 Personen',
+    text: 'Großzügige Flächen, hochwertige Ausstattung. Die Premiumoption für Glamping-Anlagen und exklusive Wohnparks. Mehr Raum in Küche, Bad, Wohnbereich und Schlafzimmer.',
+    features: ['Erweiterte Fläche', 'Premium-Küche', 'Wohnbereich', 'Schlafbereich', 'Vollbad', 'Klimaanlage', 'PV optional'],
+  },
+];
+---
+
+<section class="section section--dark" id="module">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-kicker">Unsere Module</span>
+      <h2>Drei Grundmodule. Beliebig kombinierbar.</h2>
+      <p class="section-lead">
+        Jedes Modulhaus wird schlüsselfertig geliefert — wählen Sie das Modul, das zu Ihrem
+        Betrieb passt, und kombinieren Sie beliebig.
+      </p>
+    </div>
+
+    <div class="md-grid">
+      {module.map((m) => (
+        <article class="md-card card reveal">
+          <div class="md-card__media">
+            <Image src={m.img} alt={m.alt} widths={[400, 700]} sizes="(max-width: 920px) 100vw, 33vw" />
+            <span class="md-card__badge">{m.badge}</span>
+          </div>
+          <div class="md-card__body">
+            <h3>{m.title}</h3>
+            <p class="md-card__subtitle">{m.subtitle}</p>
+            <p class="md-card__text">{m.text}</p>
+            <p class="md-card__features-label">Ausstattung</p>
+            <ul class="md-card__features">
+              {m.features.map((f) => <li class="chip">{f}</li>)}
+            </ul>
+            <a href="#anfrage" class="btn btn--ghost md-card__cta">Angebot anfragen</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .md-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.2rem, 2.5vw, 2rem);
+    align-items: stretch;
+  }
+
+  .md-card {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .md-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .md-card__media {
+    position: relative;
+  }
+  .md-card__media img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+  }
+  .md-card__badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-family: var(--font-head);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+  }
+
+  .md-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.6rem 1.6rem 1.8rem;
+  }
+
+  .md-card__body h3 { margin-bottom: 0.15rem; }
+
+  .md-card__subtitle {
+    font-size: 0.88rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: var(--font-head);
+    font-weight: 600;
+    margin-bottom: 0.9rem;
+  }
+
+  .md-card__text {
+    color: var(--muted);
+    font-size: 0.98rem;
+  }
+
+  .md-card__features-label {
+    font-family: var(--font-head);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0.4rem 0 0.6rem;
+  }
+
+  .md-card__features {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding: 0;
+    margin: 0 0 1.5rem;
+  }
+  .md-card__features :global(.chip) {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  .md-card__cta {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  @media (max-width: 920px) {
+    .md-grid { grid-template-columns: 1fr; }
+    .md-card__media img { height: 300px; }
+
+    :global(#module .section-head--center) {
+      margin-inline: 0;
+      text-align: left;
+    }
+  }
+</style>

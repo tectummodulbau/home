@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import imgProduktion from '../assets/galerie-produktion.jpg';
+
+const punkte = [
+  {
+    title: 'Vorfertigung im Werk',
+    text: 'CNC-gesteuerte Fertigung in unserer eigenen Werkstatt — witterungsunabhängig und in gleichbleibender Qualität.',
+  },
+  {
+    title: 'Qualitätskontrolle',
+    text: 'Jede Einheit durchläuft eine geprüfte Endabnahme nach DGNB- und TÜV-Standard, bevor sie das Werk verlässt.',
+  },
+  {
+    title: 'Lieferung ab Werk',
+    text: 'Schlüsselfertiger Transport direkt zu Ihrem Standort — keine klassische Baustelle, keine Wartezeit vor Ort.',
+  },
+];
+---
+
+<section class="section section--dark werk" id="werk">
+  <div class="container werk-grid">
+    <figure class="werk-visual reveal">
+      <Image
+        src={imgProduktion}
+        alt="CNC-Fertigung der Modulhäuser im Tectum Werk"
+        widths={[480, 900]}
+        sizes="(max-width: 920px) 100vw, 45vw"
+      />
+    </figure>
+
+    <div class="werk-copy">
+      <span class="section-kicker">Unser Werk</span>
+      <h2>Gebaut im Werk. Nicht auf der Baustelle.</h2>
+      <p class="section-lead">
+        Alle Tectum Module entstehen in unserer eigenen Fertigung — witterungsunabhängig,
+        DGNB-zertifiziert und in konstanter Qualität, bevor sie schlüsselfertig zu Ihnen
+        geliefert werden.
+      </p>
+
+      <ul class="werk-list">
+        {punkte.map((p) => (
+          <li class="reveal">
+            <strong>{p.title}</strong>
+            <span>{p.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .werk-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+
+  .werk-visual {
+    margin: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .werk-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .werk-copy .section-lead {
+    max-width: 34rem;
+  }
+
+  .werk-list {
+    list-style: none;
+    margin: 2.2rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+  }
+  .werk-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding-left: 1.2rem;
+    border-left: 2px solid var(--accent);
+  }
+  .werk-list strong {
+    font-family: var(--font-head);
+    font-size: 1.05rem;
+  }
+  .werk-list span {
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  @media (max-width: 920px) {
+    .werk-grid { grid-template-columns: 1fr; }
+    .werk-visual { order: -1; }
+  }
+</style>

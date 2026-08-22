@@ -1,0 +1,409 @@
+---
+// Ertragsrechner — Berechnungslogik 1:1 von der Original-Seite übernommen:
+// Umsatz = 365 × Auslastung × Preis × Einheiten
+// Netto  = Umsatz − Leasing (KFZ-Brief) − 25 % Betrieb − bisheriger Ertrag
+// ROI    = (Leasingrate × 7) / Netto
+---
+
+<section class="section section--stone" id="rechner">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-kicker">Ertragsrechner</span>
+      <h2>Ihr Ertragspotenzial auf einen Blick.</h2>
+      <p class="section-lead">Rechnen Sie selbst, wie schnell sich Ihre Einheiten amortisieren.</p>
+    </div>
+
+    <div class="rc reveal">
+      <div class="rc__inputs">
+        <div class="rc__tabs" role="tablist" aria-label="Modulvariante wählen">
+          <button class="rc__tab is-active" data-variant="schlaf" role="tab" aria-selected="true">Schlafeinheit</button>
+          <button class="rc__tab" data-variant="family" role="tab" aria-selected="false">Wohnraumeinheit</button>
+          <button class="rc__tab" data-variant="luxus" role="tab" aria-selected="false">Luxuseinheit</button>
+        </div>
+
+        <div class="rc__chips" id="rc-chips" aria-live="polite"></div>
+
+        <div class="rc__slider">
+          <div class="rc__slider-head">
+            <label for="rc-module">Anzahl Einheiten</label>
+            <output id="rc-val-module">10</output>
+          </div>
+          <input type="range" id="rc-module" min="10" max="50" value="10" />
+          <p class="rc__hint">Mindestbestellmenge: 10 Einheiten — skalierbar bis zum ganzen Park.</p>
+        </div>
+
+        <div class="rc__slider">
+          <div class="rc__slider-head">
+            <label for="rc-auslastung">Auslastung pro Jahr</label>
+            <output id="rc-val-auslastung">60&nbsp;%</output>
+          </div>
+          <input type="range" id="rc-auslastung" min="30" max="95" value="60" />
+          <p class="rc__hint">Erfahrungswert: 55–70 % — ganzjährig dank Klimaanlage &amp; Wärmepumpe.</p>
+        </div>
+
+        <div class="rc__slider">
+          <div class="rc__slider-head">
+            <label for="rc-preis">Preis pro Nacht</label>
+            <output id="rc-val-preis">95&nbsp;€</output>
+          </div>
+          <input type="range" id="rc-preis" min="50" max="300" value="95" />
+          <p class="rc__hint">Vergleichbare Parks: 80–160 € pro Nacht.</p>
+        </div>
+
+        <div class="rc__slider">
+          <div class="rc__slider-head">
+            <label for="rc-heute">Heutiger Ertrag / Jahr (gesamt)</label>
+            <output id="rc-val-heute">15.000&nbsp;€</output>
+          </div>
+          <input type="range" id="rc-heute" min="0" max="200000" step="1000" value="15000" />
+          <p class="rc__hint">Was die Fläche heute bereits einbringt (z.&nbsp;B. Stellplätze, Pacht).</p>
+        </div>
+      </div>
+
+      <div class="rc__results">
+        <p class="rc__results-label">Netto-Mehrertrag</p>
+        <p class="rc__netto" id="rc-netto" aria-live="polite">+0&nbsp;€</p>
+        <p class="rc__netto-sub">pro Jahr</p>
+
+        <div class="rc__roi" id="rc-roi-badge">
+          <span>ROI-Amortisation</span>
+          <strong id="rc-roi">–</strong>
+        </div>
+
+        <dl class="rc__rows">
+          <div><dt>Vermietungsumsatz (neu)</dt><dd id="rc-umsatz">—</dd></div>
+          <div><dt>Leasing (KFZ-Brief-Rate)</dt><dd id="rc-leasing">—</dd></div>
+          <div><dt>Betriebskosten (25&nbsp;%)</dt><dd id="rc-betrieb">—</dd></div>
+          <div><dt>Bisheriger Ertrag</dt><dd id="rc-heute-res">—</dd></div>
+        </dl>
+
+        <p class="rc__disclaimer">
+          365 Nächte × Auslastung × Preis × Einheiten − Leasing (KFZ-Brief) − 25 % Betrieb −
+          bisheriger Ertrag. Exakte Projektrechnung auf Anfrage.
+        </p>
+
+        <a href="#anfrage" class="btn btn--light rc__cta">Unverbindliche Projektprüfung</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .rc {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: clamp(1.2rem, 3vw, 2.4rem);
+    max-width: 1020px;
+    margin-inline: auto;
+  }
+
+  .rc__inputs {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+  }
+
+  .rc__tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.1rem;
+  }
+
+  .rc__tab {
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.55rem 1.15rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .rc__tab:hover { border-color: var(--ink); }
+  .rc__tab.is-active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .rc__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.6rem;
+    min-height: 1.8rem;
+  }
+  .rc__chips :global(.chip) { font-size: 0.75rem; }
+
+  .rc__slider { margin-bottom: 1.35rem; }
+  .rc__slider:last-child { margin-bottom: 0; }
+
+  .rc__slider-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+  }
+  .rc__slider-head label {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .rc__slider-head output {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.05rem;
+  }
+
+  .rc__slider input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--ink) 0%, var(--sand) 0%);
+    outline: none;
+    cursor: pointer;
+  }
+  .rc__slider input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 3px solid var(--paper);
+    box-shadow: 0 1px 6px rgba(20, 19, 15, 0.35);
+  }
+  .rc__slider input[type='range']::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 3px solid var(--paper);
+    box-shadow: 0 1px 6px rgba(20, 19, 15, 0.35);
+  }
+
+  .rc__hint {
+    font-size: 0.83rem;
+    color: var(--muted);
+    margin: 0.45rem 0 0;
+  }
+
+  .rc__results {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: var(--radius-lg);
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rc__results-label {
+    font-family: var(--font-head);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.3rem;
+  }
+
+  .rc__netto {
+    font-family: var(--font-head);
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--accent);
+  }
+  .rc__netto.is-negative { color: #e08a7a; }
+
+  .rc__netto-sub {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.9rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .rc__roi {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius);
+    padding: 0.8rem 1.1rem;
+    margin-bottom: 1.4rem;
+    font-size: 0.95rem;
+  }
+  .rc__roi strong {
+    font-family: var(--font-head);
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+  .rc__roi.is-good {
+    border-color: var(--accent);
+  }
+  .rc__roi.is-good strong { color: var(--accent); }
+
+  .rc__rows {
+    margin: 0 0 1.2rem;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .rc__rows div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.93rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.55rem;
+  }
+  .rc__rows dt { color: rgba(255, 255, 255, 0.62); }
+  .rc__rows dd {
+    margin: 0;
+    font-family: var(--font-head);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .rc__disclaimer {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 1.3rem;
+  }
+
+  .rc__cta {
+    margin-top: auto;
+    justify-content: center;
+  }
+
+  @media (max-width: 860px) {
+    .rc { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  import { createDebouncedTracker, trackOnce } from '../lib/analytics/tracker';
+
+  // Werte und Formel entsprechen dem Rechner der Original-Seite
+  const VARIANTS: Record<string, { leasing: number; preisDefault: number; chips: string[] }> = {
+    schlaf: { leasing: 9600, preisDefault: 95, chips: ['2 Schlafzimmer', '4 Betten', 'Vollbad', 'Klimaanlage', 'Wärmepumpe'] },
+    family: { leasing: 12000, preisDefault: 120, chips: ['Küche', 'Wohnbereich', 'Schlafbereich', 'Vollbad', 'Klimaanlage', 'Wärmepumpe'] },
+    luxus: { leasing: 15600, preisDefault: 175, chips: ['Erweiterte Fläche', 'Premium-Küche', 'Wohnbereich', 'Schlafbereich', 'Vollbad', 'Klimaanlage'] },
+  };
+
+  let variant = 'schlaf';
+
+  /**
+   * Zuletzt berechneter Netto-Mehrertrag. `update()` schreibt ihn mit, damit
+   * calculator_configured die Formel nicht ein zweites Mal nachbauen muss.
+   */
+  let letzterMehrertrag = 0;
+
+  /**
+   * Wird nach 2 Sekunden ohne weitere Interaktion gefeuert. Ohne die Bremse
+   * würde jede Slider-Bewegung ein eigenes Event erzeugen.
+   */
+  const meldeKonfiguration = createDebouncedTracker('calculator_configured', 2000);
+
+  function meldeInteraktion() {
+    trackOnce('calculator_interact', 'calculator_interact');
+    meldeKonfiguration(() => ({
+      // Beschriftung des aktiven Tabs statt des internen Schlüssels — im
+      // Report lesbar und immer synchron mit der Oberfläche.
+      modultyp: document.querySelector('.rc__tab.is-active')?.textContent ?? variant,
+      anzahl_einheiten: +input('rc-module').value,
+      auslastung: +input('rc-auslastung').value,
+      preis_pro_nacht: +input('rc-preis').value,
+      berechneter_mehrertrag: letzterMehrertrag,
+    }));
+  }
+
+  const $ = (id: string) => document.getElementById(id) as HTMLElement;
+  const input = (id: string) => document.getElementById(id) as HTMLInputElement;
+
+  const fmt = (n: number) => Math.abs(Math.round(n)).toLocaleString('de-DE') + ' €';
+  const fmtSign = (n: number) => (n >= 0 ? '+' : '−') + fmt(n);
+
+  function renderChips() {
+    $('rc-chips').innerHTML = VARIANTS[variant].chips
+      .map((c) => `<span class="chip">${c}</span>`)
+      .join('');
+  }
+
+  function paintTrack(el: HTMLInputElement) {
+    const p = ((+el.value - +el.min) / (+el.max - +el.min)) * 100;
+    el.style.background = `linear-gradient(to right, var(--ink) ${p}%, var(--sand) ${p}%)`;
+  }
+
+  function update() {
+    const mod = +input('rc-module').value;
+    const aus = +input('rc-auslastung').value / 100;
+    const prs = +input('rc-preis').value;
+    const heu = +input('rc-heute').value;
+    const v = VARIANTS[variant];
+
+    $('rc-val-module').textContent = String(mod);
+    $('rc-val-auslastung').textContent = Math.round(aus * 100) + ' %';
+    $('rc-val-preis').textContent = prs + ' €';
+    $('rc-val-heute').textContent = heu.toLocaleString('de-DE') + ' €';
+
+    const umsatz = 365 * aus * prs * mod;
+    const leasing = v.leasing * mod;
+    const betrieb = umsatz * 0.25;
+    const netto = umsatz - leasing - betrieb - heu;
+
+    letzterMehrertrag = netto;
+
+    const nettoEl = $('rc-netto');
+    nettoEl.textContent = fmtSign(netto);
+    nettoEl.classList.toggle('is-negative', netto < 0);
+
+    $('rc-umsatz').textContent = '+' + fmt(umsatz);
+    $('rc-leasing').textContent = '−' + fmt(leasing);
+    $('rc-betrieb').textContent = '−' + fmt(betrieb);
+    $('rc-heute-res').textContent = '−' + fmt(heu);
+
+    const inv = leasing * 7;
+    let years: number | null = null;
+    if (netto > 0) {
+      years = inv / netto;
+      $('rc-roi').textContent =
+        years < 1 ? '< 1 Jahr' : Math.ceil(years) + (Math.ceil(years) === 1 ? ' Jahr' : ' Jahre');
+    } else {
+      $('rc-roi').textContent = '–';
+    }
+    $('rc-roi-badge').classList.toggle('is-good', years !== null && years < 8);
+
+    ['rc-module', 'rc-auslastung', 'rc-preis', 'rc-heute'].forEach((id) => paintTrack(input(id)));
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.rc__tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      variant = tab.dataset.variant ?? 'schlaf';
+      document.querySelectorAll('.rc__tab').forEach((t) => {
+        t.classList.toggle('is-active', t === tab);
+        t.setAttribute('aria-selected', String(t === tab));
+      });
+      input('rc-preis').value = String(VARIANTS[variant].preisDefault);
+      renderChips();
+      update();
+      meldeInteraktion();
+    });
+  });
+
+  ['rc-module', 'rc-auslastung', 'rc-preis', 'rc-heute'].forEach((id) =>
+    input(id).addEventListener('input', () => {
+      update();
+      meldeInteraktion();
+    })
+  );
+
+  renderChips();
+  update();
+</script>

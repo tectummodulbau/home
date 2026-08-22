@@ -1,0 +1,56 @@
+---
+/**
+ * Google Consent Mode v2 — Default-Signale.
+ *
+ * MUSS als erstes Skript im <head> stehen, vor jedem Tag-Skript. Deshalb
+ * `is:inline`: das Snippet wird unverändert in das HTML geschrieben und
+ * synchron ausgeführt, statt von Astro gebündelt und deferred zu werden.
+ *
+ * Was hier passiert, verlässt den Browser nicht — `gtag()` schreibt lediglich
+ * in ein lokales Array (`window.dataLayer`). Es wird kein Skript nachgeladen
+ * und kein Request abgesetzt. Der Google-Tag selbst lädt ausschließlich über
+ * die Consent-Registry nach erteilter Statistik-Zustimmung
+ * (src/lib/consent/registry.ts).
+ *
+ * Betriebsmodus: BASIC. Im Advanced-Modus würde der Google-Tag bereits vor der
+ * Entscheidung laden und cookielose Pings senden. Das widerspricht der Linie
+ * dieser Seite (kein Third-Party-Script vor Zustimmung) und wurde bewusst
+ * nicht gewählt.
+ *
+ * Zuordnung Kategorie → Signal (einzige Definition im Projekt):
+ *   Statistik  → analytics_storage
+ *   Marketing  → ad_storage, ad_user_data, ad_personalization
+ *   functionality_storage und security_storage sind technisch notwendig und
+ *   von Beginn an `granted`.
+ */
+import { CONSENT_EVENT } from '../../lib/consent/state';
+
+const snippet = `
+window.dataLayer = window.dataLayer || [];
+function gtag(){window.dataLayer.push(arguments);}
+window.gtag = window.gtag || gtag;
+
+gtag('consent', 'default', {
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+  analytics_storage: 'denied',
+  functionality_storage: 'granted',
+  security_storage: 'granted'
+});
+
+document.addEventListener(${JSON.stringify(CONSENT_EVENT)}, function (event) {
+  var categories = (event && event.detail && event.detail.categories) || [];
+  var analytics = categories.indexOf('analytics') !== -1 ? 'granted' : 'denied';
+  var marketing = categories.indexOf('marketing') !== -1 ? 'granted' : 'denied';
+  gtag('consent', 'update', {
+    analytics_storage: analytics,
+    ad_storage: marketing,
+    ad_user_data: marketing,
+    ad_personalization: marketing
+  });
+});
+`.trim();
+---
+
+<script is:inline set:html={snippet}></script>

@@ -1,0 +1,28 @@
+---
+// Eigenes, reduziertes Tectum-Symbol: zwei versetzte Gebäudemodule mit
+// angedeuteter Dachlinie und einem geometrischen Fenster. Keine externe
+// Icon-Bibliothek, keine Kopie eines Zertifizierungslogos.
+interface Props {
+  size?: number;
+}
+const { size = 22 } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  <rect x="3" y="10" width="9" height="10" rx="0.5" />
+  <path d="M3 10l2.6-2.2h3.8L12 10" />
+  <rect x="12.6" y="6.4" width="8" height="13.6" rx="0.5" />
+  <path d="M12.6 6.4l2.6-2.2h2.8l2.6 2.2" />
+  <rect x="5.8" y="14" width="2.8" height="2.8" />
+</svg>

@@ -1,0 +1,717 @@
+---
+// 4-Schritte-Anfrage auf EINER Seite — ersetzt den alten Multi-Page-Flow
+// (Home → /kunde/ → /zielsetzung/ → /angaben/). Felder und Optionen
+// entsprechen 1:1 dem Original-Formular.
+import { Image } from 'astro:assets';
+import modulTectumRender from '../assets/modul-tectum-render-v2.png';
+
+const abnehmerTypen = [
+  'Gewerblicher Betreiber – Campingplatz, Wohnpark oder Freizeitanlage',
+  'Kommune oder öffentliche Einrichtung',
+  'Projektentwickler – Gewerbliches Bauprojekt ab 10 Einheiten',
+  'Händler oder Reseller – Whitelabel-Produktion',
+  'Privater Grundstückseigentümer oder Family Office',
+  'Privatperson – Eigenbedarf auf eigenem Grundstück',
+];
+
+const vorhabenOptionen = [
+  'Erstbestückung einer neuen Anlage oder eines Areals',
+  'Erweiterung einer bestehenden Anlage',
+  'Saisonale oder temporäre Unterkünfte für Mitarbeiter oder Gäste',
+  'Whitelabel-Produktion für eigenen Vertrieb',
+  'Projekt in Planung – Beratung gewünscht',
+];
+
+const einheitenOptionen = [
+  '10 bis 20 Einheiten',
+  '21 bis 50 Einheiten',
+  '51 bis 100 Einheiten',
+  'Über 100 Einheiten',
+  'Noch unklar',
+];
+
+const erwerbOptionen = [
+  'Kauf – Direkterwerb',
+  'Leasing mit Rückkaufoption',
+  'Beides offen – ich möchte beide Modelle besprechen',
+];
+---
+
+<section class="section section--stone lf-section" id="anfrage">
+  <div class="container">
+    <div class="lf-layout">
+      <div class="lf-layout__form">
+        <div class="section-head reveal">
+          <span class="section-kicker">Anfrage</span>
+          <h2>Ihr Bedarf. Unser Angebot. Kostenlos und unverbindlich.</h2>
+          <p class="section-lead">
+            Schildern Sie uns Ihr Projekt — wir melden uns innerhalb von 24 Stunden mit einem
+            konkreten Vorschlag.
+          </p>
+        </div>
+
+        <form class="lf reveal" id="lead-form" novalidate>
+      <!-- Fortschritt -->
+      <div class="lf__progress" aria-hidden="true">
+        <div class="lf__progress-bar" id="lf-progress-bar"></div>
+      </div>
+      <p class="lf__step-label"><span id="lf-step-label">Schritt 1 von 4</span></p>
+
+      <!-- Schritt 1: Fläche -->
+      <fieldset class="lf__step is-active" data-step="1">
+        <legend>Haben Sie bereits eine Fläche?</legend>
+        <p class="lf__step-hint">Tectum Modulbau liefert ausschließlich auf vorhandene Grundstücke und Flächen.</p>
+
+        <div class="lf__options" role="radiogroup" aria-label="Fläche oder Grundstück vorhanden?">
+          <label class="lf__option">
+            <input type="radio" name="flaeche_vorhanden" value="Ja, Fläche ist vorhanden" required />
+            <span class="lf__option-card">
+              <strong>Ja</strong>
+              <span>Fläche oder Grundstück ist vorhanden</span>
+            </span>
+          </label>
+          <label class="lf__option">
+            <input type="radio" name="flaeche_vorhanden" value="Nein, noch keine Fläche vorhanden" />
+            <span class="lf__option-card">
+              <strong>Nein</strong>
+              <span>Noch keine Fläche vorhanden</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="lf__blocker" id="lf-blocker" hidden>
+          <h3>Aktuell keine Anfrage möglich.</h3>
+          <p>
+            Tectum Modulbau liefert ausschließlich auf bereits gesicherten Flächen. Sobald Ihr
+            Grundstück feststeht, freuen wir uns auf Ihre Anfrage.
+          </p>
+        </div>
+
+        <p class="field-error lf__step-error" hidden data-error-for="1">Bitte treffen Sie eine Auswahl.</p>
+      </fieldset>
+
+      <!-- Schritt 2: Rolle -->
+      <fieldset class="lf__step" data-step="2">
+        <legend>Als was nehmen Sie die Einheiten ab?</legend>
+        <p class="lf__step-hint">Damit wir Ihre Anfrage richtig einordnen und vorbereiten können.</p>
+
+        <div class="field">
+          <label for="lf-abnehmer">Ihre Rolle</label>
+          <select id="lf-abnehmer" name="abnehmer_typ" required>
+            <option value="">– Bitte wählen –</option>
+            {abnehmerTypen.map((o) => <option value={o}>{o}</option>)}
+          </select>
+          <span class="field-error">Bitte wählen Sie Ihre Rolle aus.</span>
+        </div>
+      </fieldset>
+
+      <!-- Schritt 3: Vorhaben -->
+      <fieldset class="lf__step" data-step="3">
+        <legend>Ihr Vorhaben</legend>
+        <p class="lf__step-hint">Drei kurze Angaben — damit wir bestens vorbereitet ins Gespräch gehen.</p>
+
+        <div class="field">
+          <label for="lf-vorhaben">Was planen Sie konkret?</label>
+          <select id="lf-vorhaben" name="vorhaben" required>
+            <option value="">– Bitte wählen –</option>
+            {vorhabenOptionen.map((o) => <option value={o}>{o}</option>)}
+          </select>
+          <span class="field-error">Bitte wählen Sie Ihr Vorhaben aus.</span>
+        </div>
+
+        <div class="field">
+          <label for="lf-einheiten">Wie viele Einheiten planen Sie ungefähr?</label>
+          <select id="lf-einheiten" name="einheitenanzahl" required>
+            <option value="">– Bitte wählen –</option>
+            {einheitenOptionen.map((o) => <option value={o}>{o}</option>)}
+          </select>
+          <span class="field-error">Bitte wählen Sie eine Größenordnung aus.</span>
+        </div>
+
+        <div class="field">
+          <label for="lf-erwerb">Wie möchten Sie die Einheiten erwerben?</label>
+          <select id="lf-erwerb" name="erwerbsmodell" required>
+            <option value="">– Bitte wählen –</option>
+            {erwerbOptionen.map((o) => <option value={o}>{o}</option>)}
+          </select>
+          <span class="field-error">Bitte wählen Sie ein Erwerbsmodell aus.</span>
+        </div>
+      </fieldset>
+
+      <!-- Schritt 4: Kontakt -->
+      <fieldset class="lf__step" data-step="4">
+        <legend>Ihre Kontaktdaten</legend>
+        <p class="lf__step-hint">Wir melden uns innerhalb von 24 Stunden persönlich bei Ihnen.</p>
+
+        <div class="lf__summary" id="lf-summary" aria-label="Zusammenfassung Ihrer Angaben"></div>
+
+        <div class="lf__row">
+          <div class="field">
+            <label for="lf-name">Vollständiger Name</label>
+            <input type="text" id="lf-name" name="vollname" placeholder="Vor- und Nachname" autocomplete="name" required />
+            <span class="field-error">Bitte geben Sie Ihren Namen an.</span>
+          </div>
+          <div class="field">
+            <label for="lf-firma">Unternehmen / Organisation <span class="optional">(optional)</span></label>
+            <input type="text" id="lf-firma" name="firma" placeholder="Unternehmen oder Organisation" autocomplete="organization" />
+          </div>
+        </div>
+
+        <div class="lf__row">
+          <div class="field">
+            <label for="lf-email">E-Mail-Adresse</label>
+            <input type="email" id="lf-email" name="email" placeholder="E-Mail-Adresse" autocomplete="email" required />
+            <span class="field-error">Bitte geben Sie eine gültige E-Mail-Adresse an.</span>
+          </div>
+          <div class="field">
+            <label for="lf-telefon">Telefon</label>
+            <input type="tel" id="lf-telefon" name="telefon" placeholder="Telefonnummer" autocomplete="tel" required />
+            <span class="field-error">Bitte geben Sie Ihre Telefonnummer an.</span>
+          </div>
+        </div>
+
+        <p class="lf__privacy">
+          Informationen zur Verarbeitung Ihrer Angaben finden Sie in unserer
+          <a href="/datenschutz/">Datenschutzerklärung</a>.
+        </p>
+      </fieldset>
+
+      <!-- Honeypot (Spam-Schutz) -->
+      <div class="lf__hp" aria-hidden="true">
+        <label for="lf-website">Website</label>
+        <input type="text" id="lf-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <!-- Navigation -->
+      <div class="lf__nav">
+        <button type="button" class="btn btn--ghost" id="lf-back" hidden>Zurück</button>
+        <button type="button" class="btn btn--primary" id="lf-next" disabled>Weiter</button>
+        <button type="submit" class="btn btn--primary" id="lf-submit" hidden>Anfrage absenden</button>
+      </div>
+
+      <!-- Erfolg -->
+      <div class="lf__success" id="lf-success" hidden>
+        <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m8 12.5 2.5 2.5L16 9.5" /></svg>
+        <h3>Vielen Dank für Ihre Anfrage!</h3>
+        <p>Wir haben Ihre Angaben erhalten und melden uns innerhalb von 24 Stunden persönlich bei Ihnen.</p>
+      </div>
+
+      <p class="lf__error" id="lf-error" hidden>
+        Beim Senden ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder rufen Sie uns
+        an: <a href="tel:+4920393565788">+49 203 935 657 88</a>.
+      </p>
+        </form>
+      </div>
+
+      <div class="lf-layout__visual reveal">
+        <Image
+          src={modulTectumRender}
+          alt="Schlüsselfertiges Modulhaus von Tectum — freistehende Ansicht"
+          widths={[500, 800, 1100]}
+          sizes="(max-width: 1080px) 100vw, 38vw"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lf-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 30%);
+    gap: clamp(2rem, 5vw, 3.5rem);
+    align-items: start;
+  }
+
+  .lf-layout__form {
+    max-width: 720px;
+  }
+
+  .lf-section {
+    overflow: hidden;
+    position: relative;
+    padding-block: 3vw;
+  }
+
+  .lf-layout__visual {
+    position: absolute;
+    top: 50%;
+    right: -14vw;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .lf-layout__visual img {
+    display: block;
+    width: 50vw;
+    max-width: none;
+    height: auto;
+  }
+
+  @media (max-width: 1080px) {
+    .lf-layout { grid-template-columns: 1fr; }
+    .lf-layout__form { max-width: none; }
+    .lf-layout__visual { display: none; }
+  }
+
+  .lf {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(1.6rem, 4vw, 2.8rem);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .lf__progress {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--sand);
+    overflow: hidden;
+  }
+  .lf__progress-bar {
+    height: 100%;
+    width: 25%;
+    background: var(--ink);
+    border-radius: inherit;
+    transition: width 0.35s ease;
+  }
+
+  .lf__step-label {
+    font-family: var(--font-head);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0.9rem 0 1.6rem;
+  }
+
+  .lf__step {
+    display: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .lf__step.is-active { display: block; }
+
+  .lf__step legend {
+    font-family: var(--font-head);
+    font-size: clamp(1.25rem, 2.5vw, 1.55rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    padding: 0;
+    margin-bottom: 0.4rem;
+  }
+
+  .lf__step-hint {
+    color: var(--muted);
+    margin-bottom: 1.6rem;
+  }
+
+  .lf__options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .lf__option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .lf__option-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.3rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    height: 100%;
+  }
+  .lf__option-card strong {
+    font-family: var(--font-head);
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+  .lf__option-card span { color: var(--muted); font-size: 0.92rem; }
+
+  .lf__option input:checked + .lf__option-card {
+    border-color: var(--ink);
+    background: var(--stone);
+    box-shadow: 0 0 0 3px rgba(20, 19, 15, 0.08);
+  }
+  .lf__option input:focus-visible + .lf__option-card {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .lf__blocker {
+    margin-top: 1.4rem;
+    border: 1.5px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--sand);
+    padding: 1.3rem 1.5rem;
+  }
+  .lf__blocker h3 { font-size: 1.05rem; margin-bottom: 0.35rem; }
+  .lf__blocker p { margin: 0; color: var(--ink-soft); font-size: 0.97rem; }
+
+  .lf__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 1.2rem;
+  }
+
+  .lf__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 1.5rem;
+  }
+  .lf__summary:empty { display: none; }
+  .lf__summary :global(.chip) { font-size: 0.78rem; white-space: normal; }
+
+  .lf__privacy {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0.3rem 0 0;
+  }
+
+  .lf__hp {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .lf__nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .lf__nav .btn[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  #lf-next, #lf-submit { margin-left: auto; }
+
+  .lf__step-error { margin-top: 1rem; }
+
+  .lf__success {
+    text-align: center;
+    padding: 2.5rem 1rem 1.5rem;
+  }
+  .lf__success svg { color: var(--green); margin-bottom: 0.8rem; }
+  .lf__success h3 { margin-bottom: 0.4rem; }
+  .lf__success p { color: var(--muted); margin: 0; }
+
+  .lf__error {
+    margin: 1.4rem 0 0;
+    color: var(--red);
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 640px) {
+    .lf__options, .lf__row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  // Tracking läuft ausschließlich über den zentralen Helfer. Die Formular-
+  // logik selbst ist unverändert — die Aufrufe hängen sich nur an die
+  // bestehenden Zustandswechsel an.
+  import { track, trackLead, trackOnce } from '../lib/analytics/tracker';
+
+  /**
+   * Schrittbezeichnungen für form_step_view. Reihenfolge entspricht
+   * data-step="1..4".
+   */
+  const STEP_NAMES = ['flaeche', 'rolle', 'vorhaben', 'kontakt'];
+
+  /**
+   * Feldnamen, die bei form_validation_error gemeldet werden dürfen. Das sind
+   * ausschließlich Qualifizierungsfelder und die Namen (nicht die Inhalte!)
+   * der Kontaktfelder — es wird nie ein eingegebener Wert übertragen.
+   */
+  const FIELD_LABELS: Record<string, string> = {
+    flaeche_vorhanden: 'flaeche_vorhanden',
+    abnehmer_typ: 'abnehmer_typ',
+    vorhaben: 'vorhaben',
+    einheitenanzahl: 'einheitenanzahl',
+    erwerbsmodell: 'erwerbsmodell',
+    vollname: 'vollname',
+    email: 'email',
+    telefon: 'telefon',
+  };
+
+  const form = document.getElementById('lead-form') as HTMLFormElement;
+  const steps = [...form.querySelectorAll<HTMLFieldSetElement>('.lf__step')];
+  const bar = document.getElementById('lf-progress-bar') as HTMLElement;
+  const stepLabel = document.getElementById('lf-step-label') as HTMLElement;
+  const backBtn = document.getElementById('lf-back') as HTMLButtonElement;
+  const nextBtn = document.getElementById('lf-next') as HTMLButtonElement;
+  const submitBtn = document.getElementById('lf-submit') as HTMLButtonElement;
+  const blocker = document.getElementById('lf-blocker') as HTMLElement;
+  const summary = document.getElementById('lf-summary') as HTMLElement;
+  const successBox = document.getElementById('lf-success') as HTMLElement;
+  const errorBox = document.getElementById('lf-error') as HTMLElement;
+
+  let current = 1;
+  const TOTAL = steps.length;
+
+  /** Höchster erreichter Schritt — Parameter von form_abandon. */
+  let maxStepReached = 1;
+  /** Wurde das Formular überhaupt angefasst? Steuert form_abandon. */
+  let formStarted = false;
+  /** Erfolgreich abgesendet — dann ist kein Abbruch mehr möglich. */
+  let formSubmitted = false;
+
+  const value = (name: string) => (new FormData(form).get(name) as string | null) ?? '';
+
+  /**
+   * Auswahl aus Schritt 1 auf ja/nein reduzieren. Der volle Optionstext ist
+   * für die Auswertung unnötig lang.
+   */
+  const flaecheKurz = () =>
+    flaecheValue().startsWith('Ja') ? 'ja' : flaecheValue().startsWith('Nein') ? 'nein' : '';
+
+  /**
+   * Qualifizierungsdaten für generate_lead. Enthält bewusst KEINE
+   * Kontaktdaten — weder Name, E-Mail, Telefon noch Firma dürfen als
+   * Event-Parameter das Haus verlassen.
+   */
+  function qualificationParams() {
+    return {
+      rolle: value('abnehmer_typ'),
+      einheiten_range: value('einheitenanzahl'),
+      erwerbsmodell: value('erwerbsmodell'),
+      flaeche_vorhanden: flaecheKurz(),
+    };
+  }
+
+  /** Gibt zurück, ob das Event die Consent-Sperre passiert hat. */
+  function trackStepView(n: number): boolean {
+    return track('form_step_view', { step_number: n, step_name: STEP_NAMES[n - 1] });
+  }
+
+  /** Meldet je ungültigem Pflichtfeld ein eigenes Event. */
+  function trackValidationErrors(n: number) {
+    const fs = steps[n - 1];
+    // Union-Typen sind als Generic für querySelectorAll nicht zulässig,
+    // deshalb die Zuweisung per Cast (gleiche Schreibweise wie stepValid()).
+    const fields = [...fs.querySelectorAll('input[required], select[required]')] as (
+      | HTMLInputElement
+      | HTMLSelectElement
+    )[];
+    const gemeldet = new Set<string>();
+    for (const field of fields) {
+      if (field.checkValidity()) continue;
+      const name = FIELD_LABELS[field.name];
+      if (!name || gemeldet.has(name)) continue;
+      gemeldet.add(name);
+      track('form_validation_error', { step_number: n, feldname: name });
+    }
+  }
+
+  const flaecheValue = () =>
+    (form.querySelector('input[name="flaeche_vorhanden"]:checked') as HTMLInputElement | null)?.value ?? '';
+
+  function stepValid(n: number): boolean {
+    if (n === 1) return flaecheValue() === 'Ja, Fläche ist vorhanden';
+    const fs = steps[n - 1];
+    return [...fs.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input[required], select[required]')]
+      .every((el) => el.checkValidity());
+  }
+
+  function markErrors(n: number) {
+    const fs = steps[n - 1];
+    fs.querySelectorAll<HTMLElement>('.field').forEach((f) => {
+      const el = f.querySelector<HTMLInputElement | HTMLSelectElement>('input[required], select[required]');
+      f.classList.toggle('has-error', !!el && !el.checkValidity());
+    });
+    if (n === 1) {
+      const err = fs.querySelector<HTMLElement>('[data-error-for="1"]');
+      if (err) err.hidden = flaecheValue() !== '';
+    }
+  }
+
+  function renderSummary() {
+    const data = new FormData(form);
+    const parts = [
+      data.get('flaeche_vorhanden'),
+      data.get('abnehmer_typ'),
+      data.get('vorhaben'),
+      data.get('einheitenanzahl'),
+      data.get('erwerbsmodell'),
+    ].filter(Boolean) as string[];
+    summary.innerHTML = parts
+      .map((p) => `<span class="chip">${p.split('–')[0].trim()}</span>`)
+      .join('');
+  }
+
+  function show(n: number) {
+    current = n;
+    maxStepReached = Math.max(maxStepReached, n);
+    steps.forEach((s, i) => s.classList.toggle('is-active', i === n - 1));
+    bar.style.width = `${(n / TOTAL) * 100}%`;
+    stepLabel.textContent = `Schritt ${n} von ${TOTAL}`;
+    backBtn.hidden = n === 1;
+    nextBtn.hidden = n === TOTAL;
+    submitBtn.hidden = n !== TOTAL;
+    nextBtn.disabled = !stepValid(n);
+    if (n === TOTAL) renderSummary();
+  }
+
+  // Jede echte Eingabe zählt als „Formular begonnen" — Grundlage für
+  // form_abandon. Capture-Phase, damit die Markierung unabhängig von den
+  // fachlichen Listenern unten greift.
+  form.addEventListener('input', () => { formStarted = true; }, true);
+  form.addEventListener('change', () => { formStarted = true; }, true);
+
+  // Schritt 1: Auswahl steuert Blocker + Weiter-Button
+  form.querySelectorAll<HTMLInputElement>('input[name="flaeche_vorhanden"]').forEach((r) =>
+    r.addEventListener('change', () => {
+      blocker.hidden = flaecheValue() !== 'Nein, noch keine Fläche vorhanden';
+      const err = form.querySelector<HTMLElement>('[data-error-for="1"]');
+      if (err) err.hidden = true;
+      nextBtn.disabled = !stepValid(1);
+    })
+  );
+
+  // Selects/Inputs: Weiter-Button live aktivieren
+  steps.forEach((fs, i) => {
+    fs.addEventListener('input', () => {
+      if (current === i + 1) nextBtn.disabled = !stepValid(current);
+      fs.querySelectorAll('.field.has-error').forEach((f) => {
+        const el = f.querySelector<HTMLInputElement | HTMLSelectElement>('input, select');
+        if (el?.checkValidity()) f.classList.remove('has-error');
+      });
+    });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (!stepValid(current)) {
+      markErrors(current);
+      trackValidationErrors(current);
+      return;
+    }
+    // Pro Schritt genau die im Schritt getroffene Auswahl mitgeben.
+    const abgeschlossen = current;
+    if (abgeschlossen === 1) {
+      track('form_step_complete', { step_number: 1, flaeche_vorhanden: flaecheKurz() });
+    } else if (abgeschlossen === 2) {
+      track('form_step_complete', { step_number: 2, rolle: value('abnehmer_typ') });
+    } else if (abgeschlossen === 3) {
+      track('form_step_complete', {
+        step_number: 3,
+        vorhaben: value('vorhaben'),
+        einheiten_range: value('einheitenanzahl'),
+        erwerbsmodell: value('erwerbsmodell'),
+      });
+    }
+    show(current + 1);
+    trackStepView(current);
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  backBtn.addEventListener('click', () => {
+    show(current - 1);
+    trackStepView(current);
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!stepValid(TOTAL)) {
+      markErrors(TOTAL);
+      trackValidationErrors(TOTAL);
+      return;
+    }
+
+    // Letzter Schritt gilt mit dem Absenden als abgeschlossen. Bewusst ohne
+    // Inhaltsdaten — Schritt 4 enthält ausschließlich Kontaktangaben.
+    track('form_step_complete', { step_number: 4 });
+
+    errorBox.hidden = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Wird gesendet…';
+
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    try {
+      const res = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      // Erfolg gilt erst als bestätigt, wenn der Endpunkt auch inhaltlich
+      // `ok: true` meldet — nicht schon bei HTTP 200.
+      const payload = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+      if (!payload?.ok) throw new Error('Antwort ohne Bestätigung');
+
+      // Erfolg: Formular-Inhalt ausblenden, Bestätigung zeigen
+      steps.forEach((s) => s.classList.remove('is-active'));
+      backBtn.hidden = true;
+      submitBtn.hidden = true;
+      stepLabel.textContent = 'Anfrage gesendet';
+      bar.style.width = '100%';
+      successBox.hidden = false;
+      successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      formSubmitted = true;
+      // Der Endpunkt beantwortet auch einen ausgefüllten Honeypot mit
+      // `ok: true`, um Bots nicht zu verraten (functions/api/lead.ts). Für die
+      // Conversion-Zählung wird dieser Fall hier ausgeschlossen.
+      const honeypotLeer = String(data.website ?? '').trim() === '';
+      if (honeypotLeer) trackLead(qualificationParams());
+    } catch {
+      errorBox.hidden = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Anfrage absenden';
+    }
+  });
+
+  show(1);
+
+  // form_start und die Ansicht von Schritt 1 zählen erst, wenn das Formular
+  // tatsächlich im Blickfeld war — es steht am Seitenende, ein Aufruf der
+  // Startseite allein ist noch kein Formularkontakt.
+  if (typeof IntersectionObserver !== 'undefined') {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          // form_start einmal pro Sitzung, die Schrittansicht einmal pro
+          // Seitenaufruf — sonst fehlt sie bei einem zweiten Besuch der Seite
+          // innerhalb derselben Sitzung.
+          trackOnce('form_start', 'form_start');
+          if (trackStepView(1)) observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(steps[0]);
+  }
+
+  // Abbruch: begonnen, aber nicht erfolgreich abgesendet. `visibilitychange`
+  // ist der einzige Weg, der auf Mobilgeräten zuverlässig feuert; `pagehide`
+  // fängt den Desktop-Fall ab, in dem der Tab direkt geschlossen wird.
+  let abandonGemeldet = false;
+  function meldeAbbruch() {
+    if (abandonGemeldet || formSubmitted || !formStarted) return;
+    abandonGemeldet = true;
+    track('form_abandon', { step_number: maxStepReached });
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') meldeAbbruch();
+  });
+  window.addEventListener('pagehide', meldeAbbruch);
+</script>

@@ -1,0 +1,268 @@
+---
+import {
+  CATEGORY_LABELS,
+  getNecessaryServices,
+  getRuntimeServices,
+  getServicesByCategory,
+  type ConsentCategory,
+} from '../../lib/consent/registry';
+
+const mockEnabled = import.meta.env.DEV && import.meta.env.PUBLIC_CONSENT_MOCK === '1';
+const services = getRuntimeServices(mockEnabled);
+const necessaryServices = getNecessaryServices(services);
+const optionalCategoryOrder: ConsentCategory[] = ['analytics', 'marketing', 'externalMedia'];
+
+const categoryDescriptions: Record<Exclude<ConsentCategory, 'necessary'>, string> = {
+  // Nicht „anonym": Google Analytics 4 setzt Cookies und arbeitet mit
+  // pseudonymen Kennungen. Die Formulierung muss zum Ist-Zustand passen.
+  analytics:
+    'Pseudonyme Auswertung der Websitenutzung, um Angebot und Inhalte zu verbessern (z. B. Reichweite, Nutzungsverhalten, Verlauf des Anfrageformulars).',
+  marketing:
+    'Erfolgsmessung von Werbekampagnen und personalisierte Werbung (z. B. Conversion-Tracking, Remarketing).',
+  externalMedia:
+    'Einbindung externer Inhalte wie Karten, Videos oder Social-Media-Elemente, die Daten an Drittanbieter übertragen können.',
+};
+---
+
+<dialog id="tectum-privacy-dialog" class="pd" aria-labelledby="pd-title">
+  <div class="pd__head">
+    <h2 id="pd-title">Datenschutz-Einstellungen</h2>
+    <button type="button" class="pd__close" data-privacy-close aria-label="Dialog schließen">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+    </button>
+  </div>
+
+  <div class="pd__body">
+    <p>
+      Wir verwenden notwendige Technologien für den sicheren Betrieb dieser Website.
+      Optionale Dienste für Statistik, Marketing oder externe Inhalte laden wir ausschließlich
+      nach Ihrer ausdrücklichen Zustimmung (Art. 6 Abs. 1 lit. a DSGVO, § 25 TDDDG). Ihre
+      Auswahl können Sie jederzeit widerrufen oder anpassen.
+    </p>
+
+    <fieldset class="pd__category">
+      <legend>
+        <span>{CATEGORY_LABELS.necessary}</span>
+        <span class="pd__always-on">Immer aktiv</span>
+      </legend>
+      <p class="pd__meta pd__cat-desc">
+        Diese Technologien sind für den Betrieb der Website zwingend erforderlich und
+        setzen keine Einwilligung voraus.
+      </p>
+      <ul class="pd__service-list">
+        {necessaryServices.map((service) => (
+          <li>
+            <strong>{service.name}</strong>
+            <span>{service.purpose} — Anbieter: {service.provider}</span>
+            <span class="pd__meta">{service.storageInfo}</span>
+          </li>
+        ))}
+      </ul>
+    </fieldset>
+
+    {optionalCategoryOrder.map((category) => {
+      const categoryServices = getServicesByCategory(category, services).filter((s) => s.enabled);
+      return (
+        <fieldset class="pd__category">
+          <legend>
+            <label class="pd__toggle">
+              <input type="checkbox" data-consent-category={category} />
+              <span>{CATEGORY_LABELS[category]}</span>
+            </label>
+          </legend>
+          <p class="pd__meta pd__cat-desc">{categoryDescriptions[category]}</p>
+          {categoryServices.length > 0 ? (
+            <ul class="pd__service-list">
+              {categoryServices.map((service) => (
+                <li>
+                  <strong>{service.name}</strong>
+                  <span>{service.purpose} — Anbieter: {service.provider}</span>
+                  <span class="pd__meta">{service.storageInfo}</span>
+                  {service.thirdCountryNotice && <span class="pd__meta">{service.thirdCountryNotice}</span>}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="pd__meta pd__cat-empty">
+              Derzeit sind in dieser Kategorie keine Dienste im Einsatz.
+            </p>
+          )}
+        </fieldset>
+      );
+    })}
+
+    <p class="pd__links">
+      <a href="/datenschutz/">Datenschutzerklärung</a>
+      <a href="/impressum/">Impressum</a>
+    </p>
+
+    <div class="pd__actions">
+      <button type="button" class="btn btn--ghost" id="pd-reject-all">Nur notwendige</button>
+      <button type="button" class="btn btn--ghost" id="pd-save">Auswahl speichern</button>
+      <button type="button" class="btn btn--primary" id="pd-accept-all">Alle akzeptieren</button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .pd {
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 0;
+    max-width: 560px;
+    width: min(92vw, 560px);
+    max-height: min(86vh, 720px);
+    box-shadow: var(--shadow-md);
+    color: var(--ink);
+    overflow: hidden;
+  }
+  /* dialog ist per UA-Stylesheet ohne [open] auf display:none gesetzt — das
+     gilt nur, solange kein Author-Stylesheet display anders definiert. Daher
+     display hier explizit an [open] binden statt bedingungslos zu setzen. */
+  .pd[open] {
+    display: flex;
+    flex-direction: column;
+  }
+  .pd::backdrop {
+    background: rgba(20, 19, 15, 0.55);
+  }
+
+  .pd__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.4rem 1.6rem;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+    background: var(--paper);
+  }
+  .pd__head h2 {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  .pd__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .pd__close:hover { background: var(--sand); }
+  .pd__close:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .pd__body {
+    padding: 1.4rem 1.6rem 1.6rem;
+    overflow-y: auto;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    min-height: 0;
+  }
+  .pd__body h3 {
+    font-size: 0.95rem;
+    margin: 1.4rem 0 0.6rem;
+  }
+
+  .pd__category {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    margin: 0 0 0.9rem;
+  }
+  .pd__category legend {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .pd__always-on {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .pd__toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    width: 100%;
+  }
+  .pd__toggle input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--ink);
+    cursor: pointer;
+  }
+  .pd__toggle input:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .pd__service-list {
+    list-style: none;
+    margin: 0.7rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+  .pd__service-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .pd__service-list strong {
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+    color: var(--ink);
+  }
+  .pd__service-list span { font-size: 0.85rem; }
+  .pd__meta { color: var(--muted); font-size: 0.78rem; }
+  .pd__cat-desc { margin: 0.5rem 0 0; font-size: 0.85rem; }
+  .pd__cat-empty { margin: 0.7rem 0 0; font-style: italic; }
+
+  .pd__links {
+    display: flex;
+    gap: 1.2rem;
+    margin: 1.2rem 0 0;
+  }
+  .pd__links a {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .pd__links a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .pd__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 1.6rem;
+  }
+  .pd__actions .btn { width: 100%; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pd {
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+  }
+</style>

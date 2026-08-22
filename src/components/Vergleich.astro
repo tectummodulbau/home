@@ -1,0 +1,147 @@
+---
+import bgImg from '../assets/vergleich-bg.jpg';
+
+const zeilen = [
+  {
+    label: 'Bauzeit',
+    konventionell: '12–24 Monate',
+    tectum: 'Lieferung ab Werk in wenigen Wochen',
+  },
+  {
+    label: 'Kapitalbindung',
+    konventionell: 'Hoch, lange vor Inbetriebnahme',
+    tectum: 'Gering durch kürzere Vorlaufzeit',
+  },
+  {
+    label: 'Finanzierung',
+    konventionell: 'Klassisch',
+    tectum: 'Kauf oder Leasing mit Rückkaufoption',
+  },
+  {
+    label: 'Erweiterung',
+    konventionell: 'Anbau als neues Bauprojekt',
+    tectum: 'Modular erweiterbar — Einheit für Einheit',
+  },
+  {
+    label: 'Wiederverkauf',
+    konventionell: 'Immobilie standortgebunden',
+    tectum: 'Rückkaufoption und Zweitmarkt',
+  },
+];
+---
+
+<section class="section vergleich" id="vergleich" style={`background-image: url(${bgImg.src})`}>
+  <div class="vergleich__overlay"></div>
+  <div class="container vergleich__inner">
+    <div class="section-head section-head--center reveal">
+      <span class="section-kicker">Der Vergleich</span>
+      <h2>Warum immer mehr Betreiber auf Modulbau setzen.</h2>
+    </div>
+
+    <div class="vg-table reveal" role="table" aria-label="Vergleich konventioneller Bau und Tectum Modulbau">
+      <div class="vg-row vg-row--head" role="row">
+        <span role="columnheader" class="vg-cell vg-cell--label"></span>
+        <span role="columnheader" class="vg-cell">Konventioneller Bau</span>
+        <span role="columnheader" class="vg-cell vg-cell--tectum">Tectum Modulbau</span>
+      </div>
+      {zeilen.map((z) => (
+        <div class="vg-row" role="row">
+          <span role="rowheader" class="vg-cell vg-cell--label">{z.label}</span>
+          <span role="cell" class="vg-cell vg-cell--konv">{z.konventionell}</span>
+          <span role="cell" class="vg-cell vg-cell--tectum">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+            {z.tectum}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .vergleich {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    color: var(--paper);
+  }
+  .vergleich .section-kicker { color: var(--accent); }
+  .vergleich .section-lead { color: rgba(255, 255, 255, 0.72); }
+
+  .vergleich__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(20, 19, 15, 0.82), rgba(20, 19, 15, 0.72));
+  }
+
+  .vergleich__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .vg-table {
+    max-width: 900px;
+    margin-inline: auto;
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .vg-row {
+    display: grid;
+    grid-template-columns: 0.8fr 1fr 1.2fr;
+    border-bottom: 1px solid var(--line);
+  }
+  .vg-row:last-child { border-bottom: 0; }
+
+  .vg-row--head {
+    background: var(--stone);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+  }
+
+  .vg-cell {
+    padding: 1.05rem 1.3rem;
+    font-size: 0.98rem;
+  }
+
+  .vg-cell--label {
+    font-family: var(--font-head);
+    font-weight: 700;
+  }
+
+  .vg-cell--konv { color: var(--muted); }
+
+  .vg-cell--tectum {
+    background: var(--sand);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .vg-cell--tectum svg {
+    flex-shrink: 0;
+    color: var(--accent);
+  }
+  .vg-row--head .vg-cell--tectum { color: var(--ink); }
+
+  @media (max-width: 680px) {
+    .vg-row { grid-template-columns: 1fr; }
+    .vg-cell--label {
+      padding-bottom: 0.2rem;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+    .vg-cell--konv { padding-block: 0.2rem; }
+    .vg-row--head { display: none; }
+    .vg-cell--konv::before {
+      content: 'Konventionell: ';
+      color: var(--muted);
+    }
+  }
+</style>
