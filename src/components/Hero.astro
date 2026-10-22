@@ -12,11 +12,11 @@ import { heroScene, heroSpots } from '../lib/iso/scenes';
 // damit die Logos auf Retina-Displays und beim CSS-Hochskalieren scharf
 // bleiben.
 const zertifikate = [
-  { src: logoDgnb, alt: 'DGNB — Deutsche Gesellschaft für Nachhaltiges Bauen' },
-  { src: logoTuevNord, alt: 'TÜV Nord zertifiziert' },
-  { src: logoTuevSued, alt: 'TÜV Süd zertifiziert' },
-  { src: logoFsc, alt: 'FSC-zertifiziertes Holz' },
-  { src: logoInnovator, alt: 'Innovator des Jahres 2025' },
+  { k: 0.72, src: logoDgnb, alt: 'DGNB — Deutsche Gesellschaft für Nachhaltiges Bauen' },
+  { k: 0.72, src: logoTuevNord, alt: 'TÜV Nord zertifiziert' },
+  { k: 1, src: logoTuevSued, alt: 'TÜV Süd zertifiziert' },
+  { k: 1, src: logoFsc, alt: 'FSC-zertifiziertes Holz' },
+  { k: 0.7, src: logoInnovator, alt: 'Innovator des Jahres 2025' },
 ];
 // Liste verdoppelt, damit der Slider (Mobil/Tablet) nahtlos loopt. Auf dem
 // Desktop stehen die Logos nebeneinander, die Kopien werden dort ausgeblendet.
@@ -77,7 +77,7 @@ const spots = heroSpots();
       <div class="hero__certs-track-wrap">
         <div class="hero__certs-track">
           {zertifikateLoop.map((z) => (
-            <span class:list={['hero__cert', { 'hero__cert--dup': z.dup }]} aria-hidden={z.dup ? 'true' : undefined}>
+            <span class:list={['hero__cert', { 'hero__cert--dup': z.dup }]} style={`--k:${z.k}`} aria-hidden={z.dup ? 'true' : undefined}>
               <Image src={z.src} alt={z.dup ? '' : z.alt} title={z.dup ? undefined : z.alt} height={80} densities={[1.5, 2, 3]} loading={z.dup ? 'lazy' : 'eager'} />
             </span>
           ))}
@@ -300,7 +300,7 @@ const spots = heroSpots();
   .hero__cert { display: inline-flex; align-items: center; flex-shrink: 0; }
   .hero__cert img {
     width: auto;
-    height: 58px;
+    height: calc(58px * var(--k, 1));
     object-fit: contain;
     transition: transform 0.25s ease;
   }
@@ -359,10 +359,10 @@ const spots = heroSpots();
     }
     .hero__trust-label { text-align: left; white-space: nowrap; font-size: 0.7rem; }
     .hero__certs-track-wrap { flex: 1; min-width: 0; }
-    .hero__cert img { height: 50px; }
+    .hero__cert img { height: calc(50px * var(--k, 1)); }
   }
   @media (min-width: 1280px) {
-    .hero__cert img { height: 64px; }
+    .hero__cert img { height: calc(68px * var(--k, 1)); }
   }
 
   /* Desktop: alle Logos passen nebeneinander, kein Slider */
@@ -373,7 +373,7 @@ const spots = heroSpots();
     }
     .hero__certs-track {
       width: 100%;
-      justify-content: space-between;
+      justify-content: space-evenly;
       gap: 1.5rem;
       animation: none;
     }
