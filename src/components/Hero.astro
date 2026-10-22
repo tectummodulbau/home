@@ -330,17 +330,17 @@ const spots = heroSpots();
       grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
       gap: clamp(1rem, 2vw, 2rem);
       align-items: start;
-      padding-block: clamp(6.2rem, 9vh, 7.2rem) 0.5rem;
+      padding-block: clamp(8rem, 13vh, 9.5rem) 0.5rem;
     }
     .hero__copy { position: relative; z-index: 2; }
-    /* Headline in einer Zeile; darf in die Bühne hineinragen */
-    h1 { white-space: nowrap; font-size: clamp(2.1rem, 3.7vw, 3.4rem); margin-bottom: 0.7rem; }
-    .hero__line--accent { white-space: normal; max-width: 30rem; }
-    .hero__kicker { margin-bottom: 1rem; }
-    .hero__lead { font-size: 1.05rem; line-height: 1.55; }
-    .hero__actions { margin-top: 1.2rem; }
-    .hero__micro { margin-top: 0.8rem; }
-    .hero__facts { margin-top: 1.2rem; padding-top: 1rem; }
+    /* Beide Überschriftzeilen je in einer Zeile; dürfen in die Bühne hineinragen */
+    h1 { white-space: nowrap; font-size: clamp(2.1rem, 3.7vw, 3.4rem); margin-bottom: 1.3rem; }
+    .hero__line--accent { white-space: nowrap; margin-top: 0.3em; font-size: 0.56em; }
+    .hero__kicker { margin-bottom: 1.6rem; }
+    .hero__lead { font-size: 1.05rem; line-height: 1.6; }
+    .hero__actions { margin-top: 1.6rem; }
+    .hero__micro { margin-top: 1rem; }
+    .hero__facts { margin-top: 1.8rem; padding-top: 1.3rem; }
     .hero__stage { margin-top: clamp(0.5rem, 3vh, 2.5rem); z-index: 1; }
 
     /* Zertifikate: schlanker Streifen unter dem ersten Bildschirm */
