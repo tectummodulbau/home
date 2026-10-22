@@ -409,6 +409,8 @@ und `description`; alles andere leitet sich daraus und aus
 | `OG_IMAGE` | `structured-data.ts` | `og:image`/`twitter:image` inkl. Maßen |
 | `SITE_URL` | `structured-data.ts` | Basis aller absoluten URLs im Schema |
 
+**Canonical-Host ist `https://www.tectum-modulbau.de`.** `SITE_URL` (structured-data.ts) und `SITE` (astro.config.mjs) müssen übereinstimmen; daraus entstehen Canonical, og:url, Sitemap und Schema. In `public/robots.txt` steht die Sitemap-URL ebenfalls mit `www`. Die Apex-Domain gehört per Cloudflare Redirect Rule (301) auf `www`.
+
 **Warum `SITE_NAME` an genau einer Stelle steht:** Google hat den Startseiten-
 titel im Suchergebnis durch einen selbst hergeleiteten Namen ersetzt
 („Tectum Modulbau“), obwohl `<title>` etwas anderes sagte. Das passiert, wenn

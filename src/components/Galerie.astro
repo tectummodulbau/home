@@ -6,10 +6,10 @@ import imgWohnraum from '../assets/galerie-wohnraum.jpg';
 import imgPool from '../assets/addon-aussenanlage.jpg';
 
 const bilder = [
-  { img: imgWellness, alt: 'Wellnessbereich einer Modulanlage von Tectum Modulbau', caption: 'Wellnessbereich', wide: true },
-  { img: imgWohnraum, alt: 'Innenausbau einer modularen Wohnraumeinheit von Tectum', caption: 'Wohnraumeinheit innen', wide: false },
-  { img: imgProduktion, alt: 'CNC-Fertigung der Modulhäuser in der Tectum Holzwerkstatt', caption: 'Fertigung im Werk', wide: false },
-  { img: imgPool, alt: 'Poolanlage als Außenbereich einer Tectum Moduleinheit', caption: 'Außenanlage mit Pool', wide: true },
+  { img: imgWellness, alt: 'Wellnessbereich mit Sauna in einer Modulhaus-Anlage von Tectum Modulbau für Glamping und Camping', title: 'Wellnessbereich einer Modulanlage', caption: 'Wellnessbereich', wide: true },
+  { img: imgWohnraum, alt: 'Innenausbau einer schlüsselfertigen modularen Wohneinheit von Tectum Modulbau', title: 'Wohnraumeinheit — Innenausbau', caption: 'Wohnraumeinheit innen', wide: false },
+  { img: imgProduktion, alt: 'CNC-Fertigung von Modulhäusern in der Holzwerkstatt von Tectum Modulbau', title: 'Vorfertigung im Werk', caption: 'Fertigung im Werk', wide: false },
+  { img: imgPool, alt: 'Poolanlage als Außenbereich einer Tiny-House-Anlage von Tectum Modulbau', title: 'Außenanlage mit Pool', caption: 'Außenanlage mit Pool', wide: true },
 ];
 ---
 
@@ -23,7 +23,7 @@ const bilder = [
     <div class="gal-grid">
       {bilder.map((b) => (
         <figure class={`gal-item reveal ${b.wide ? 'gal-item--wide' : ''}`}>
-          <Image src={b.img} alt={b.alt} widths={[500, 900]} sizes="(max-width: 720px) 100vw, 60vw" />
+          <Image src={b.img} alt={b.alt} title={b.title} widths={[500, 900]} sizes="(max-width: 720px) 100vw, 60vw" />
           <figcaption>{b.caption}</figcaption>
         </figure>
       ))}

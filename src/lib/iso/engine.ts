@@ -128,5 +128,5 @@ export function boundsOf(vs: V3[], pad = 20): Bounds {
 export function svg(id: string, b: Bounds, inner: string, label: string, cls = 'iso'): string {
   const w = Math.round(b.maxX - b.minX);
   const h = Math.round(b.maxY - b.minY);
-  return `<svg class="${cls}" viewBox="${Math.round(b.minX)} ${Math.round(b.minY)} ${w} ${h}" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${defs(id)}${inner}</svg>`;
+  return `<svg class="${cls}" viewBox="${Math.round(b.minX)} ${Math.round(b.minY)} ${w} ${h}" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg"><title>${label}</title>${defs(id)}${inner}</svg>`;
 }
