@@ -68,7 +68,7 @@ export interface ConsentService {
  * geänderte Kategorie, geänderter Zweck). Eine höhere Version als im
  * gespeicherten Consent löst automatisch eine erneute Abfrage aus.
  */
-export const CONSENT_VERSION = 2;
+export const CONSENT_VERSION = 3;
 
 export const CONSENT_STORAGE_KEY = 'tectum_privacy_consent';
 

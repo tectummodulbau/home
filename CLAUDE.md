@@ -75,11 +75,13 @@ src/scripts/motion.ts  Reveal, Scroll-Bühnen, Zähler, Parallax, Sticky-CTA, Le
 |---|---|---|---|
 | Cloudflare Hosting/Sicherheit | notwendig | aktiv | – |
 | Cloudflare Web Analytics | notwendig | aktiv, Skript kommt von der Plattform | – |
-| Google Analytics 4 (gtag direkt) | Statistik | aktiv, `G-ZLHWPYQ9LJ` | optional `PUBLIC_GA4_MEASUREMENT_ID` |
+| Google Analytics 4 (gtag direkt) | Statistik | **abgeschaltet** (`enabled: false` im Manifest), vorher `G-ZLHWPYQ9LJ` | optional `PUBLIC_GA4_MEASUREMENT_ID` |
 | Google Tag Manager | Statistik | vorbereitet, aus | `PUBLIC_GTM_ID` |
 | Google Ads | Marketing | vorbereitet, aus | `PUBLIC_GOOGLE_ADS_ID`, `PUBLIC_GOOGLE_ADS_LEAD_LABEL` |
 | Meta-Pixel | Marketing | vorbereitet, aus | `PUBLIC_META_PIXEL_ID` |
 | Google Maps | Externe Inhalte | vorbereitet, aus | `PUBLIC_GOOGLE_MAPS_API_KEY` |
+
+**Stand: GA4 ist abgeschaltet.** Damit gibt es keinen aktiven optionalen Dienst: kein Banner, der Dialog zeigt nur Notwendiges, die Datenschutzerklärung enthält keine Abschnitte zu GA4 und Consent Mode. Beim Wiedereinschalten `enabled: true`, `CONSENT_VERSION` erhöhen und die Abschnitte aus `docs/datenschutz-bausteine.md` wieder einfügen.
 
 **Kein GTM.** Die Messung läuft direkt über `gtag.js`. Der GTM-Eintrag bleibt
 nur als Option bestehen.

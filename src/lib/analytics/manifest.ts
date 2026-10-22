@@ -110,7 +110,7 @@ export const MEASUREMENT_CHANNELS: MeasurementChannel[] = [
     name: 'Google Analytics 4',
     provider: 'Google Ireland Limited',
     category: 'analytics',
-    enabled: true,
+    enabled: false,
     purpose:
       'Reichweite, Herkunft der Besucher, Nutzung der Seitenabschnitte sowie Verlauf und Abschluss des Anfrageformulars.',
     env: [
