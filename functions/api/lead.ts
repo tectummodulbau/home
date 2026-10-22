@@ -1,18 +1,17 @@
 /**
  * Cloudflare Pages Function: nimmt Anfragen des Step-Formulars entgegen,
- * speichert sie in Supabase (Tabelle `leads`, siehe supabase/schema.sql)
+ * speichert sie in D1 (Tabelle `leads`, siehe d1/schema.sql)
  * und leitet sie zusätzlich per E-Mail weiter (Resend, https://resend.com).
  *
- * Benötigte Umgebungsvariablen (Cloudflare Pages → Settings → Environment variables):
- *   SUPABASE_URL              — z. B. https://xxxxx.supabase.co
- *   SUPABASE_SERVICE_ROLE_KEY — Service-Role-Key (geheim, nur serverseitig!)
+ * Benötigt das D1-Binding `DB` (wrangler.toml) sowie die Umgebungsvariablen
+ * (Cloudflare Pages → Settings → Environment variables):
  *   RESEND_API_KEY — API-Key von Resend (nur serverseitig, nie im Client-Bundle)
  *   LEAD_TO_EMAIL  — Empfängeradresse (produktiv: info@tectum-modulbau.de)
  *   LEAD_FROM_EMAIL — Verifizierte Absenderadresse (z. B. anfrage@tectum-modulbau.de)
  *
  * Ohne konfigurierten API-Key antwortet der Endpoint mit 200 und loggt den
  * Lead nur — so bleibt das Formular in Preview-Umgebungen funktionsfähig.
- * Gleiches gilt für Supabase: fehlen die Variablen, wird der Insert übersprungen.
+ * Gleiches gilt für D1: fehlt das Binding, wird der Insert übersprungen.
  *
  * Hinweis Rate Limiting: Der In-Memory-Zähler unten ist ein Best-Effort-Schutz
  * innerhalb einer warmen Worker-Instanz und KEIN Ersatz für eine echte,
@@ -22,8 +21,7 @@
  */
 
 interface Env {
-  SUPABASE_URL?: string;
-  SUPABASE_SERVICE_ROLE_KEY?: string;
+  DB?: D1Database;
   RESEND_API_KEY?: string;
   LEAD_TO_EMAIL?: string;
   LEAD_FROM_EMAIL?: string;
@@ -100,31 +98,35 @@ interface LeadRow {
   telefon: string;
 }
 
-/** Best-effort: schreibt den Lead in die Supabase-Tabelle `leads`. Ein
+/** Best-effort: schreibt den Lead in die D1-Tabelle `leads`. Ein
  * Fehlschlag blockiert nicht den restlichen Versand (E-Mail bleibt der
  * primäre, garantierte Kanal), wird aber geloggt. */
-async function saveToSupabase(env: Env, row: LeadRow): Promise<void> {
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.log('Lead nicht in Supabase gespeichert (SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY fehlen).');
+async function saveToDatabase(env: Env, row: LeadRow): Promise<void> {
+  if (!env.DB) {
+    console.log('Lead nicht in D1 gespeichert (Binding DB fehlt).');
     return;
   }
 
   try {
-    const res = await fetch(`${env.SUPABASE_URL}/rest/v1/leads`, {
-      method: 'POST',
-      headers: {
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=minimal',
-      },
-      body: JSON.stringify(row),
-    });
-    if (!res.ok) {
-      console.error('Supabase-Insert fehlgeschlagen, Status', res.status);
-    }
+    await env.DB.prepare(
+      `INSERT INTO leads (id, flaeche_vorhanden, abnehmer_typ, vorhaben, einheitenanzahl, erwerbsmodell, vollname, firma, email, telefon)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+      .bind(
+        crypto.randomUUID(),
+        row.flaeche_vorhanden ?? null,
+        row.abnehmer_typ ?? null,
+        row.vorhaben ?? null,
+        row.einheitenanzahl ?? null,
+        row.erwerbsmodell ?? null,
+        row.vollname,
+        row.firma ?? null,
+        row.email,
+        row.telefon
+      )
+      .run();
   } catch (err) {
-    console.error('Supabase-Insert-Fehler', err);
+    console.error('D1-Insert-Fehler', err);
   }
 }
 
@@ -210,7 +212,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const telefon = sanitize(lead.telefon);
 
-  await saveToSupabase(env, {
+  await saveToDatabase(env, {
     flaeche_vorhanden: lead.flaeche_vorhanden,
     abnehmer_typ: lead.abnehmer_typ,
     vorhaben: lead.vorhaben,

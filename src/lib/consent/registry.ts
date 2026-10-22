@@ -15,8 +15,8 @@
  * docs/datenschutz-bausteine.md.
  *
  * Ausnahme beim `enabled`-Flag: Für die vier Messkanäle (GA4, Google Ads,
- * Meta-Pixel, GTM) steht es in src/lib/analytics/manifest.ts. Grund ist die
- * Analyseübersicht unter /admin/analyse — sie läuft als Pages Function im
+ * Meta-Pixel, GTM) steht es in src/lib/analytics/manifest.ts. Grund war die
+ * früheren Analyseübersicht im Admin-Bereich — sie lief als Pages Function im
  * Worker und kann diese Datei nicht importieren, weil hier `window`,
  * `document` und `location` vorkommen. Das Flag an zwei Stellen zu pflegen
  * wäre die schlechtere Antwort gewesen; load()/cleanup() bleiben hier.
@@ -208,7 +208,6 @@ export const SERVICES: ConsentService[] = [
     // setzen und PUBLIC_GOOGLE_ADS_ID sowie PUBLIC_GOOGLE_ADS_LEAD_LABEL in
     // Cloudflare Pages hinterlegen. Die Conversion selbst feuert der Tracker
     // beim bestätigten generate_lead (src/lib/analytics/tracker.ts → trackLead).
-    // Den aktuellen Stand zeigt /admin/analyse.
     enabled: CHANNEL_ENABLED['google-ads'],
     requiredEnv: ['PUBLIC_GOOGLE_ADS_ID', 'PUBLIC_GOOGLE_ADS_LEAD_LABEL'],
     privacyNotice:
@@ -250,7 +249,6 @@ export const SERVICES: ConsentService[] = [
     // setzen und PUBLIC_META_PIXEL_ID hinterlegen — mehr ist nicht nötig. Der
     // Tracker reicht die in manifest.ts zugeordneten Standardereignisse
     // (Lead, Contact, InitiateCheckout, CustomizeProduct) automatisch weiter.
-    // Den aktuellen Stand zeigt /admin/analyse.
     enabled: CHANNEL_ENABLED['meta-pixel'],
     requiredEnv: ['PUBLIC_META_PIXEL_ID'],
     privacyNotice:

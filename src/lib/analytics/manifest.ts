@@ -6,7 +6,8 @@
  *
  *   1. src/lib/consent/registry.ts   — bezieht das `enabled`-Flag der Messkanäle
  *   2. src/lib/analytics/tracker.ts  — bezieht die Zuordnung zu Meta-Standardevents
- *   3. functions/admin/analyse.ts    — rendert daraus die Analyseübersicht
+ *   3. (früher) die Analyseübersicht im Admin-Bereich — entfernt; die Datei
+ *      bleibt frei von Browser-APIs, damit sie auch serverseitig lesbar ist
  *
  * Punkt 3 ist der Grund für die Datei: eine Cloudflare Pages Function läuft
  * im Worker, nicht im Browser. Sie darf registry.ts nicht importieren, weil
