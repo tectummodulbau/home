@@ -43,6 +43,9 @@ export async function fetchLeads(env: LeadEnv): Promise<LeadFetchResult> {
     return { ok: true, leads: results };
   } catch (err) {
     console.error('D1-Abfrage-Fehler', err);
-    return { ok: false, status: 502, message: 'Fehler beim Laden der Leads.' };
+    // Bewusst nicht 502: Cloudflare ersetzt 502-Antworten durch eine generische
+    // Fehlerseite und die Meldung ginge verloren. Der Bereich ist ohnehin per Login geschützt.
+    const detail = err instanceof Error ? err.message : String(err);
+    return { ok: false, status: 500, message: `Fehler beim Laden der Leads: ${detail}` };
   }
 }
