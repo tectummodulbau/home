@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Seite nicht gefunden | Tectum Modulbau"
+  description="Diese Seite existiert nicht oder wurde verschoben. Zurück zur Startseite von Tectum Modulbau — schlüsselfertige Modulhäuser und Tiny Houses."
+  noindex
+>
+  <main class="section notfound">
+    <div class="container">
+      <p class="section-kicker">Fehler 404</p>
+      <h1>Seite nicht gefunden</h1>
+      <p class="section-lead">
+        Die gewünschte Seite existiert nicht oder wurde verschoben. Hier geht es weiter:
+      </p>
+      <p class="notfound__actions">
+        <a class="btn btn--primary btn--lg" href="/">Zur Startseite</a>
+        <a class="btn btn--lg" href="/#module">Unsere Module</a>
+        <a class="btn btn--lg" href="/#anfrage">Projekt anfragen</a>
+      </p>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .notfound { min-height: 60vh; display: grid; align-items: center; text-align: center; }
+  .notfound__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 2rem; }
+</style>
