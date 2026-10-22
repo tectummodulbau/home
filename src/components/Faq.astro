@@ -3,6 +3,12 @@
 // FAQPage-Schema im <head> (src/lib/seo/structured-data.ts). Antworten also
 // dort pflegen, nicht hier.
 import { FAQS, normalizeText } from '../lib/content/faq';
+
+// Die ersten Einträge sind sofort sichtbar, der Rest steht im Markup (lesbar und
+// indexierbar) und klappt über den Button auf.
+const VISIBLE = 5;
+const first = FAQS.slice(0, VISIBLE);
+const rest = FAQS.slice(VISIBLE);
 ---
 
 <section class="section section--sand" id="faq">
@@ -16,8 +22,8 @@ import { FAQS, normalizeText } from '../lib/content/faq';
       <a href="#anfrage" class="btn btn--primary">Jetzt kontaktieren</a>
     </div>
 
-    <div class="faq__list">
-      {FAQS.map((f) => (
+    <div class="faq__list" id="faq-list">
+      {first.map((f) => (
         <details class="faq__item reveal">
           <summary>
             <span>{f.q}</span>
@@ -26,6 +32,29 @@ import { FAQS, normalizeText } from '../lib/content/faq';
           <p>{normalizeText(f.a)}</p>
         </details>
       ))}
+
+      {rest.length > 0 && (
+        <div class="faq__more" id="faq-more">
+          <div class="faq__more-inner">
+            {rest.map((f) => (
+              <details class="faq__item reveal">
+          <summary>
+            <span>{f.q}</span>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          </summary>
+          <p>{normalizeText(f.a)}</p>
+        </details>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {rest.length > 0 && (
+        <button type="button" class="btn btn--ghost faq__toggle" id="faq-toggle" aria-expanded="false" aria-controls="faq-more" hidden>
+          <span data-label>Weitere FAQs anzeigen ({rest.length})</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+        </button>
+      )}
     </div>
   </div>
 </section>
@@ -79,7 +108,67 @@ import { FAQS, normalizeText } from '../lib/content/faq';
     color: var(--muted);
   }
 
+  /* Zugeklappt nur mit JavaScript (html.js-faq); ohne bleibt alles offen sichtbar.
+     Der Inhalt bleibt im DOM und wird nur per Höhe/visibility versteckt. */
+  .faq__more { display: grid; grid-template-rows: 1fr; }
+  .faq__more-inner {
+    display: grid;
+    gap: 0.9rem;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .faq__more.is-collapsed {
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    margin-top: -0.9rem;
+  }
+  .faq__more.is-animated {
+    transition: grid-template-rows 0.4s ease, margin-top 0.4s ease, visibility 0s linear 0s;
+  }
+  .faq__more.is-animated.is-collapsed {
+    transition: grid-template-rows 0.4s ease, margin-top 0.4s ease, visibility 0s linear 0.4s;
+  }
+
+  .faq__toggle { justify-self: center; gap: 0.5rem; margin-top: 0.4rem; }
+  .faq__toggle svg { transition: transform 0.25s ease; }
+  .faq__toggle[aria-expanded='true'] svg { transform: rotate(180deg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq__more.is-animated,
+    .faq__more.is-animated.is-collapsed { transition: none; }
+  }
+
   @media (max-width: 860px) {
     .faq__grid { grid-template-columns: 1fr; }
   }
 </style>
+
+<script>
+  const more = document.getElementById('faq-more');
+  const toggle = document.getElementById('faq-toggle');
+  if (more && toggle) {
+    const label = toggle.querySelector<HTMLElement>('[data-label]')!;
+    const count = more.querySelectorAll('details').length;
+    const list = document.getElementById('faq-list')!;
+
+    // Erst mit JavaScript zuklappen — ohne bleiben alle Antworten sichtbar.
+    more.classList.add('is-collapsed');
+    toggle.hidden = false;
+
+    const set = (open: boolean) => {
+      more.classList.toggle('is-collapsed', !open);
+      toggle.setAttribute('aria-expanded', String(open));
+      label.textContent = open ? 'Weniger anzeigen' : `Weitere FAQs anzeigen (${count})`;
+      if (!open) {
+        more.querySelectorAll('details').forEach((d) => d.removeAttribute('open'));
+        const top = list.getBoundingClientRect().top;
+        if (top < 0) list.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
+    };
+
+    toggle.addEventListener('click', () => {
+      more.classList.add('is-animated');
+      set(more.classList.contains('is-collapsed'));
+    });
+  }
+</script>
