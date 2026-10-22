@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rsync:*)",
+      "Bash(tar:*)",
+      "Bash(cp:*)",
+      "Bash(git rm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm ci)",
+      "Bash(npm run build)",
+      "Bash(npx tsc --noEmit)"
+    ]
+  }
+}
