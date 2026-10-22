@@ -35,7 +35,9 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 130px;
+  /* Anker landen bündig am oberen Rand; die Kopfleiste blendet sich dabei aus
+     (siehe Header.astro, Sprung-Logik). */
+  scroll-padding-top: 0;
 }
 
 body {

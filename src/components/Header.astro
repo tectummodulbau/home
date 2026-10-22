@@ -5,7 +5,6 @@ const links = [
   { href: '/#konfigurator', label: 'Konfigurator' },
   { href: '/#rechner', label: 'Rendite' },
   { href: '/#ablauf', label: 'Ablauf' },
-  { href: '/#faq', label: 'FAQ' },
 ];
 ---
 
@@ -299,10 +298,21 @@ const links = [
   const header = document.getElementById('site-header');
   let lastY = scrollY;
   let ticking = false;
+  // Beim Sprung zu einem Anker bleibt die Kopfleiste ausgeblendet, damit der
+  // Abschnitt bündig am oberen Rand beginnt (scroll-padding-top: 0) und nichts
+  // vom Abschnitt davor oder von der Leiste verdeckt wird. Ein späteres
+  // Hochscrollen blendet sie wieder ein.
+  let jumping = false;
+  let jumpTimer: number | undefined;
+  function endJump() { jumping = false; lastY = Math.max(scrollY, 0); }
   function onScroll() {
     const y = Math.max(scrollY, 0);
     const open = nav?.classList.contains('is-open');
-    if (open || y < 80) header?.classList.remove('is-hidden');
+    if (jumping) {
+      header?.classList.toggle('is-hidden', y >= 80 && !open);
+      clearTimeout(jumpTimer);
+      jumpTimer = window.setTimeout(endJump, 200);
+    } else if (open || y < 80) header?.classList.remove('is-hidden');
     else if (Math.abs(y - lastY) > 6) header?.classList.toggle('is-hidden', y > lastY);
     lastY = y;
     ticking = false;
@@ -310,6 +320,15 @@ const links = [
   addEventListener('scroll', () => {
     if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
   }, { passive: true });
+  document.addEventListener('click', (e) => {
+    const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href*="#"]');
+    if (!a || e.defaultPrevented) return;
+    const url = new URL(a.href, location.href);
+    if (url.pathname !== location.pathname || !url.hash || !document.querySelector(url.hash)) return;
+    jumping = true;
+    clearTimeout(jumpTimer);
+    jumpTimer = window.setTimeout(endJump, 1500);
+  });
   header?.addEventListener('focusin', () => header.classList.remove('is-hidden'));
 
   document.addEventListener('keydown', (e) => {
