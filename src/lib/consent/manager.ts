@@ -4,7 +4,7 @@
  * registry.ts eingetragenen Dienste. Enthält keine dienstspezifische Logik —
  * die liegt ausschließlich in registry.ts.
  */
-import { getRuntimeServices, type ConsentCategory } from './registry';
+import { getRuntimeServices, hasAnyActiveOptionalService, type ConsentCategory } from './registry';
 import {
   OPTIONAL_CATEGORIES,
   getGrantedCategories,
@@ -139,6 +139,9 @@ function init() {
   document.getElementById('pd-accept-all')?.addEventListener('click', acceptAll);
   document.getElementById('pd-reject-all')?.addEventListener('click', rejectAll);
   document.getElementById('pd-save')?.addEventListener('click', saveDialogSelection);
+
+  // Ohne aktiven optionalen Dienst gibt es nichts, wozu man einwilligen könnte.
+  if (!hasAnyActiveOptionalService(SERVICES)) return;
 
   const consent = readConsent();
   if (isConsentValid(consent)) {

@@ -4,12 +4,14 @@ import {
   getNecessaryServices,
   getRuntimeServices,
   getServicesByCategory,
+  hasAnyActiveOptionalService,
   type ConsentCategory,
 } from '../../lib/consent/registry';
 
 const mockEnabled = import.meta.env.DEV && import.meta.env.PUBLIC_CONSENT_MOCK === '1';
 const services = getRuntimeServices(mockEnabled);
 const necessaryServices = getNecessaryServices(services);
+const hasOptional = hasAnyActiveOptionalService(services);
 const optionalCategoryOrder: ConsentCategory[] = ['analytics', 'marketing', 'externalMedia'];
 
 const categoryDescriptions: Record<Exclude<ConsentCategory, 'necessary'>, string> = {
@@ -33,12 +35,19 @@ const categoryDescriptions: Record<Exclude<ConsentCategory, 'necessary'>, string
   </div>
 
   <div class="pd__body">
-    <p>
-      Wir verwenden notwendige Technologien für den sicheren Betrieb dieser Website.
-      Optionale Dienste für Statistik, Marketing oder externe Inhalte laden wir ausschließlich
-      nach Ihrer ausdrücklichen Zustimmung (Art. 6 Abs. 1 lit. a DSGVO, § 25 TDDDG). Ihre
-      Auswahl können Sie jederzeit widerrufen oder anpassen.
-    </p>
+    {hasOptional ? (
+      <p>
+        Wir verwenden notwendige Technologien für den sicheren Betrieb dieser Website.
+        Optionale Dienste für Statistik, Marketing oder externe Inhalte laden wir ausschließlich
+        nach Ihrer ausdrücklichen Zustimmung (Art. 6 Abs. 1 lit. a DSGVO, § 25 TDDDG). Ihre
+        Auswahl können Sie jederzeit widerrufen oder anpassen.
+      </p>
+    ) : (
+      <p>
+        Diese Website verwendet ausschließlich notwendige Technologien für den sicheren Betrieb.
+        Statistik-, Marketing- oder externe Dienste kommen nicht zum Einsatz.
+      </p>
+    )}
 
     <fieldset class="pd__category">
       <legend>
@@ -60,7 +69,7 @@ const categoryDescriptions: Record<Exclude<ConsentCategory, 'necessary'>, string
       </ul>
     </fieldset>
 
-    {optionalCategoryOrder.map((category) => {
+    {hasOptional && optionalCategoryOrder.map((category) => {
       const categoryServices = getServicesByCategory(category, services).filter((s) => s.enabled);
       return (
         <fieldset class="pd__category">
@@ -97,9 +106,15 @@ const categoryDescriptions: Record<Exclude<ConsentCategory, 'necessary'>, string
     </p>
 
     <div class="pd__actions">
-      <button type="button" class="btn btn--ghost" id="pd-reject-all">Nur notwendige</button>
-      <button type="button" class="btn btn--ghost" id="pd-save">Auswahl speichern</button>
-      <button type="button" class="btn btn--primary" id="pd-accept-all">Alle akzeptieren</button>
+      {hasOptional ? (
+        <>
+          <button type="button" class="btn btn--ghost" id="pd-reject-all">Nur notwendige</button>
+          <button type="button" class="btn btn--ghost" id="pd-save">Auswahl speichern</button>
+          <button type="button" class="btn btn--primary" id="pd-accept-all">Alle akzeptieren</button>
+        </>
+      ) : (
+        <button type="button" class="btn btn--primary" data-privacy-close>Schließen</button>
+      )}
     </div>
   </div>
 </dialog>
