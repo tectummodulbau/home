@@ -114,7 +114,7 @@ Analyseübersicht unter `/admin/analyse`.
 Externe Hosts im gebauten Auslieferungsstand: `googletagmanager.com` und
 `connect.facebook.net` stehen nur als Zeichenketten in der Registry und werden
 ohne Einwilligung bzw. bei `enabled: false` nie angefordert. Alle übrigen Treffer
-(`ec.europa.eu`, `resend.com`, `thatsit.marketing`, `google.com/webmasters`) sind
+(`ec.europa.eu`, `resend.com`, `henneberg-webdesign.de`, `google.com/webmasters`) sind
 reine Textlinks in Impressum, Datenschutz und Sitemap-Ansicht.
 
 ---
