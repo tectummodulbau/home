@@ -300,11 +300,12 @@ const spots = heroSpots();
   .hero__cert { display: inline-flex; align-items: center; flex-shrink: 0; }
   .hero__cert img {
     width: auto;
-    height: calc(58px * var(--k, 1));
+    height: calc(54px * var(--k, 1));
     object-fit: contain;
-    transition: transform 0.25s ease;
+    opacity: 0.78;
+    transition: transform 0.25s ease, opacity 0.25s ease;
   }
-  .hero__cert:hover img { transform: scale(1.08); }
+  .hero__cert:hover img { transform: scale(1.06); opacity: 1; }
 
   @keyframes hero-certs-scroll {
     from { transform: translateX(0); }
@@ -359,10 +360,10 @@ const spots = heroSpots();
     }
     .hero__trust-label { text-align: left; white-space: nowrap; font-size: 0.7rem; }
     .hero__certs-track-wrap { flex: 1; min-width: 0; }
-    .hero__cert img { height: calc(50px * var(--k, 1)); }
+    .hero__cert img { height: calc(46px * var(--k, 1)); }
   }
   @media (min-width: 1280px) {
-    .hero__cert img { height: calc(68px * var(--k, 1)); }
+    .hero__cert img { height: calc(62px * var(--k, 1)); }
   }
 
   /* Desktop: alle Logos passen nebeneinander, kein Slider */
