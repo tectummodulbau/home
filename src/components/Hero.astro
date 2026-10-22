@@ -18,8 +18,12 @@ const zertifikate = [
   { src: logoFsc, alt: 'FSC-zertifiziertes Holz' },
   { src: logoInnovator, alt: 'Innovator des Jahres 2025' },
 ];
-// Liste verdoppelt, damit der Slider nahtlos loopt.
-const zertifikateLoop = [...zertifikate, ...zertifikate];
+// Liste verdoppelt, damit der Slider (Mobil/Tablet) nahtlos loopt. Auf dem
+// Desktop stehen die Logos nebeneinander, die Kopien werden dort ausgeblendet.
+const zertifikateLoop = [
+  ...zertifikate.map((z) => ({ ...z, dup: false })),
+  ...zertifikate.map((z) => ({ ...z, dup: true })),
+];
 
 const szene = heroScene();
 const spots = heroSpots();
@@ -73,8 +77,8 @@ const spots = heroSpots();
       <div class="hero__certs-track-wrap">
         <div class="hero__certs-track">
           {zertifikateLoop.map((z) => (
-            <span class="hero__cert">
-              <Image src={z.src} alt={z.alt} title={z.alt} height={80} densities={[1.5, 2, 3]} loading="eager" />
+            <span class:list={['hero__cert', { 'hero__cert--dup': z.dup }]} aria-hidden={z.dup ? 'true' : undefined}>
+              <Image src={z.src} alt={z.dup ? '' : z.alt} title={z.dup ? undefined : z.alt} height={80} densities={[1.5, 2, 3]} loading={z.dup ? 'lazy' : 'eager'} />
             </span>
           ))}
         </div>
@@ -358,6 +362,21 @@ const spots = heroSpots();
     .hero__cert img { height: 38px; }
   }
 
+  /* Desktop: alle Logos passen nebeneinander, kein Slider */
+  @media (min-width: 1100px) {
+    .hero__certs-track-wrap {
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+    .hero__certs-track {
+      width: 100%;
+      justify-content: space-between;
+      gap: 1.5rem;
+      animation: none;
+    }
+    .hero__cert--dup { display: none; }
+  }
+
   /* Eintritts-Animation Text */
   @media (prefers-reduced-motion: no-preference) {
     .hero__kicker,
@@ -382,6 +401,7 @@ const spots = heroSpots();
 
   @media (prefers-reduced-motion: reduce) {
     .hero__certs-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; }
+    .hero__cert--dup { display: none; }
     .hero__spot { opacity: 1; animation: none; }
   }
 </style>
