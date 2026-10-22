@@ -30,6 +30,44 @@ export function normalizeText(value: string): string {
 
 export const FAQS: FaqEntry[] = [
   {
+    q: 'Was ist Tectum Modulbau und was liefern Sie?',
+    a: `Tectum ist Hersteller von schlüsselfertigen Modulhäusern und modular kombinierbaren
+        Wohneinheiten für Campingplatzbetreiber, Wohnparks, Kommunen, Projektentwickler und
+        Händler. Die Einheiten entstehen in serieller Modulbauweise im Werk, sind vollständig
+        ausgestattet und nach dem Anschluss sofort einsatzbereit. Wir liefern ab 10 Einheiten
+        in Deutschland, Österreich und der Schweiz.`,
+  },
+  {
+    q: 'Was bedeutet schlüsselfertig beim Modulbau?',
+    a: `Bad, Küche, Wärmepumpe und Klimaanlage sind ab Werk eingebaut. Das Modul wird komplett
+        geliefert und ist nach dem Anschluss an Strom, Wasser und Abwasser nutzbar. Es bleibt
+        keine Baustelle im klassischen Sinne: Sie brauchen keine Gewerke für den Innenausbau und
+        keinen langen Planungsvorlauf.`,
+  },
+  {
+    q: 'Wie lange dauert die Lieferung eines Modulhauses?',
+    a: `Die Fertigung im Werk dauert wenige Wochen statt der 12 bis 24 Monate, die ein
+        konventioneller Bau typischerweise braucht. Der genaue Liefertermin hängt von Stückzahl,
+        Konfiguration und Standort ab und wird im Angebot festgelegt. Je früher Ihre Einheiten
+        stehen, desto früher beginnt der Ertrag.`,
+  },
+  {
+    q: 'Was ist der Unterschied zwischen einem Modulhaus und einem Mobilheim?',
+    a: `Ein klassisches Mobilheim ist für die saisonale Nutzung gedacht. Tectum-Modulhäuser sind
+        dagegen nach den Anforderungen des Gebäudeenergiegesetzes (GEG) gefertigt, durchgängig
+        auf Passivhaus-Niveau gedämmt und mit Wärmepumpe und Klimaanlage ganzjährig nutzbar.
+        Sie sind modular erweiterbar und lassen sich als Tiny House, Camping-Chalet oder
+        Glamping-Unterkunft einsetzen.`,
+  },
+  {
+    q: 'Für welche Projekte eignen sich Ihre Modulhäuser?',
+    a: `Für Camping-Chalets und Glamping-Unterkünfte auf Campingplätzen, für Wohn- und
+        Freizeitparks, für Arbeitnehmer- und Kommunalunterkünfte sowie für Messen und
+        Ausstellungen. Es stehen drei Grundmodule zur Wahl: Schlafeinheit, Wohnraumeinheit und
+        Luxuseinheit. Auf Wunsch ergänzen wir Terrasse, Sauna, Fitness, Pool oder
+        Photovoltaik mit Speicher.`,
+  },
+  {
     q: 'Bieten Sie Leasing an?',
     a: `Ja. Alle Module stehen sowohl im Kauf als auch im Leasing zur Verfügung. Leasing bindet
         weniger Kapital und verkürzt die Zeit bis zum ersten Cashflow — die Einheiten arbeiten
@@ -66,5 +104,11 @@ export const FAQS: FaqEntry[] = [
         Genehmigungsverfahren benötigt werden — die Genehmigung selbst liegt im
         Verantwortungsbereich des Betreibers oder Grundstückseigentümers. Wir empfehlen die
         frühzeitige Abstimmung mit der zuständigen Baubehörde.`,
+  },
+  {
+    q: 'Können Händler und Projektentwickler als Whitelabel-Partner einsteigen?',
+    a: `Ja. Die Modulhäuser sind Whitelabel-fähig: Wiederverkäufer, Händler und Projektentwickler
+        können sie unter eigener Marke anbieten. Gerne besprechen wir Stückzahlen,
+        Konfiguration und Konditionen im persönlichen Gespräch.`,
   },
 ];
