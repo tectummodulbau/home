@@ -3,8 +3,7 @@ pages_build_output_dir = "dist"
 compatibility_date = "2026-07-31"
 
 # D1-Datenbank für die Leads (Schema: d1/schema.sql).
-# database_id im Cloudflare-Dashboard unter Storage & Databases → D1 → leads kopieren.
 [[d1_databases]]
 binding = "DB"
 database_name = "leads"
-database_id = "d9c027fb-02f1-488e-REPLACE-ME"
+database_id = "d9c027fb-02f1-488e-b6de-68afc386d62a"
