@@ -35,6 +35,38 @@ npx astro check  # Typprüfung
 
 ---
 
+## Seitenaufbau und 3D-Szenen
+
+Die Startseite ist eine Conversion-Landingpage ohne Fotos: Alle Modulhäuser sind
+isometrische 3D-Illustrationen, die beim Build als Inline-SVG erzeugt werden.
+Reihenfolge in `src/pages/index.astro`: Hero → StatsBand → Prinzip (Scroll-Bühne)
+→ Module → Konfigurator → Zielgruppen → Vorteile → Werk → Video → Vergleich →
+Rechner → Ablauf → FAQ → Anfrage.
+
+```
+src/lib/iso/
+  engine.ts    Projektion, Flächen, box(), item() (animierbare Gruppe), svg()
+  objects.ts   Modul (schlaf/wohn/luxus), Terrasse, Pool, Sauna, Fitness, PV, Bäume
+  scenes.ts    Fertige Szenen: Hero, Prinzip, Konfigurator, Modulkarten, Werk, Zielgruppen
+src/styles/iso.css     Animationen der Szenen (enter / scroll / Schleifen)
+src/scripts/motion.ts  Reveal, Scroll-Bühnen, Zähler, Parallax, Sticky-CTA, Lesefortschritt
+```
+
+- **Neues Bauteil** = Funktion in `objects.ts` (Meter-Koordinaten, `box()`/`poly()`),
+  danach in der gewünschten Szene in `scenes.ts` einsetzen. Zeichenreihenfolge =
+  Reihenfolge im Array (hinten zuerst).
+- **Scroll-Bühne:** Ein Abschnitt mit `data-stage` und `position: sticky`-Innenteil
+  bekommt `--p` (0…1). `.iso-item[data-at="a,b"]` blendet zwischen `a` und `b` ein,
+  `[data-range="a,b"]` markiert die aktive Beschriftung (`.is-on`). Mit
+  `prefers-reduced-motion` erscheint alles sofort (Klasse `is-static`).
+- Die Szenen sind reines Markup, kein Laufzeit-JavaScript — Bewegung kommt aus CSS
+  und `motion.ts`.
+- Der Rechner (`Rechner.astro`) behält Formel, Element-IDs und Tracking; neu sind
+  Szenarien, Verlaufsdiagramm und die Vorbelegung des Formularfelds
+  „Einheiten“ über den Rechner-CTA.
+
+---
+
 ## Tracking und Consent
 
 ### Eingesetzte Dienste
@@ -108,7 +140,7 @@ src/lib/consent/
   state.ts      Speicherung, Gültigkeit, Benachrichtigung. Wird von manager.ts
                 UND vom Tracking gelesen.
   manager.ts    Banner-/Dialog-Logik, ruft load()/cleanup() auf.
-src/components/privacy/   Banner, Dialog, Widget (unverändertes Design)
+src/components/privacy/   Banner (kompakt, 3 Aktionen), Dialog. Kein schwebendes Widget — Wiederaufruf über Footer-Link „Datenschutz-Einstellungen“
 src/components/analytics/ConsentModeDefaults.astro
 ```
 
@@ -283,7 +315,7 @@ wird nicht gemeldet.
 
 | Event | Auslöser | Parameter |
 |---|---|---|
-| `click_phone` | Klick auf `a[href^="tel:"]` | `position` (ID des Abschnitts, sonst `header`/`footer`) |
+| `click_phone` | Klick auf `a[href^="tel:"]` | `position` (ID des Abschnitts, sonst `header`/`footer`; `data-track-section` am Element hat Vorrang) |
 | `click_email` | Klick auf `a[href^="mailto:"]` | – |
 | `cta_click` | Klick auf einen Link, dessen `href` auf `#anfrage` endet | `cta_label` (Linktext), `section` |
 
@@ -292,6 +324,10 @@ eine Textänderung im Marketing hängt das Tracking damit nicht stillschweigend
 ab. Erfasst sind „Unverbindliches Angebot", „Projekt anfragen", „Angebot
 anfragen", „Unverbindliche Projektprüfung" und „Jetzt kontaktieren". „Unsere
 Module" (`#module`) ist reine Navigation und bleibt außen vor.
+
+Die mobile Sticky-Leiste (`#sticky-cta` in `Layout.astro`) trägt
+`data-track-section="sticky-cta"`, damit ihre Klicks im Report als eigene Position
+erscheinen.
 
 **Ein neuer CTA wird automatisch mitgezählt, sobald er auf `#anfrage` zeigt.**
 Zeigt ein neuer Anfrage-Button woanders hin, muss `CTA_SELECTOR` erweitert
@@ -315,13 +351,15 @@ zweiten Liste — Umbenennungen im Markup schlagen automatisch durch.
 | `faq_open` | `<details>` im FAQ wird geöffnet | `frage` |
 | `video_play` | **nutzerinitiierter** Klick auf den Play-Button des Hero-Films, 1×/Sitzung | – |
 
-Beobachtet werden alle `main section[id]`: `zielgruppen`, `vorteile`, `module`,
-`werk`, `galerie`, `konfiguration`, `vergleich`, `rechner`, `ablauf`, `faq`,
-`anfrage`. Hero und StatsBand haben keine ID und werden nicht gezählt.
+Beobachtet werden alle `main section[id]`: `prinzip`, `module`, `konfigurator`,
+`zielgruppen`, `vorteile`, `werk`, `video`, `vergleich`, `rechner`, `ablauf`,
+`faq`, `anfrage`. Hero und StatsBand haben keine ID und werden nicht gezählt.
+`prinzip` und `video` sind hohe Scroll-Bühnen — sie zählen über die Regel
+„füllt 50 % der Viewporthöhe“.
 
-Das Hero-Video läuft mit `autoplay muted loop`. Würde man das `play`-Event des
-Elements auswerten, wäre `video_play` faktisch ein zweiter Seitenaufruf. Der
-Hook hängt deshalb am Play-Button, nicht am Video.
+Der Imagefilm liegt nicht mehr im Hero, sondern im Abschnitt `#video`
+(`src/components/Video.astro`). Er lädt erst nach dem Klick (`preload="none"`),
+läuft nie von selbst, und `video_play` hängt am Klick auf den Play-Button.
 
 ### GA4-Schlüsselereignisse
 

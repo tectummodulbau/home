@@ -1,6 +1,4 @@
 ---
-import bgImg from '../assets/vergleich-bg.jpg';
-
 const zeilen = [
   {
     label: 'Bauzeit',
@@ -28,24 +26,63 @@ const zeilen = [
     tectum: 'Rückkaufoption und Zweitmarkt',
   },
 ];
+
+const achse = [0, 6, 12, 18, 24];
 ---
 
-<section class="section vergleich" id="vergleich" style={`background-image: url(${bgImg.src})`}>
-  <div class="vergleich__overlay"></div>
-  <div class="container vergleich__inner">
+<section class="section section--dark vg" id="vergleich">
+  <div class="container vg__container">
     <div class="section-head section-head--center reveal">
       <span class="section-kicker">Der Vergleich</span>
       <h2>Warum immer mehr Betreiber auf Modulbau setzen.</h2>
+      <p class="section-lead">
+        Jeder Monat ohne Gäste ist ein Monat ohne Umsatz. Hier sehen Sie, wie viel früher Ihre
+        Einheiten Ertrag bringen.
+      </p>
     </div>
 
+    <figure class="vg-chart reveal" aria-label="Zeitstrahl: Zeit bis zur Inbetriebnahme, konventioneller Bau gegenüber Tectum Modulbau">
+      <div class="vg-axis" aria-hidden="true">
+        {achse.map((m) => <span style={`left:${(m / 24) * 100}%`}>{m === 0 ? 'Start' : `${m} Mon.`}</span>)}
+      </div>
+
+      <div class="vg-row">
+        <p class="vg-row__label">Konventioneller Bau</p>
+        <div class="vg-track">
+          <span class="vg-bar vg-bar--build" style="left:0;width:50%;--d:0.1s"><em>Bauzeit</em></span>
+          <span class="vg-bar vg-bar--range" style="left:50%;width:50%;--d:0.6s"><em>bis zu 24 Monate</em></span>
+        </div>
+        <p class="vg-row__note">Einnahmen starten erst nach <strong>12–24 Monaten</strong>.</p>
+      </div>
+
+      <div class="vg-gap" aria-hidden="true">
+        <span class="vg-gap__line"></span>
+        <span class="vg-gap__label">Ihr Einnahmen-Vorsprung</span>
+      </div>
+
+      <div class="vg-row">
+        <p class="vg-row__label vg-row__label--tectum">Tectum Modulbau</p>
+        <div class="vg-track">
+          <span class="vg-bar vg-bar--tectum" style="left:0;width:7%;--d:0.2s"><em>Werk &amp; Lieferung</em></span>
+          <span class="vg-bar vg-bar--revenue" style="left:7%;width:93%;--d:0.7s"><em>Einnahmen ab Inbetriebnahme</em></span>
+        </div>
+        <p class="vg-row__note">Lieferung ab Werk in <strong>wenigen Wochen</strong> — Ihre Gäste buchen schon.</p>
+      </div>
+
+      <figcaption>
+        Schematische Darstellung auf Basis der Angaben 12–24 Monate (konventionell) gegenüber
+        Lieferung ab Werk in wenigen Wochen (Tectum).
+      </figcaption>
+    </figure>
+
     <div class="vg-table reveal" role="table" aria-label="Vergleich konventioneller Bau und Tectum Modulbau">
-      <div class="vg-row vg-row--head" role="row">
+      <div class="vg-row-t vg-row-t--head" role="row">
         <span role="columnheader" class="vg-cell vg-cell--label"></span>
         <span role="columnheader" class="vg-cell">Konventioneller Bau</span>
         <span role="columnheader" class="vg-cell vg-cell--tectum">Tectum Modulbau</span>
       </div>
       {zeilen.map((z) => (
-        <div class="vg-row" role="row">
+        <div class="vg-row-t" role="row">
           <span role="rowheader" class="vg-cell vg-cell--label">{z.label}</span>
           <span role="cell" class="vg-cell vg-cell--konv">{z.konventionell}</span>
           <span role="cell" class="vg-cell vg-cell--tectum">
@@ -55,93 +92,209 @@ const zeilen = [
         </div>
       ))}
     </div>
+
+    <div class="vg-cta reveal">
+      <a href="#rechner" class="btn btn--light btn--lg">Eigenen Ertrag berechnen</a>
+    </div>
   </div>
 </section>
 
 <style>
-  .vergleich {
-    position: relative;
-    background-size: cover;
-    background-position: center;
-    color: var(--paper);
-  }
-  .vergleich .section-kicker { color: var(--accent); }
-  .vergleich .section-lead { color: rgba(255, 255, 255, 0.72); }
+  .vg__container { padding-inline: clamp(5%, 8vw, 12%); }
+  .vg { background: radial-gradient(ellipse 60% 50% at 50% 0%, #26241c 0%, var(--ink) 70%); }
 
-  .vergleich__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(20, 19, 15, 0.82), rgba(20, 19, 15, 0.72));
-  }
-
-  .vergleich__inner {
-    position: relative;
-    z-index: 1;
-  }
-
-  .vg-table {
-    max-width: 900px;
-    margin-inline: auto;
-    background: var(--paper);
-    color: var(--ink);
+  /* ---------- Zeitstrahl ---------- */
+  .vg-chart {
+    margin: 0 0 clamp(2.5rem, 5vw, 4rem);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
+    padding: clamp(1.2rem, 3vw, 2.2rem);
+  }
+
+  .vg-axis {
+    position: relative;
+    height: 1.6rem;
+    margin-bottom: 0.4rem;
+    font-family: var(--font-head);
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .vg-axis span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .vg-axis span:first-child { transform: none; }
+  .vg-axis span:last-child { transform: translateX(-100%); }
+
+  .vg-row__label {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin: 0 0 0.5rem;
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .vg-row__label--tectum { color: var(--accent); }
+
+  .vg-track {
+    position: relative;
+    height: 54px;
+    border-radius: 12px;
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 25%),
+      rgba(255, 255, 255, 0.04);
     overflow: hidden;
-    box-shadow: var(--shadow-md);
   }
-
-  .vg-row {
-    display: grid;
-    grid-template-columns: 0.8fr 1fr 1.2fr;
-    border-bottom: 1px solid var(--line);
-  }
-  .vg-row:last-child { border-bottom: 0; }
-
-  .vg-row--head {
-    background: var(--stone);
-    font-family: var(--font-head);
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.04em;
-  }
-
-  .vg-cell {
-    padding: 1.05rem 1.3rem;
-    font-size: 0.98rem;
-  }
-
-  .vg-cell--label {
-    font-family: var(--font-head);
-    font-weight: 700;
-  }
-
-  .vg-cell--konv { color: var(--muted); }
-
-  .vg-cell--tectum {
-    background: var(--sand);
+  .vg-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    padding-inline: 0.9rem;
+    border-radius: 10px;
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 1.1s cubic-bezier(0.2, 0.85, 0.25, 1) var(--d, 0s);
+    overflow: hidden;
   }
-  .vg-cell--tectum svg {
-    flex-shrink: 0;
-    color: var(--accent);
+  .vg-chart.is-visible .vg-bar { transform: scaleX(1); }
+  .vg-bar em {
+    font-style: normal;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.82rem;
+    white-space: nowrap;
   }
-  .vg-row--head .vg-cell--tectum { color: var(--ink); }
+  .vg-bar--build { background: #4b4a44; color: #e8e6df; border-radius: 10px 0 0 10px; }
+  .vg-bar--range {
+    background: repeating-linear-gradient(135deg, #4b4a44 0 8px, #3c3b36 8px 16px);
+    color: #cfccc3;
+    border-radius: 0 10px 10px 0;
+    justify-content: flex-end;
+  }
+  .vg-bar--tectum { background: var(--accent); color: var(--ink); padding-inline: 0.3rem; }
+  .vg-bar--tectum em { font-size: 0; }
+  .vg-bar--revenue {
+    background: linear-gradient(90deg, #2a6b3c, #3b8a52);
+    color: #fff;
+    position: absolute;
+  }
+  .vg-bar--revenue::after {
+    content: '€  €  €  €  €  €  €  €  €  €  €  €';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.8rem;
+    letter-spacing: 1.1rem;
+    font-family: var(--font-head);
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.16);
+    white-space: nowrap;
+    animation: vg-coins 6s linear infinite;
+  }
+  @keyframes vg-coins { from { background-position: 0 0; } to { background-position: 0 0; } }
 
-  @media (max-width: 680px) {
-    .vg-row { grid-template-columns: 1fr; }
-    .vg-cell--label {
-      padding-bottom: 0.2rem;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--muted);
-    }
-    .vg-cell--konv { padding-block: 0.2rem; }
-    .vg-row--head { display: none; }
-    .vg-cell--konv::before {
-      content: 'Konventionell: ';
-      color: var(--muted);
-    }
+  .vg-row__note { margin: 0.55rem 0 0; font-size: 0.9rem; color: rgba(255, 255, 255, 0.65); }
+  .vg-row__note strong { color: #fff; }
+
+  .vg-gap {
+    position: relative;
+    height: 3.4rem;
+    margin: 0.4rem 0 0.2rem;
+    display: flex;
+    align-items: flex-start;
+  }
+  .vg-gap__line {
+    position: absolute;
+    left: 7%;
+    right: 0;
+    bottom: 0.2rem;
+    height: 14px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1.2s cubic-bezier(0.2, 0.85, 0.25, 1) 1.3s;
+    border-top: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    opacity: 0.8;
+  }
+  .vg-chart.is-visible .vg-gap__line { transform: scaleX(1); }
+  .vg-gap__label {
+    position: relative;
+    margin-left: 7%;
+    padding-left: 1rem;
+    background: transparent;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.6s ease 2s;
+  }
+  .vg-chart.is-visible .vg-gap__label { opacity: 1; }
+
+  .vg-chart figcaption {
+    margin-top: 1.2rem;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.42);
+  }
+
+  /* ---------- Tabelle ---------- */
+  .vg-table { display: grid; gap: 0.5rem; }
+  .vg-row-t {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1.6fr;
+    gap: 0.6rem;
+    align-items: stretch;
+  }
+  .vg-cell {
+    padding: 0.9rem 1.1rem;
+    border-radius: 12px;
+    font-size: 0.96rem;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .vg-row-t--head .vg-cell {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    padding-block: 0.3rem;
+  }
+  .vg-row-t--head .vg-cell--tectum { color: var(--accent); }
+  .vg-cell--label { font-family: var(--font-head); font-weight: 700; padding-inline: 0.2rem; }
+  .vg-cell--konv { background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.62); }
+  .vg-cell--tectum:not(.vg-row-t--head .vg-cell) {
+    background: linear-gradient(90deg, rgba(42, 107, 60, 0.4), rgba(42, 107, 60, 0.22));
+    border: 1px solid rgba(90, 170, 112, 0.35);
+    color: #fff;
+    font-weight: 600;
+  }
+  .vg-cell--tectum svg { color: #7fd09a; flex-shrink: 0; }
+
+  .vg-cta { margin-top: clamp(2rem, 4vw, 3rem); text-align: center; }
+
+  @media (max-width: 760px) {
+    .vg-row-t { grid-template-columns: 1fr; gap: 0.3rem; margin-bottom: 0.8rem; }
+    .vg-row-t--head { display: none; }
+    .vg-cell--label { padding: 0; }
+    .vg-bar em { font-size: 0.68rem; }
+    .vg-bar--tectum em { display: none; }
+    .vg-gap__label { font-size: 0.68rem; margin-left: 7%; padding-left: 0.2rem; }
+    .vg-axis { font-size: 0.66rem; }
+    .vg-bar { padding-inline: 0.5rem; }
+    .vg-track { height: 46px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vg-bar, .vg-gap__line { transform: none; transition: none; }
+    .vg-gap__label { opacity: 1; transition: none; }
   }
 </style>

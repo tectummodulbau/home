@@ -1,10 +1,11 @@
 ---
 const links = [
-  { href: '/', label: 'Home' },
+  { href: '/#prinzip', label: 'Prinzip' },
   { href: '/#module', label: 'Module' },
-  { href: '/#konfiguration', label: 'Konfiguration' },
+  { href: '/#konfigurator', label: 'Konfigurator' },
+  { href: '/#rechner', label: 'Rendite' },
   { href: '/#ablauf', label: 'Ablauf' },
-  { href: '/#kontakt', label: 'Kontakt' },
+  { href: '/#faq', label: 'FAQ' },
 ];
 ---
 
@@ -44,11 +45,21 @@ const links = [
     position: sticky;
     top: clamp(0.8rem, 2vw, 1.5rem);
     z-index: 60;
-    padding-inline: 20%;
+    padding-inline: max(5%, calc((100vw - 1120px) / 2));
+    transition: transform 0.35s cubic-bezier(0.2, 0.85, 0.25, 1);
+  }
+  /* Hide on Scroll: beim Runterscrollen weg, beim Hochscrollen zurück */
+  .site-header.is-hidden { transform: translateY(calc(-100% - 2rem)); }
+
+  /* Startseite: Kopfleiste schwebt über dem Hero statt einen weißen Streifen
+     darüber zu erzeugen. */
+  :global(body:has(.hero)) .site-header { margin-bottom: -68px; }
+  @media (max-width: 920px) {
+    :global(body:has(.hero)) .site-header { margin-bottom: -54px; }
   }
 
   @media (max-width: 1180px) {
-    .site-header { padding-inline: 10%; }
+    .site-header { padding-inline: 5%; }
   }
 
   @media (max-width: 640px) {
@@ -75,6 +86,7 @@ const links = [
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
+    white-space: nowrap;
     font-family: var(--font-head);
     font-weight: 800;
     font-size: 1.1rem;
@@ -283,6 +295,22 @@ const links = [
       setOpen(false);
     }
   });
+
+  const header = document.getElementById('site-header');
+  let lastY = scrollY;
+  let ticking = false;
+  function onScroll() {
+    const y = Math.max(scrollY, 0);
+    const open = nav?.classList.contains('is-open');
+    if (open || y < 80) header?.classList.remove('is-hidden');
+    else if (Math.abs(y - lastY) > 6) header?.classList.toggle('is-hidden', y > lastY);
+    lastY = y;
+    ticking = false;
+  }
+  addEventListener('scroll', () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  header?.addEventListener('focusin', () => header.classList.remove('is-hidden'));
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && nav?.classList.contains('is-open')) setOpen(false);

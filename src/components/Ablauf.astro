@@ -67,6 +67,9 @@ const schritte = [
     width: 2px;
     background: rgba(255, 255, 255, 0.16);
   }
+  @media (prefers-reduced-motion: reduce) {
+    .ab-step::before { transform: scaleY(1); transition: none; }
+  }
 
   .ab-step {
     position: relative;
@@ -75,6 +78,21 @@ const schritte = [
     padding-bottom: 2.2rem;
   }
   .ab-step:last-child { padding-bottom: 0; }
+  /* Fortschrittslinie: füllt sich, sobald der Schritt sichtbar wird */
+  .ab-step::before {
+    content: '';
+    position: absolute;
+    left: 27px;
+    top: 28px;
+    bottom: -28px;
+    width: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.9s ease 0.35s;
+  }
+  .ab-step.is-visible::before { transform: scaleY(1); }
+  .ab-step:last-child::before { display: none; }
 
   .ab-step__num {
     position: relative;
@@ -92,7 +110,9 @@ const schritte = [
     font-weight: 800;
     font-size: 1.25rem;
     border: 4px solid var(--ink);
+    transition: background 0.4s ease 0.2s, color 0.4s ease 0.2s, transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) 0.2s;
   }
+  .ab-step.is-visible .ab-step__num { background: var(--accent); transform: scale(1.08); }
 
   .ab-step h3 {
     margin: 0.55rem 0 0.35rem;

@@ -6,8 +6,9 @@ import Vorteile from '../components/Vorteile.astro';
 import StatsBand from '../components/StatsBand.astro';
 import Module from '../components/Module.astro';
 import Werk from '../components/Werk.astro';
-import Galerie from '../components/Galerie.astro';
-import Konfiguration from '../components/Konfiguration.astro';
+import Video from '../components/Video.astro';
+import Konfigurator from '../components/Konfigurator.astro';
+import Prinzip from '../components/Prinzip.astro';
 import Vergleich from '../components/Vergleich.astro';
 import Rechner from '../components/Rechner.astro';
 import Ablauf from '../components/Ablauf.astro';
@@ -22,13 +23,14 @@ import LeadForm from '../components/LeadForm.astro';
 >
   <main>
     <Hero />
+    <StatsBand />
+    <Prinzip />
+    <Module />
+    <Konfigurator />
     <Zielgruppen />
     <Vorteile />
-    <Module />
-    <StatsBand />
     <Werk />
-    <Galerie />
-    <Konfiguration />
+    <Video />
     <Vergleich />
     <Rechner />
     <Ablauf />
@@ -36,5 +38,3 @@ import LeadForm from '../components/LeadForm.astro';
     <LeadForm />
   </main>
 </Layout>
-
-<script src="../scripts/reveal.ts"></script>

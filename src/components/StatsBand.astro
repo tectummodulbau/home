@@ -1,18 +1,22 @@
 ---
 // Kennzahlen-Band direkt unter den Grundmodulen
 const stats = [
-  { value: 'GEG', label: 'Bauweise nach den Anforderungen des Gebäudeenergiegesetzes' },
-  { value: '< 0,20', label: 'U-Wert in W/(m²·K) — Dämmung auf Passivhaus-Niveau' },
-  { value: 'Wochen', label: 'Lieferung ab Werk statt 12–24 Monate Bauzeit' },
-  { value: '365 Tage', label: 'Ganzjahresbetrieb dank Wärmepumpe und Klimaanlage' },
+  { prefix: '', value: 'GEG', count: null, decimals: 0, suffix: '', label: 'Bauweise nach den Anforderungen des Gebäudeenergiegesetzes' },
+  { prefix: '< ', value: '0,20', count: 0.2, decimals: 2, suffix: '', label: 'U-Wert in W/(m²·K) — Dämmung auf Passivhaus-Niveau' },
+  { prefix: '', value: 'Wochen', count: null, decimals: 0, suffix: '', label: 'Lieferung ab Werk statt 12–24 Monate Bauzeit' },
+  { prefix: '', value: '365', count: 365, decimals: 0, suffix: ' Tage', label: 'Ganzjahresbetrieb dank Wärmepumpe und Klimaanlage' },
 ];
 ---
 
-<section class="section stats-band">
+<section class="section section--dark stats-band">
   <div class="container stats-band__grid">
     {stats.map((s) => (
       <div class="stats-band__item reveal">
-        <strong>{s.value}</strong>
+        <strong>
+          {s.prefix}
+          {s.count !== null ? <span data-count={s.count} data-decimals={s.decimals}>{s.value}</span> : s.value}
+          {s.suffix}
+        </strong>
         <span>{s.label}</span>
       </div>
     ))}
@@ -41,11 +45,13 @@ const stats = [
     font-size: clamp(1.7rem, 3vw, 2.3rem);
     font-weight: 800;
     letter-spacing: -0.02em;
+    color: var(--accent);
+    white-space: pre;
   }
 
   .stats-band__item span {
     font-size: 0.92rem;
-    color: var(--muted);
+    color: rgba(255, 255, 255, 0.68);
   }
 
   @media (max-width: 920px) {

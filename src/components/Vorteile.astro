@@ -2,52 +2,62 @@
 const vorteile = [
   {
     icon: 'M13 2 3 14h7l-1 8L19 10h-7l1-8z',
+    kpi: 'Wochen',
     title: 'Schnelle Lieferfähigkeit',
     text: 'Keine monatelange Bauzeit. Unsere Einheiten werden im Werk gefertigt und fertig angeliefert. Sie sparen Zeit und binden weniger Kapital.',
+    big: true,
+  },
+  {
+    icon: 'M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4zM9 12l2 2 4-4',
+    kpi: 'DGNB · TÜV',
+    title: 'Zertifiziert & finanzierbar',
+    text: 'DGNB- und TÜV-zertifiziert, gefertigt nach den Anforderungen des Gebäudeenergiegesetzes (GEG). Kauf oder Leasing mit Rückkaufoption — Sie wählen das Modell, das zu Ihrem Projekt passt.',
+    big: true,
   },
   {
     icon: 'M4 20h16M6 20V9l6-5 6 5v11M10 20v-6h4v6',
+    kpi: 'ab 10',
     title: 'Skalierbar ab 10 Einheiten',
     text: 'Ob 10 oder 100 — Ihr Bestand wächst mit Ihrem Bedarf. Größere Abnahmemengen profitieren von gestaffelten Preisen, die wir auf Ihr Projekt zuschneiden.',
   },
   {
     icon: 'M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
+    kpi: '365',
     title: 'Ganzjährig nutzbar',
     text: 'Klimaanlage ab Werk in jeder Einheit, Wärmepumpe für effizientes Heizen im Winter. Kein Nachrüsten, kein Mehraufwand — Dauerbetrieb das ganze Jahr.',
   },
   {
     icon: 'M3 18h18M5 18V8l7 4V8l7 4v6M12 3v2',
+    kpi: 'PV',
     title: 'Photovoltaik & Speicher auf Wunsch',
     text: 'Jede Einheit lässt sich optional mit PV-Anlage und Batteriespeicher ausstatten. So senken Sie Ihre Betriebskosten und werden unabhängiger vom Netz.',
   },
   {
     icon: 'M20 7 9 18l-5-5M4 7h6M4 11h4',
+    kpi: 'Ihr Label',
     title: 'Whitelabel-fähig',
     text: 'Wir produzieren unter Ihrer Marke. Sie erhalten eine fertige Einheit — unter Ihrem eigenen Label.',
-  },
-  {
-    icon: 'M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4zM9 12l2 2 4-4',
-    title: 'Zertifiziert & finanzierbar',
-    text: 'DGNB- und TÜV-zertifiziert, gefertigt nach den Anforderungen des Gebäudeenergiegesetzes (GEG). Kauf oder Leasing mit Rückkaufoption — Sie wählen das Modell, das zu Ihrem Projekt passt.',
+    wide: true,
   },
 ];
 ---
 
-<section class="section section--stone" id="vorteile">
-  <div class="container">
+<section class="section section--sand" id="vorteile">
+  <div class="container vt__container">
     <div class="section-head reveal">
       <span class="section-kicker">Ihre Vorteile</span>
       <h2>Modulbau, der sich rechnet. Für Betreiber, Kommunen und Händler.</h2>
     </div>
 
     <div class="vt-grid">
-      {vorteile.map((v) => (
-        <article class="vt-card reveal">
+      {vorteile.map((v, i) => (
+        <article class={`vt-card reveal${v.big ? ' vt-card--big' : ''}${v.wide ? ' vt-card--wide' : ''}`} style={`--i:${i}`}>
           <span class="vt-card__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-              <path d={v.icon} />
+              <path d={v.icon} pathLength="1" />
             </svg>
           </span>
+          <p class="vt-card__kpi">{v.kpi}</p>
           <h3>{v.title}</h3>
           <p>{v.text}</p>
         </article>
@@ -55,62 +65,83 @@ const vorteile = [
     </div>
 
     <div class="vt-cta reveal">
-      <a href="#anfrage" class="btn btn--primary">Unverbindliches Angebot</a>
+      <a href="#anfrage" class="btn btn--primary btn--lg">Unverbindliches Angebot</a>
     </div>
   </div>
 </section>
 
 <style>
+  .vt__container { padding-inline: clamp(5%, 8vw, 12%); }
+
   .vt-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1.1rem, 2.5vw, 1.8rem);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(0.9rem, 1.6vw, 1.3rem);
   }
-
   .vt-card {
+    grid-column: span 2;
+    position: relative;
     background: var(--paper);
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
-    padding: 1.9rem 1.7rem;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    padding: clamp(1.4rem, 2.4vw, 2rem);
+    overflow: hidden;
+    transition: box-shadow 0.35s ease, transform 0.65s ease, opacity 0.65s ease, border-color 0.3s ease;
+    transition-delay: 0s, calc(var(--i) * 0.06s), calc(var(--i) * 0.06s), 0s;
   }
-  .vt-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-  }
+  .vt-card--big { grid-column: span 3; background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .vt-card--wide { grid-column: span 6; }
+  .vt-card--big p:last-child { color: rgba(255, 255, 255, 0.74); }
+  .vt-card:hover { box-shadow: var(--shadow-md); border-color: var(--accent); }
 
   .vt-card__icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 52px;
-    height: 52px;
+    display: inline-grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
     border-radius: 14px;
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--sand);
+    color: var(--ink);
     margin-bottom: 1.2rem;
   }
-  .vt-card__icon svg { width: 26px; height: 26px; }
-
-  .vt-card h3 {
-    font-size: 1.15rem;
-    margin-bottom: 0.45rem;
+  .vt-card--big .vt-card__icon { background: rgba(200, 169, 110, 0.18); color: var(--accent); }
+  .vt-card__icon svg { width: 24px; height: 24px; }
+  .vt-card__icon path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .vt-card.is-visible .vt-card__icon path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.4s ease 0.3s;
   }
-  .vt-card p {
-    color: var(--muted);
-    font-size: 0.98rem;
+
+  .vt-card__kpi {
+    position: absolute;
+    top: clamp(1.2rem, 2vw, 1.7rem);
+    right: clamp(1.2rem, 2vw, 1.7rem);
     margin: 0;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8a6f3a;
+    background: #f6efe0;
+    border-radius: 999px;
+    padding: 0.28rem 0.75rem;
   }
+  .vt-card--big .vt-card__kpi { background: rgba(200, 169, 110, 0.18); color: var(--accent); }
 
-  .vt-cta {
-    margin-top: 2.6rem;
-    text-align: center;
-  }
+  .vt-card h3 { font-size: 1.2rem; }
+  .vt-card p:last-child { margin: 0; font-size: 0.97rem; color: var(--muted); }
 
-  @media (max-width: 920px) {
-    .vt-grid { grid-template-columns: repeat(2, 1fr); }
+  .vt-cta { margin-top: clamp(2rem, 4vw, 3rem); text-align: center; }
+
+  @media (max-width: 1000px) {
+    .vt-card, .vt-card--big { grid-column: span 3; }
+    .vt-card--wide { grid-column: span 6; }
   }
-  @media (max-width: 600px) {
-    .vt-grid { grid-template-columns: 1fr; }
+  @media (max-width: 640px) {
+    .vt-card, .vt-card--big, .vt-card--wide { grid-column: span 6; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vt-card__icon path { stroke-dashoffset: 0; }
   }
 </style>

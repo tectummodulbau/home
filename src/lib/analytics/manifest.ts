@@ -92,6 +92,13 @@ export interface MeasurementChannel {
    * Kanal live gehen darf. Der Admin-Bereich zeigt sie als Checkliste.
    */
   activationSteps: string[];
+  /**
+   * Einstellungen im Konto des Anbieters. Sie entscheiden mit darüber, ob und
+   * wie gemessen wird — liegen aber außerhalb dieses Repositorys und lassen
+   * sich von der Analyseübersicht **nicht** prüfen. Sie werden deshalb immer
+   * angezeigt, auch bei einem Kanal, der im Code fertig ist.
+   */
+  accountSteps: string[];
   /** Gilt der Kanal nur auf den Hosts aus ANALYTICS_HOSTS? */
   hostLocked: boolean;
 }
@@ -116,6 +123,13 @@ export const MEASUREMENT_CHANNELS: MeasurementChannel[] = [
     fallbackId: GA4_MEASUREMENT_ID_DEFAULT,
     privacyPolicySection: 'Ziffer 5',
     activationSteps: [],
+    accountSteps: [
+      'Datenaufbewahrung auf 14 Monate stellen (Verwaltung → Dateneinstellungen → Datenaufbewahrung). GA4 steht standardmäßig auf 2 Monate, Ziffer 5 der veröffentlichten Datenschutzerklärung nennt aber bereits 14 Monate — solange das auseinanderläuft, ist die Erklärung falsch.',
+      'Schlüsselereignisse markieren, in dieser Reihenfolge: form_start, form_step_complete, generate_lead (Verwaltung → Ereignisse).',
+      'Internen Traffic ausschließen (Verwaltung → Datenstreams → Tag-Einstellungen → Internen Traffic definieren), sonst zählen die eigenen Besuche mit.',
+      'Google-Signale ausgeschaltet lassen. Eingeschaltet kämen geräteübergreifende Profile hinzu — das wäre eine neue Verarbeitung und müsste in der Datenschutzerklärung stehen.',
+      'Prüfen, dass unter dieser Mess-ID tatsächlich Daten ankommen: Berichte → Echtzeit, während die Seite mit erteilter Statistik-Zustimmung offen ist.',
+    ],
     hostLocked: true,
   },
   {
@@ -146,6 +160,11 @@ export const MEASUREMENT_CHANNELS: MeasurementChannel[] = [
       'Auftragsverarbeitungsvertrag prüfen und ins Verarbeitungsverzeichnis aufnehmen.',
       'Nach dem Deployment im Netzwerk-Tab gegenprüfen: vor der Zustimmung kein Request an Google.',
     ],
+    accountSteps: [
+      'Conversion-Aktion vom Typ „Lead" anlegen; Conversion-ID und Label daraus übernehmen.',
+      'Entscheiden, ob die Conversion aus GA4 importiert ODER über dieses Tag gemessen wird. Beides gleichzeitig zählt jeden Lead doppelt.',
+      'Erweiterte Conversions ausgeschaltet lassen — dabei würden gehashte Kontaktdaten aus dem Formular an Google gehen.',
+    ],
     hostLocked: true,
   },
   {
@@ -172,6 +191,11 @@ export const MEASUREMENT_CHANNELS: MeasurementChannel[] = [
       'Im Meta Events Manager prüfen, dass „Automatischer erweiterter Abgleich" ausgeschaltet bleibt.',
       'Nach dem Deployment im Netzwerk-Tab gegenprüfen: vor der Zustimmung kein Request an Meta.',
     ],
+    accountSteps: [
+      'Pixel im Events Manager anlegen und dessen ID übernehmen.',
+      '„Automatischer erweiterter Abgleich" im Events Manager ausgeschaltet lassen. Der Code schaltet ihn zwar mit autoConfig: false ab, die Kontoeinstellung ist aber die zweite Sicherung.',
+      'Die Conversions API bleibt außen vor — gemessen wird ausschließlich über den Browser-Pixel.',
+    ],
     hostLocked: true,
   },
   {
@@ -195,6 +219,9 @@ export const MEASUREMENT_CHANNELS: MeasurementChannel[] = [
       'CONSENT_VERSION in src/lib/consent/registry.ts erhöhen.',
       'Datenschutzerklärung um Google Tag Manager ergänzen.',
       'Doppelmessung ausschließen: bei aktivem GTM darf GA4 nicht zusätzlich direkt geladen werden.',
+    ],
+    accountSteps: [
+      'Container anlegen und im Container die Consent-Einstellungen konfigurieren; die Tags müssen auf die hier gesetzten Consent-Mode-Signale hören.',
     ],
     hostLocked: false,
   },

@@ -1,0 +1,170 @@
+/* ============================================================
+   3D-Szenen (siehe src/lib/iso) — Animation & Interaktion
+   ============================================================ */
+
+.iso {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.iso-item {
+  transform-box: view-box;
+}
+
+/* --- enter: Teile fahren beim Laden ein ----------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .iso--enter .iso-item {
+    animation: iso-in 1s cubic-bezier(0.2, 0.85, 0.25, 1) var(--d, 0s) both;
+  }
+
+  @keyframes iso-in {
+    from {
+      opacity: 0;
+      transform: translate(var(--tx, 0px), var(--ty, 0px));
+    }
+    60% {
+      opacity: 1;
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* --- scroll: --k (0…1) wird per JS je Teil gesetzt ------------------------ */
+.iso--scroll .iso-item[data-at] {
+  --k: 1;
+  opacity: clamp(0, calc(var(--k) * 1.6), 1);
+  transform: translate(calc((1 - var(--k)) * var(--tx, 0px)), calc((1 - var(--k)) * var(--ty, 0px)));
+  will-change: transform, opacity;
+}
+
+/* --- Konfigurator: zuschaltbare Erweiterungen ----------------------------- */
+.iso-addon {
+  transition: opacity 0.45s ease;
+}
+.iso-addon .iso-addon__in {
+  transition: transform 0.7s cubic-bezier(0.2, 0.85, 0.25, 1), opacity 0.45s ease;
+}
+.iso-addon.is-off {
+  pointer-events: none;
+}
+.iso-addon.is-off .iso-addon__in {
+  opacity: 0;
+  transform: translate(var(--tx, 0px), var(--ty, 0px));
+}
+
+/* --- Dauerhafte Mikro-Animationen ----------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .iso-glow {
+    animation: iso-glow 5s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes iso-glow {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 0.55; }
+  }
+
+  .iso-steam circle {
+    animation: iso-steam 3.2s ease-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+  }
+  .iso-steam circle:nth-child(2) { animation-delay: 0.9s; }
+  .iso-steam circle:nth-child(3) { animation-delay: 1.8s; }
+  @keyframes iso-steam {
+    0% { opacity: 0; transform: translateY(8px) scale(0.5); }
+    30% { opacity: 0.7; }
+    100% { opacity: 0; transform: translateY(-26px) scale(1.5); }
+  }
+
+  .iso-ripple {
+    animation: iso-ripple 3s ease-in-out infinite;
+    animation-delay: calc(var(--r, 0) * 0.4s);
+  }
+  @keyframes iso-ripple {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.75; }
+  }
+
+  .iso-sun {
+    animation: iso-sun 6s ease-in-out infinite;
+  }
+  .iso-sun polygon {
+    animation: iso-sun-glint 6s ease-in-out infinite;
+  }
+  @keyframes iso-sun-glint {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.16; }
+  }
+
+  .iso-hover {
+    transition: transform 0.45s cubic-bezier(0.2, 0.85, 0.25, 1);
+  }
+  .iso-card:hover .iso-hover {
+    transform: translateY(-10px);
+  }
+}
+
+/* Parallax-Ebene (per JS: --px / --py) */
+[data-tilt] {
+  --px: 0;
+  --py: 0;
+}
+[data-tilt] > .iso {
+  transform: translate3d(calc(var(--px) * -10px), calc(var(--py) * -8px), 0) rotate(calc(var(--px) * 0.6deg));
+  transition: transform 0.25s ease-out;
+}
+
+/* --- Werk-Schleifen -------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .iso-loop {
+    animation: iso-assemble 8s cubic-bezier(0.2, 0.85, 0.25, 1) var(--d, 0s) infinite both;
+  }
+  @keyframes iso-assemble {
+    0% { opacity: 0; transform: translate(var(--tx, 0px), var(--ty, 0px)); }
+    16%, 82% { opacity: 1; transform: none; }
+    94%, 100% { opacity: 0; transform: none; }
+  }
+
+  .iso-scan {
+    animation: iso-scan 5s ease-in-out infinite;
+  }
+  @keyframes iso-scan {
+    0% { opacity: 0; transform: translate(0, 0); }
+    10% { opacity: 1; }
+    80% { opacity: 1; transform: translate(var(--sx), var(--sy)); }
+    90%, 100% { opacity: 0; transform: translate(var(--sx), var(--sy)); }
+  }
+
+  .iso-badge {
+    animation: iso-badge 5s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @keyframes iso-badge {
+    0%, 70% { opacity: 0; scale: 0.3; }
+    82% { opacity: 1; scale: 1.18; }
+    90%, 96% { opacity: 1; scale: 1; }
+    100% { opacity: 0; scale: 1; }
+  }
+
+  .iso-drive {
+    animation: iso-drive 9s cubic-bezier(0.3, 0.1, 0.25, 1) infinite;
+  }
+  @keyframes iso-drive {
+    0% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+    8% { opacity: 1; }
+    42%, 62% { opacity: 1; transform: none; }
+    92% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(var(--dx) * -1), calc(var(--dy) * -1)); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iso-badge { opacity: 1; }
+  .iso-scan { display: none; }
+}

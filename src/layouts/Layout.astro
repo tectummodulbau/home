@@ -7,6 +7,7 @@ import '@fontsource/hanken-grotesk/300.css';
 import '@fontsource/hanken-grotesk/400.css';
 import '@fontsource/hanken-grotesk/600.css';
 import '../styles/global.css';
+import '../styles/iso.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PrivacyRoot from '../components/privacy/PrivacyRoot.astro';
@@ -89,11 +90,14 @@ const robots = noindex
          Als Modul deferred geladen, blockiert das Rendering nicht. Sendet
          nichts ohne Statistik-Zustimmung. -->
     <script src="../scripts/analytics-init.ts"></script>
+    <script src="../scripts/motion.ts"></script>
   </head>
   <body>
+    <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
     <Header />
     <slot />
     <Footer />
+    <a href="/#anfrage" class="sticky-cta" id="sticky-cta" data-track-section="sticky-cta">Unverbindliches Angebot</a>
     <PrivacyRoot />
   </body>
 </html>

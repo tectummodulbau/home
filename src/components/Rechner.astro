@@ -23,6 +23,13 @@
 
         <div class="rc__chips" id="rc-chips" aria-live="polite"></div>
 
+        <div class="rc__presets" role="group" aria-label="Szenario wählen">
+          <span class="rc__presets-label">Szenario</span>
+          <button type="button" class="rc__preset" data-aus="55" data-preis="80">Vorsichtig</button>
+          <button type="button" class="rc__preset" data-aus="60" data-preis="" data-default="1">Realistisch</button>
+          <button type="button" class="rc__preset" data-aus="70" data-preis="140">Ambitioniert</button>
+        </div>
+
         <div class="rc__slider">
           <div class="rc__slider-head">
             <label for="rc-module">Anzahl Einheiten</label>
@@ -62,13 +69,19 @@
 
       <div class="rc__results">
         <p class="rc__results-label">Netto-Mehrertrag</p>
-        <p class="rc__netto" id="rc-netto" aria-live="polite">+0&nbsp;€</p>
-        <p class="rc__netto-sub">pro Jahr</p>
+        <p class="rc__netto" id="rc-netto">+0&nbsp;€</p>
+        <p class="rc__netto-sub">pro Jahr · <span id="rc-pro-einheit">—</span> je Einheit</p>
+        <span class="sr-only" id="rc-netto-sr" aria-live="polite"></span>
 
         <div class="rc__roi" id="rc-roi-badge">
           <span>ROI-Amortisation</span>
           <strong id="rc-roi">–</strong>
         </div>
+
+        <figure class="rc__chart">
+          <figcaption>Kumulierter Mehrertrag über 10 Jahre</figcaption>
+          <svg id="rc-chart" viewBox="0 0 320 150" role="img" aria-label="Verlauf des kumulierten Mehrertrags im Vergleich zur Investition"></svg>
+        </figure>
 
         <dl class="rc__rows">
           <div><dt>Vermietungsumsatz (neu)</dt><dd id="rc-umsatz">—</dd></div>
@@ -93,7 +106,7 @@
     display: grid;
     grid-template-columns: 1.25fr 1fr;
     gap: clamp(1.2rem, 3vw, 2.4rem);
-    max-width: 1020px;
+    max-width: 1080px;
     margin-inline: auto;
   }
 
@@ -138,6 +151,69 @@
     min-height: 1.8rem;
   }
   .rc__chips :global(.chip) { font-size: 0.75rem; }
+
+  .rc__presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.3rem;
+    border-bottom: 1px dashed var(--line);
+  }
+  .rc__presets-label {
+    font-family: var(--font-head);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 0.3rem;
+  }
+  .rc__preset {
+    font-family: var(--font-head);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.95rem;
+    border-radius: 999px;
+    border: 1.5px dashed var(--line);
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .rc__preset:hover { border-color: var(--ink); border-style: solid; }
+  .rc__preset.is-active { background: var(--accent); border-color: var(--accent); border-style: solid; color: var(--ink); }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .rc__chart { margin: 0 0 1.3rem; }
+  .rc__chart figcaption {
+    font-family: var(--font-head);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.4rem;
+  }
+  .rc__chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .rc__chart :global(.ch-line) { transition: d 0.45s ease; }
+  .rc__chart :global(.ch-label) {
+    font-family: var(--font-head);
+    font-size: 9px;
+    font-weight: 700;
+    fill: rgba(255, 255, 255, 0.55);
+  }
+  .rc__chart :global(.ch-be) { animation: rc-be 2s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes rc-be { 0% { box-shadow: none; opacity: 1; } 70%, 100% { opacity: 0.25; } }
 
   .rc__slider { margin-bottom: 1.35rem; }
   .rc__slider:last-child { margin-bottom: 0; }
@@ -226,8 +302,9 @@
   .rc__netto-sub {
     color: rgba(255, 255, 255, 0.55);
     font-size: 0.9rem;
-    margin-bottom: 1.4rem;
+    margin-bottom: 1.2rem;
   }
+  .rc__netto-sub span { color: rgba(255, 255, 255, 0.85); font-weight: 600; }
 
   .rc__roi {
     display: flex;
@@ -299,6 +376,11 @@
 
   let variant = 'schlaf';
 
+  /** Angezeigter Netto-Wert (für die Zahlen-Animation). */
+  let angezeigt = 0;
+  let tweenId = 0;
+  let srTimer: number | undefined;
+
   /**
    * Zuletzt berechneter Netto-Mehrertrag. `update()` schreibt ihn mit, damit
    * calculator_configured die Formel nicht ein zweites Mal nachbauen muss.
@@ -361,8 +443,9 @@
     letzterMehrertrag = netto;
 
     const nettoEl = $('rc-netto');
-    nettoEl.textContent = fmtSign(netto);
+    zeigeNetto(netto);
     nettoEl.classList.toggle('is-negative', netto < 0);
+    $('rc-pro-einheit').textContent = fmtSign(netto / mod);
 
     $('rc-umsatz').textContent = '+' + fmt(umsatz);
     $('rc-leasing').textContent = '−' + fmt(leasing);
@@ -381,20 +464,115 @@
     $('rc-roi-badge').classList.toggle('is-good', years !== null && years < 8);
 
     ['rc-module', 'rc-auslastung', 'rc-preis', 'rc-heute'].forEach((id) => paintTrack(input(id)));
+    zeichneChart(netto, inv, years);
+
+    const aktiv = presetFor(Math.round(aus * 100), prs);
+    document.querySelectorAll<HTMLElement>('.rc__preset').forEach((b) => b.classList.toggle('is-active', b === aktiv));
+  }
+
+  /** Zahl weich zum neuen Wert laufen lassen. */
+  function zeigeNetto(ziel: number) {
+    cancelAnimationFrame(tweenId);
+    const von = angezeigt;
+    const t0 = performance.now();
+    const reduziert = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const el = $('rc-netto');
+    const schritt = (jetzt: number) => {
+      const t = reduziert ? 1 : Math.min(1, (jetzt - t0) / 450);
+      const e = 1 - Math.pow(1 - t, 3);
+      angezeigt = von + (ziel - von) * e;
+      el.textContent = fmtSign(angezeigt);
+      if (t < 1) tweenId = requestAnimationFrame(schritt);
+      else angezeigt = ziel;
+    };
+    tweenId = requestAnimationFrame(schritt);
+    // Screenreader bekommt nur den Endwert, nicht jeden Zwischenschritt.
+    clearTimeout(srTimer);
+    srTimer = window.setTimeout(() => {
+      $('rc-netto-sr').textContent = `Netto-Mehrertrag ${fmtSign(ziel)} pro Jahr`;
+    }, 700);
+  }
+
+  /** Kumulierter Mehrertrag vs. Investition, 10 Jahre. */
+  function zeichneChart(netto: number, inv: number, years: number | null) {
+    const W = 320, H = 150, L = 6, R = 10, T = 14, B = 22;
+    const jahre = 10;
+    const werte = [0, inv, netto * jahre];
+    const max = Math.max(...werte, 1) * 1.08;
+    const min = Math.min(...werte, 0);
+    const x = (j: number) => L + ((W - L - R) * j) / jahre;
+    const y = (v: number) => T + ((H - T - B) * (max - v)) / (max - min);
+    const end = netto * jahre;
+    const linie = `M${x(0)} ${y(0)} L${x(jahre)} ${y(end)}`;
+    const flaeche = `${linie} L${x(jahre)} ${y(0)} Z`;
+    let svg = `<defs><linearGradient id="rc-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8a96e" stop-opacity=".45"/><stop offset="1" stop-color="#c8a96e" stop-opacity="0"/></linearGradient></defs>`;
+    svg += `<path d="M${L} ${y(0)} H${W - R}" stroke="rgba(255,255,255,.18)" stroke-width="1"/>`;
+    for (let j = 0; j <= jahre; j += 2) svg += `<text class="ch-label" x="${x(j)}" y="${H - 6}" text-anchor="middle">${j === 0 ? 'Start' : 'J' + j}</text>`;
+    if (netto > 0) svg += `<path d="${flaeche}" fill="url(#rc-grad)"/>`;
+    svg += `<path d="M${L} ${y(inv)} H${W - R}" stroke="#e08a7a" stroke-width="1.3" stroke-dasharray="4 4"/>`;
+    svg += `<text class="ch-label" x="${W - R}" y="${y(inv) - 4}" text-anchor="end" fill="#e08a7a" style="fill:#e08a7a">Investition</text>`;
+    svg += `<path class="ch-line" d="${linie}" fill="none" stroke="${netto >= 0 ? '#c8a96e' : '#e08a7a'}" stroke-width="2.5" stroke-linecap="round"/>`;
+    if (years !== null && years <= jahre) {
+      svg += `<circle class="ch-be" cx="${x(years)}" cy="${y(inv)}" r="9" fill="#c8a96e" opacity=".3"/><circle cx="${x(years)}" cy="${y(inv)}" r="4.5" fill="#c8a96e" stroke="#14130f" stroke-width="2"/>`;
+      svg += `<text class="ch-label" x="${Math.min(x(years), W - 26)}" y="${y(inv) + 16}" text-anchor="middle" style="fill:#fff">Break-even ~J${Math.ceil(years)}</text>`;
+    }
+    $('rc-chart').innerHTML = svg;
+  }
+
+  /** Welches Szenario passt zu den aktuellen Reglern? */
+  function presetFor(aus: number, prs: number): HTMLElement | null {
+    for (const b of document.querySelectorAll<HTMLElement>('.rc__preset')) {
+      const p = b.dataset.preis ? +b.dataset.preis : VARIANTS[variant].preisDefault;
+      if (+b.dataset.aus! === aus && p === prs) return b;
+    }
+    return null;
+  }
+
+  function waehleVariante(key: string) {
+    variant = key in VARIANTS ? key : 'schlaf';
+    document.querySelectorAll<HTMLElement>('.rc__tab').forEach((t) => {
+      const on = t.dataset.variant === variant;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', String(on));
+    });
+    input('rc-preis').value = String(VARIANTS[variant].preisDefault);
+    renderChips();
+    update();
   }
 
   document.querySelectorAll<HTMLButtonElement>('.rc__tab').forEach((tab) => {
     tab.addEventListener('click', () => {
-      variant = tab.dataset.variant ?? 'schlaf';
-      document.querySelectorAll('.rc__tab').forEach((t) => {
-        t.classList.toggle('is-active', t === tab);
-        t.setAttribute('aria-selected', String(t === tab));
-      });
-      input('rc-preis').value = String(VARIANTS[variant].preisDefault);
-      renderChips();
-      update();
+      waehleVariante(tab.dataset.variant ?? 'schlaf');
       meldeInteraktion();
     });
+  });
+
+  // Szenarien setzen Auslastung und Preis in einem Schritt
+  document.querySelectorAll<HTMLButtonElement>('.rc__preset').forEach((b) =>
+    b.addEventListener('click', () => {
+      input('rc-auslastung').value = b.dataset.aus ?? '60';
+      input('rc-preis').value = b.dataset.preis || String(VARIANTS[variant].preisDefault);
+      update();
+      meldeInteraktion();
+    })
+  );
+
+  // „Ertrag mit dieser Einheit rechnen" aus den Modulkarten: Variante vorwählen.
+  // Bewusst kein Tracking — das ist Navigation, keine Rechner-Interaktion.
+  document.querySelectorAll<HTMLAnchorElement>('[data-calc-variant]').forEach((a) =>
+    a.addEventListener('click', () => waehleVariante(a.dataset.calcVariant ?? 'schlaf'))
+  );
+
+  // Rechner-CTA: gewählte Größenordnung im Anfrageformular vorbelegen.
+  document.querySelector<HTMLAnchorElement>('.rc__cta')?.addEventListener('click', () => {
+    const sel = document.getElementById('lf-einheiten') as HTMLSelectElement | null;
+    if (!sel) return;
+    const n = +input('rc-module').value;
+    const ziel = n <= 20 ? '10 bis 20 Einheiten' : '21 bis 50 Einheiten';
+    if ([...sel.options].some((o) => o.value === ziel)) {
+      sel.value = ziel;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   });
 
   ['rc-module', 'rc-auslastung', 'rc-preis', 'rc-heute'].forEach((id) =>
