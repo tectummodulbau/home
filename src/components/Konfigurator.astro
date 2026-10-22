@@ -1,0 +1,391 @@
+---
+import { configScene } from '../lib/iso/scenes';
+import type { Variant } from '../lib/iso/objects';
+
+const basis: { key: Variant; label: string }[] = [
+  { key: 'schlaf', label: 'Schlafeinheit' },
+  { key: 'wohn', label: 'Wohnraumeinheit' },
+  { key: 'luxus', label: 'Luxuseinheit' },
+];
+
+const addons = [
+  {
+    key: 'terrasse',
+    title: 'Terrasse & Lounge',
+    kurz: 'Aufenthaltsqualität',
+    text: 'Gestaltete Terrasse direkt an der Einheit — gemeinsam mit der Haupteinheit geliefert.',
+    on: true,
+  },
+  {
+    key: 'pool',
+    title: 'Außenanlage mit Pool',
+    kurz: 'Poolanlage, Whirlpool, Terrasse',
+    text: 'Jede Tectum-Einheit lässt sich um einen vollwertigen Außenbereich erweitern. Die Konfiguration wird individuell abgestimmt.',
+    on: true,
+  },
+  {
+    key: 'sauna',
+    title: 'Sauna & Wellness',
+    kurz: 'Wellness als fester Bestandteil',
+    text: 'Individuell konfigurierter Wellnessbereich — schlüsselfertig, ohne separates Gewerk, ohne zusätzliche Baustelle.',
+    on: false,
+  },
+  {
+    key: 'fitness',
+    title: 'Fitnesseinheit',
+    kurz: 'Eigener Fitnessbereich',
+    text: 'Direkte Erweiterung Ihrer Tectum-Einheit. Ausstattung und Größe werden individuell abgestimmt — kauf- oder leasingfähig.',
+    on: false,
+  },
+  {
+    key: 'pv',
+    title: 'Photovoltaik & Speicher',
+    kurz: 'Geringere Betriebskosten',
+    text: 'PV-Anlage und Batteriespeicher je Einheit — unabhängiger vom Netz und niedrigere laufende Kosten.',
+    on: true,
+  },
+];
+
+const szenen = basis.map((b) => ({ ...b, svg: configScene(b.key, b.key) }));
+---
+
+<section class="section kf" id="konfigurator">
+  <div class="container kf__container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-kicker">Konfigurator</span>
+      <h2>Mehr als vier Wände. Stellen Sie Ihr Angebot zusammen.</h2>
+      <p class="section-lead">
+        Alle Tectum-Einheiten lassen sich frei kombinieren und mit Zusatzmodulen erweitern.
+        Schalten Sie Erweiterungen zu und sehen Sie, wie aus einer Wohneinheit eine komplette
+        Anlage wird, die Ihre Gäste begeistert und Ihren Ertrag steigert.
+      </p>
+    </div>
+
+    <div class="kf__layout reveal" id="kf-root">
+      <div class="kf__stage" data-tilt>
+        {szenen.map((s, i) => (
+          <div class="kf__scene" data-variant={s.key} hidden={i !== 1}>
+            <Fragment set:html={s.svg} />
+          </div>
+        ))}
+        <p class="kf__badge" aria-live="polite"><span id="kf-count">3</span> Erweiterungen aktiv</p>
+      </div>
+
+      <div class="kf__panel">
+        <p class="kf__label">1 · Einheit wählen</p>
+        <div class="kf__tabs" role="tablist" aria-label="Basiseinheit">
+          {basis.map((b) => (
+            <button type="button" role="tab" class={`kf__tab${b.key === 'wohn' ? ' is-active' : ''}`} data-variant={b.key} aria-selected={b.key === 'wohn'}>
+              {b.label}
+            </button>
+          ))}
+        </div>
+
+        <p class="kf__label">2 · Erweiterungen zuschalten</p>
+        <ul class="kf__addons">
+          {addons.map((a) => (
+            <li>
+              <button type="button" class={`kf__addon${a.on ? ' is-on' : ''}`} data-addon={a.key} aria-pressed={a.on}>
+                <span class="kf__switch" aria-hidden="true"><i></i></span>
+                <span class="kf__addon-text">
+                  <strong>{a.title}</strong>
+                  <small>{a.text}</small>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <a href="#anfrage" class="btn btn--primary kf__cta">Diese Anlage anfragen</a>
+        <p class="kf__note">Alle Erweiterungen sind kauf- oder leasingfähig und werden individuell abgestimmt.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobil: Vorschau am unteren Rand, sobald einmal geschaltet wurde und die
+       Hauptvorschau aus dem Bild gescrollt ist. Szenen werden per Skript geklont. -->
+  <div class="kf__dock" id="kf-dock" aria-hidden="true">
+    <div class="kf__dock-scenes"></div>
+    <p class="kf__badge"><span id="kf-dock-count">3</span> Erweiterungen aktiv</p>
+  </div>
+</section>
+
+<style>
+  .kf__container { padding-inline: clamp(5%, 8vw, 12%); }
+
+  .kf__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.2rem, 3vw, 2.5rem);
+    align-items: center;
+  }
+
+  .kf__stage {
+    position: relative;
+    background:
+      linear-gradient(rgba(20, 19, 15, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20, 19, 15, 0.045) 1px, transparent 1px),
+      #fff;
+    background-size: 40px 40px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(0.8rem, 2vw, 1.6rem);
+  }
+  .kf__stage :global(.iso) { filter: drop-shadow(0 22px 26px rgba(20, 19, 15, 0.14)); }
+
+  .kf__badge {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    margin: 0;
+    font-family: var(--font-head);
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+  }
+
+  .kf__label {
+    font-family: var(--font-head);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.7rem;
+  }
+
+  .kf__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.6rem;
+  }
+  .kf__tab {
+    font-family: var(--font-head);
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .kf__tab:hover { border-color: var(--ink); }
+  .kf__tab.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .kf__addons {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .kf__addon {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    align-items: center;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .kf__addon:hover { border-color: var(--ink-soft); }
+  .kf__addon.is-on { border-color: var(--ink); box-shadow: var(--shadow-sm); }
+  .kf__addon-text strong { display: block; font-family: var(--font-head); font-size: 0.98rem; }
+  .kf__addon-text small {
+    display: block;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--muted);
+    margin-top: 0.1rem;
+  }
+
+  .kf__switch {
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--line);
+    position: relative;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+  }
+  .kf__switch i {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.25s cubic-bezier(0.2, 0.85, 0.25, 1);
+  }
+  .kf__addon.is-on .kf__switch { background: var(--green); }
+  .kf__addon.is-on .kf__switch i { transform: translateX(18px); }
+
+  .kf__cta { width: 100%; justify-content: center; }
+  .kf__note { font-size: 0.82rem; color: var(--muted); margin: 0.8rem 0 0; text-align: center; }
+
+  .kf__dock { display: none; }
+
+  @media (max-width: 900px) {
+    .kf__layout { grid-template-columns: 1fr; }
+    .kf__stage { padding: 2.6rem 0.2rem 0.4rem; margin-inline: -0.6rem; }
+
+    .kf.is-touched { padding-bottom: calc(34svh + 2rem); }
+    .kf__dock {
+      display: block;
+      position: fixed;
+      left: 0.7rem;
+      right: 0.7rem;
+      bottom: max(0.7rem, env(safe-area-inset-bottom));
+      z-index: 140;
+      height: 32svh;
+      padding: 2.4rem 0.2rem 0.2rem;
+      background:
+        linear-gradient(rgba(20, 19, 15, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 19, 15, 0.045) 1px, transparent 1px),
+        #fff;
+      background-size: 32px 32px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 14px 40px rgba(20, 19, 15, 0.22);
+      transform: translateY(130%);
+      visibility: hidden;
+      transition: transform 0.4s cubic-bezier(0.2, 0.85, 0.25, 1), visibility 0s linear 0.4s;
+    }
+    .kf__dock.is-on {
+      transform: none;
+      visibility: visible;
+      transition: transform 0.4s cubic-bezier(0.2, 0.85, 0.25, 1), visibility 0s;
+    }
+    .kf__dock-scenes { height: 100%; }
+    .kf__dock-scenes :global(.kf__scene) { height: 100%; }
+    .kf__dock-scenes :global(.iso) { width: 100%; height: 100%; }
+    .kf__dock .kf__badge { left: 0.7rem; top: 0.7rem; font-size: 0.72rem; padding: 0.28rem 0.7rem; }
+  }
+  /* Die Sticky-CTA-Leiste würde die Vorschau überdecken */
+  :global([data-kf-dock] .sticky-cta) { transform: translateY(160%) !important; }
+</style>
+
+<script>
+  const root = document.getElementById('kf-root');
+  const section = document.getElementById('konfigurator');
+  if (root && section) {
+    const sceneSel = '.kf__scene';
+    const scenes = [...root.querySelectorAll<HTMLElement>(sceneSel)];
+    const tabs = root.querySelectorAll<HTMLButtonElement>('.kf__tab');
+    const buttons = root.querySelectorAll<HTMLButtonElement>('.kf__addon');
+    const count = document.getElementById('kf-count');
+    const badge = root.querySelector<HTMLElement>('.kf__badge');
+
+    // Vorschau-Dock (mobil): geklonte Szenen, IDs umbenannt, damit Verläufe/Filter eindeutig bleiben
+    const dock = document.getElementById('kf-dock');
+    const dockCount = document.getElementById('kf-dock-count');
+    const dockBadge = dock?.querySelector<HTMLElement>('.kf__badge');
+    const dockHost = dock?.querySelector<HTMLElement>('.kf__dock-scenes');
+    const dockScenes: HTMLElement[] = [];
+    if (dockHost) {
+      scenes.forEach((sc) => {
+        const html = sc.outerHTML
+          .replace(/ id="/g, ' id="d-')
+          .replace(/url\(#/g, 'url(#d-')
+          .replace(/href="#/g, 'href="#d-');
+        dockHost.insertAdjacentHTML('beforeend', html);
+        dockScenes.push(dockHost.lastElementChild as HTMLElement);
+      });
+    }
+    const allScenes = () => [...scenes, ...dockScenes];
+
+    const state = new Map<string, boolean>();
+    buttons.forEach((b) => state.set(b.dataset.addon!, b.classList.contains('is-on')));
+
+    const paint = () => {
+      allScenes().forEach((sc) =>
+        sc.querySelectorAll<SVGElement>('.iso-addon').forEach((g) =>
+          g.classList.toggle('is-off', !state.get(g.dataset.addon!))
+        )
+      );
+      const n = [...state.values()].filter(Boolean).length;
+      const label = n === 1 ? ' Erweiterung aktiv' : ' Erweiterungen aktiv';
+      if (count) count.textContent = String(n);
+      if (dockCount) dockCount.textContent = String(n);
+      if (badge) badge.lastChild!.textContent = label;
+      if (dockBadge) dockBadge.lastChild!.textContent = label;
+    };
+
+    // Dock erscheint erst nach der ersten Bedienung und nur, solange die
+    // Hauptvorschau nicht im Bild ist.
+    let touched = false;
+    let stageSeen = true;
+    let sectionSeen = false;
+    const syncDock = () => {
+      const on = touched && sectionSeen && !stageSeen;
+      dock?.classList.toggle('is-on', on);
+      dock?.setAttribute('aria-hidden', String(!on));
+      document.documentElement.toggleAttribute('data-kf-dock', on);
+    };
+    const touch = () => {
+      if (touched) return;
+      touched = true;
+      section.classList.add('is-touched');
+      syncDock();
+    };
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        (e) => {
+          stageSeen = e[e.length - 1].isIntersecting;
+          syncDock();
+        },
+        { threshold: 0.45 },
+      ).observe(root.querySelector('.kf__stage')!);
+      new IntersectionObserver(
+        (e) => {
+          sectionSeen = e[e.length - 1].isIntersecting;
+          syncDock();
+        },
+        // Nur der untere Streifen in Höhe des Docks zählt: Sobald das Ende des
+        // Abschnitts die Oberkante des Docks erreicht, wird er ausgeblendet und
+        // schiebt sich nicht über den nächsten Abschnitt.
+        { threshold: 0, rootMargin: '-62% 0px 0px 0px' },
+      ).observe(section);
+    }
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        const on = !state.get(b.dataset.addon!);
+        state.set(b.dataset.addon!, on);
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', String(on));
+        paint();
+        touch();
+      })
+    );
+
+    tabs.forEach((t) =>
+      t.addEventListener('click', () => {
+        tabs.forEach((x) => {
+          x.classList.toggle('is-active', x === t);
+          x.setAttribute('aria-selected', String(x === t));
+        });
+        scenes.forEach((sc) => (sc.hidden = sc.dataset.variant !== t.dataset.variant));
+        dockScenes.forEach((sc) => (sc.hidden = sc.dataset.variant !== t.dataset.variant));
+        touch();
+      })
+    );
+
+    paint();
+  }
+</script>

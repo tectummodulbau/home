@@ -5,12 +5,12 @@ import logoTuevNord from '../assets/logo-tuev-nord.png';
 import logoTuevSued from '../assets/logo-tuev-sued.png';
 import logoFsc from '../assets/logo-fsc.png';
 import logoInnovator from '../assets/logo-innovator.png';
+import { heroScene, heroSpots } from '../lib/iso/scenes';
 
 // Intrinsische Höhe bewusst großzügig gewählt (max. Anzeigehöhe auf Desktop
 // ist 76 px). Mit densities werden zusätzliche 2×/3×-Varianten generiert,
 // damit die Logos auf Retina-Displays und beim CSS-Hochskalieren scharf
-// bleiben. Vorher wurden die Bilder in Zwerggröße erzeugt (2 kB pro Logo)
-// und sichtbar unscharf hochgerechnet.
+// bleiben.
 const zertifikate = [
   { src: logoDgnb, alt: 'DGNB — Deutsche Gesellschaft für Nachhaltiges Bauen' },
   { src: logoTuevNord, alt: 'TÜV Nord zertifiziert' },
@@ -20,22 +20,34 @@ const zertifikate = [
 ];
 // Liste verdoppelt, damit der Slider nahtlos loopt.
 const zertifikateLoop = [...zertifikate, ...zertifikate];
+
+const szene = heroScene();
+const spots = heroSpots();
 ---
 
 <section class="hero">
+  <div class="hero__grid-bg" aria-hidden="true"></div>
+
   <div class="container hero__grid">
     <div class="hero__copy">
-      <span class="section-kicker">Tectum Modulbau</span>
-      <h1>Modulhäuser &amp; Tiny Häuser. Geliefert. Zertifiziert. Sofort einsatzbereit.</h1>
+      <span class="hero__kicker"><i aria-hidden="true"></i>Tectum Modulbau · B2B ab 10 Einheiten</span>
+      <h1>
+        <span class="hero__line" style="--i:0">Modulhäuser &amp; Tiny Häuser.</span>
+        <span class="hero__line hero__line--accent" style="--i:1">Geliefert. Zertifiziert. Sofort einsatzbereit.</span>
+      </h1>
       <p class="hero__lead">
         Tectum liefert schlüsselfertige Modulhäuser und modular kombinierbare Wohneinheiten für
         Campingplatzbetreiber, Kommunen, Wohnparks und Wiederverkäufer. DGNB-zertifiziert, fertig
         ab Werk in wenigen Wochen. Kauf und Leasing möglich.
       </p>
       <div class="hero__actions">
-        <a href="#anfrage" class="btn btn--primary">Unverbindliches Angebot</a>
-        <a href="#module" class="btn btn--ghost">Unsere Module</a>
+        <a href="#anfrage" class="btn btn--primary btn--lg">Unverbindliches Angebot</a>
+        <a href="#rechner" class="btn btn--ghost btn--lg">Rendite berechnen</a>
       </div>
+      <p class="hero__micro">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+        Kostenlos &amp; unverbindlich · Antwort innerhalb von 24 Stunden
+      </p>
       <ul class="hero__facts">
         <li><strong>GEG</strong><span>konforme Bauweise</span></li>
         <li><strong>ab 10</strong><span>Einheiten skalierbar</span></li>
@@ -43,47 +55,28 @@ const zertifikateLoop = [...zertifikate, ...zertifikate];
       </ul>
     </div>
 
-    <div class="hero__media">
-      <div class="hero__video-wrap" id="hero-video-wrap">
-        <video
-          class="hero__video"
-          id="hero-video"
-          poster="/video/hero-film-poster.jpg"
-          autoplay
-          muted
-          loop
-          playsinline
-          preload="metadata"
-          aria-label="Tectum Moduleinheit — Imagefilm"
-        >
-          <source src="/video/hero-film.mp4" type="video/mp4" />
-        </video>
+    <div class="hero__stage" data-tilt>
+      <Fragment set:html={szene} />
+      <ul class="hero__spots" aria-hidden="true">
+        {spots.map((s, i) => (
+          <li class={`hero__spot hero__spot--${s.side}`} style={`left:${s.x}%;top:${s.y}%;--i:${i}`}>
+            <i></i><span>{s.label}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
 
-        <div class="hero__video-controls" role="group" aria-label="Videosteuerung">
-          <button type="button" class="hero__video-btn" id="hero-video-play" aria-label="Video pausieren" aria-pressed="false">
-            <svg class="icon-pause" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
-            <svg class="icon-play is-icon-hidden" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 5.5v13l11-6.5-11-6.5Z" /></svg>
-          </button>
-          <button type="button" class="hero__video-btn" id="hero-video-stop" aria-label="Video stoppen">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="5.5" y="5.5" width="13" height="13" rx="1.5" /></svg>
-          </button>
-          <button type="button" class="hero__video-btn" id="hero-video-mute" aria-label="Ton einschalten" aria-pressed="true">
-            <svg class="icon-muted" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z" /><path d="M16 9.5c1 1.5 1 3.5 0 5" /><line x1="19.5" y1="6.5" x2="15" y2="17.5" /></svg>
-            <svg class="icon-unmuted is-icon-hidden" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z" /><path d="M16 9.5c1 1.5 1 3.5 0 5" /><path d="M18.5 7.5c2 2.5 2 6.5 0 9" /></svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="hero__certs">
-        <span class="hero__trust-label">Zertifiziert &amp; ausgezeichnet</span>
-        <div class="hero__certs-track-wrap">
-          <div class="hero__certs-track">
-            {zertifikateLoop.map((z) => (
-              <span class="hero__cert">
-                <Image src={z.src} alt={z.alt} height={80} densities={[1.5, 2, 3]} loading="eager" />
-              </span>
-            ))}
-          </div>
+  <div class="container hero__certs">
+    <div class="hero__certs-bar">
+      <span class="hero__trust-label">Zertifiziert &amp; ausgezeichnet</span>
+      <div class="hero__certs-track-wrap">
+        <div class="hero__certs-track">
+          {zertifikateLoop.map((z) => (
+            <span class="hero__cert">
+              <Image src={z.src} alt={z.alt} height={80} densities={[1.5, 2, 3]} loading="eager" />
+            </span>
+          ))}
         </div>
       </div>
     </div>
@@ -92,279 +85,303 @@ const zertifikateLoop = [...zertifikate, ...zertifikate];
 
 <style>
   .hero {
-    background: var(--paper);
+    position: relative;
     overflow: hidden;
+    background:
+      radial-gradient(ellipse 60% 70% at 78% 40%, #fbf7ee 0%, rgba(251, 247, 238, 0) 70%),
+      linear-gradient(180deg, #f4f1ea 0%, #ffffff 100%);
+  }
+
+  /* Skizzenpapier: feines Raster, nach außen ausgeblendet */
+  .hero :global(.container) {
+    padding-inline: clamp(5%, 6vw, 9%);
+  }
+
+  .hero__grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(20, 19, 15, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20, 19, 15, 0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 80% at 70% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 80% at 70% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
   }
 
   .hero__grid {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(1rem, 3vw, 2.5rem);
-    padding-block: clamp(1.5rem, 5vw, 6.5rem) clamp(2.5rem, 6vw, 6.5rem);
+    position: relative;
+    display: grid;
+    gap: clamp(0.5rem, 3vw, 2rem);
+    align-items: center;
+    padding-block: clamp(5.2rem, 14vw, 6.5rem) clamp(1rem, 3vw, 2rem);
   }
 
-  /* Mobile-first: .hero__copy löst sich optisch auf, damit seine Kinder
-     zusammen mit dem Medien-Block direkt im Flex angeordnet werden können.
-     Reihenfolge: Subheader, Header, Video+Zertifikate, Buttons, Text, Kennzahlen —
-     damit CTA und Vertrauenssignale direkt im ersten Sichtbereich landen. */
-  .hero__copy { display: contents; }
+  .hero__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-head);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.45rem 0.95rem;
+    margin-bottom: 1.3rem;
+  }
+  .hero__kicker i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 rgba(200, 169, 110, 0.6);
+    animation: hero-pulse 2.4s ease-out infinite;
+  }
+  @keyframes hero-pulse {
+    to { box-shadow: 0 0 0 10px rgba(200, 169, 110, 0); }
+  }
 
-  .hero__copy > .section-kicker { order: 1; }
-  .hero__copy > h1 { order: 2; }
-  .hero__media { order: 3; }
-  .hero__copy > .hero__actions { order: 4; }
-  .hero__copy > .hero__lead { order: 5; }
-  .hero__copy > .hero__facts { order: 6; }
+  h1 {
+    font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+    line-height: 1.06;
+    margin-bottom: 1.1rem;
+  }
+  .hero__line {
+    display: block;
+  }
+  .hero__line--accent {
+    margin-top: 0.15em;
+    font-size: 0.62em;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--muted);
+  }
 
   .hero__lead {
-    font-size: 1.15rem;
+    font-size: 1.12rem;
     color: var(--muted);
-    max-width: 34rem;
+    max-width: 33rem;
   }
 
   .hero__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.9rem;
+    gap: 0.8rem;
+    margin-top: 1.6rem;
   }
+
+  .hero__micro {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0 0;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  .hero__micro svg { color: var(--green); flex-shrink: 0; }
 
   .hero__facts {
     list-style: none;
     display: flex;
-    gap: clamp(1.5rem, 4vw, 2.8rem);
-    padding: 0;
-    margin: 0;
+    gap: clamp(1.4rem, 4vw, 2.8rem);
+    padding: 1.4rem 0 0;
+    margin: 1.8rem 0 0;
+    border-top: 1px solid var(--line);
   }
-  .hero__facts li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
+  .hero__facts li { display: flex; flex-direction: column; gap: 0.15rem; }
   .hero__facts strong {
     font-family: var(--font-head);
     font-weight: 800;
     font-size: 1.45rem;
   }
-  .hero__facts span {
-    font-size: 0.86rem;
-    color: var(--muted);
+  .hero__facts span { font-size: 0.86rem; color: var(--muted); }
+
+  /* ---------- 3D-Bühne ---------- */
+  .hero__stage {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    margin-inline: auto;
+  }
+  .hero__stage :global(.iso) {
+    filter: drop-shadow(0 30px 40px rgba(20, 19, 15, 0.12));
   }
 
-  /* Video und Zertifikate — kein umschließender Kasten mehr */
-  .hero__media {
+  .hero__spots {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .hero__spot {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transform: translate(-7px, -50%);
+    opacity: 0;
+    animation: hero-spot-in 0.6s ease calc(2.1s + var(--i) * 0.25s) forwards;
+    pointer-events: none;
+  }
+  .hero__spot--l { flex-direction: row-reverse; transform: translate(calc(-100% + 7px), -50%); }
+  .hero__spot i {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 0 rgba(200, 169, 110, 0.7), 0 2px 8px rgba(20, 19, 15, 0.25);
+    animation: hero-pulse 2.4s ease-out infinite;
+  }
+  .hero__spot span {
+    font-family: var(--font-head);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 999px;
+    padding: 0.28rem 0.7rem;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+  }
+  @keyframes hero-spot-in {
+    from { opacity: 0; margin-top: 8px; }
+    to { opacity: 1; margin-top: 0; }
+  }
+  @media (max-width: 640px) {
+    .hero__spot span { display: none; }
+  }
+
+  /* ---------- Zertifikate (bleiben vorn) ---------- */
+  .hero__certs {
+    position: relative;
+    padding-bottom: clamp(1.5rem, 4vw, 3rem);
+  }
+  .hero__certs-bar {
     display: flex;
     flex-direction: column;
-    gap: clamp(1rem, 2.5vw, 1.6rem);
-  }
-
-  .hero__video-wrap {
-    position: relative;
+    gap: 0.9rem;
+    background: #fff;
+    border: 1px solid var(--line);
     border-radius: var(--radius-lg);
-    overflow: hidden;
     box-shadow: var(--shadow-md);
-  }
-
-  .hero__video {
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    max-height: 48vh;
-    object-fit: contain;
-    background: var(--ink);
-  }
-
-  .hero__video-controls {
-    position: absolute;
-    right: 0.7rem;
-    bottom: 0.7rem;
-    display: flex;
-    gap: 0.4rem;
-  }
-
-  .hero__video-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(20, 19, 15, 0.6);
-    color: var(--paper);
-    cursor: pointer;
-    backdrop-filter: blur(2px);
-    transition: background 0.15s ease, transform 0.15s ease;
-  }
-  .hero__video-btn:hover { background: rgba(20, 19, 15, 0.85); }
-  .hero__video-btn:active { transform: scale(0.94); }
-  .hero__video-btn .is-icon-hidden { display: none; }
-  .hero__video-btn:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  .hero__certs {
-    flex-shrink: 0;
+    padding: 1.1rem clamp(1rem, 3vw, 2rem) 1.2rem;
   }
   .hero__trust-label {
-    display: block;
     font-family: var(--font-head);
-    font-size: 0.78rem;
+    font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 1rem;
+    text-align: center;
   }
-
   .hero__certs-track-wrap {
     overflow: hidden;
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
   }
   .hero__certs-track {
     display: flex;
     align-items: center;
     gap: clamp(2.5rem, 6vw, 4.5rem);
     width: max-content;
-    animation: hero-certs-scroll 26s linear infinite;
+    animation: hero-certs-scroll 28s linear infinite;
   }
   .hero__certs-track:hover { animation-play-state: paused; }
-
-  .hero__cert {
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
+  .hero__cert { display: inline-flex; align-items: center; flex-shrink: 0; }
   .hero__cert img {
     width: auto;
-    height: 52px;
+    height: 48px;
     object-fit: contain;
+    transition: transform 0.25s ease;
   }
-
-  @media (min-width: 1024px) {
-    .hero__cert img {
-      height: 68px;
-    }
-  }
+  .hero__cert:hover img { transform: scale(1.08); }
 
   @keyframes hero-certs-scroll {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
   }
 
-  /* Ab 1180px: zweispaltiges Layout, linke und rechte Spalte vertikal zentriert
-     zueinander. Video und Zertifikate bilden rechts einen gemeinsamen Block.
-     Unterhalb bleibt die mobile-first Reihenfolge (Subheader, Header,
-     Video/Zertifikate, Buttons, Text, Kennzahlen) für Tablet und Mobile aktiv. */
-  @media (min-width: 1180px) {
-    /* Container-Innenabstand für den Hero reduzieren, damit im Mittelfeld
-       (1180–1599px) beide Spalten atmen können. Ab 1600px übernimmt die
-       Standard-Container-Breite wieder. */
-    .hero :global(.container) {
-      padding-inline: clamp(4%, 6vw, 8%);
-    }
-
-    .hero__grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-      grid-template-areas: "copy media";
-      gap: clamp(1rem, 2.2vw, 2rem);
-      align-items: center;
-      min-height: calc(100vh - 92px);
-    }
-
-    .hero__copy { display: block; grid-area: copy; }
-    .hero__copy > .section-kicker,
-    .hero__copy > h1,
-    .hero__copy > .hero__actions,
-    .hero__copy > .hero__lead,
-    .hero__copy > .hero__facts {
-      order: initial;
-    }
-    .hero__copy > h1 { font-size: clamp(2.2rem, 3.6vw, 3.4rem); }
-    .hero__media { grid-area: media; order: initial; }
-    .hero__video { max-height: none; }
-    .hero__cert img { height: 60px; }
-
-    .hero__actions { margin-top: 1.4rem; }
-    .hero__facts { margin: 2rem 0 0; }
+  /* Mobil: Überschrift, 3D-Szene, dann CTA — die Szene ist der erste Eindruck,
+     der Button bleibt trotzdem im ersten Bildschirm erreichbar. */
+  @media (max-width: 959px) {
+    .hero__copy { display: contents; }
+    .hero__copy > .hero__kicker { order: 1; align-self: flex-start; }
+    .hero__copy > h1 { order: 2; margin-bottom: 0; }
+    .hero__stage { order: 3; margin-block: -0.4rem -0.2rem; }
+    .hero__copy > .hero__actions { order: 4; margin-top: 0; }
+    .hero__copy > .hero__micro { order: 5; margin-top: 0; }
+    .hero__copy > .hero__lead { order: 6; margin: 0; }
+    .hero__copy > .hero__facts { order: 7; margin: 0; }
+    .hero__grid { gap: 1rem; }
+    .hero__actions .btn { flex: 1 1 100%; }
   }
 
-  @media (min-width: 1600px) {
-    .hero :global(.container) { padding-inline: 10%; }
+  @media (min-width: 960px) {
+    /* Die Kopfleiste liegt über dem Hero (negativer Rand im Header), daher
+       Platz für sie oben im Hero; die Szene rückt nach oben, damit Kennzahlen
+       im ersten Bildschirm stehen. */
     .hero__grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: clamp(2rem, 4vw, 4rem);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+      gap: clamp(1rem, 2vw, 2rem);
+      align-items: start;
+      padding-block: clamp(6.2rem, 9vh, 7.2rem) 0.5rem;
     }
-    .hero__copy > h1 { font-size: clamp(2.6rem, 4vw, 3.6rem); }
-    .hero__cert img { height: 76px; }
-    .hero__actions { margin-top: 1.8rem; }
-    .hero__facts { margin: 2.6rem 0 0; }
+    .hero__copy { position: relative; z-index: 2; }
+    /* Headline in einer Zeile; darf in die Bühne hineinragen */
+    h1 { white-space: nowrap; font-size: clamp(2.1rem, 3.7vw, 3.4rem); margin-bottom: 0.7rem; }
+    .hero__line--accent { white-space: normal; max-width: 30rem; }
+    .hero__kicker { margin-bottom: 1rem; }
+    .hero__lead { font-size: 1.05rem; line-height: 1.55; }
+    .hero__actions { margin-top: 1.2rem; }
+    .hero__micro { margin-top: 0.8rem; }
+    .hero__facts { margin-top: 1.2rem; padding-top: 1rem; }
+    .hero__stage { margin-top: clamp(0.5rem, 3vh, 2.5rem); z-index: 1; }
+
+    /* Zertifikate: schlanker Streifen unter dem ersten Bildschirm */
+    .hero__certs { padding-block: 1.2rem clamp(1.5rem, 3vw, 2.5rem); }
+    .hero__certs-bar {
+      flex-direction: row;
+      align-items: center;
+      gap: 2rem;
+      padding: 0.7rem clamp(1rem, 3vw, 2rem);
+      border-radius: 999px;
+      box-shadow: var(--shadow-sm);
+    }
+    .hero__trust-label { text-align: left; white-space: nowrap; font-size: 0.7rem; }
+    .hero__certs-track-wrap { flex: 1; min-width: 0; }
+    .hero__cert img { height: 38px; }
+  }
+
+  /* Eintritts-Animation Text */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__kicker,
+    .hero__line,
+    .hero__lead,
+    .hero__actions,
+    .hero__micro,
+    .hero__facts {
+      animation: hero-up 0.8s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+    }
+    .hero__kicker { animation-delay: 0.05s; }
+    .hero__line { animation-delay: calc(0.15s + var(--i) * 0.14s); }
+    .hero__lead { animation-delay: 0.45s; }
+    .hero__actions { animation-delay: 0.55s; }
+    .hero__micro { animation-delay: 0.65s; }
+    .hero__facts { animation-delay: 0.75s; }
+    @keyframes hero-up {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: none; }
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero__certs-track { animation: none; flex-wrap: wrap; }
+    .hero__certs-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; }
+    .hero__spot { opacity: 1; animation: none; }
   }
 </style>
-
-<script>
-  import { trackOnce } from '../lib/analytics/tracker';
-
-  const video = document.getElementById('hero-video') as HTMLVideoElement | null;
-  const playBtn = document.getElementById('hero-video-play') as HTMLButtonElement | null;
-  const stopBtn = document.getElementById('hero-video-stop') as HTMLButtonElement | null;
-  const muteBtn = document.getElementById('hero-video-mute') as HTMLButtonElement | null;
-
-  if (video && playBtn && stopBtn && muteBtn) {
-    const iconPause = playBtn.querySelector('.icon-pause') as HTMLElement;
-    const iconPlay = playBtn.querySelector('.icon-play') as HTMLElement;
-    const iconMuted = muteBtn.querySelector('.icon-muted') as HTMLElement;
-    const iconUnmuted = muteBtn.querySelector('.icon-unmuted') as HTMLElement;
-
-    function syncPlayState() {
-      const isPlaying = !video!.paused && !video!.ended;
-      iconPause.classList.toggle('is-icon-hidden', !isPlaying);
-      iconPlay.classList.toggle('is-icon-hidden', isPlaying);
-      playBtn!.setAttribute('aria-pressed', String(isPlaying));
-      playBtn!.setAttribute('aria-label', isPlaying ? 'Video pausieren' : 'Video abspielen');
-    }
-
-    function syncMuteState() {
-      const isMuted = video!.muted;
-      iconMuted.classList.toggle('is-icon-hidden', !isMuted);
-      iconUnmuted.classList.toggle('is-icon-hidden', isMuted);
-      muteBtn!.setAttribute('aria-pressed', String(!isMuted));
-      muteBtn!.setAttribute('aria-label', isMuted ? 'Ton einschalten' : 'Ton ausschalten');
-    }
-
-    playBtn.addEventListener('click', () => {
-      if (video.paused || video.ended) {
-        video.play();
-        // Nur nutzerinitiiertes Starten zählt. Das Video läuft mit
-        // autoplay/muted/loop — würde man das play-Event des Elements
-        // auswerten, wäre video_play faktisch ein zweiter Seitenaufruf und
-        // kein Engagement-Signal.
-        trackOnce('video_play', 'video_play');
-      } else {
-        video.pause();
-      }
-    });
-
-    stopBtn.addEventListener('click', () => {
-      video.pause();
-      video.currentTime = 0;
-    });
-
-    muteBtn.addEventListener('click', () => {
-      video.muted = !video.muted;
-    });
-
-    video.addEventListener('play', syncPlayState);
-    video.addEventListener('pause', syncPlayState);
-    video.addEventListener('volumechange', syncMuteState);
-
-    syncPlayState();
-    syncMuteState();
-  }
-</script>

@@ -233,10 +233,22 @@ function renderChannel(status: ChannelStatus): string {
 
   const steps = status.openSteps.length
     ? `<div class="steps">
-         <h4>Offen bis zur Aktivierung</h4>
+         <h4>Offen im Code und in Cloudflare</h4>
          <ol>${status.openSteps.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
        </div>`
-    : '<p class="steps-done">Nichts offen — der Kanal ist vollständig eingerichtet.</p>';
+    : `<p class="steps-done">
+         Im Code und in Cloudflare nichts offen: Skript, ID und Host-Sperre passen zusammen.
+         Ob beim Anbieter tatsächlich Daten ankommen, sagt das noch nicht — siehe unten.
+       </p>`;
+
+  // Immer sichtbar, auch bei einem im Code fertigen Kanal: diese Einstellungen
+  // liegen außerhalb des Repositorys, und genau dort steckt der Unterschied
+  // zwischen „das Tag feuert" und „die Zahlen stimmen".
+  const account = `
+    <div class="steps steps--account">
+      <h4>Nur im Konto beim Anbieter prüfbar</h4>
+      <ol>${channel.accountSteps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol>
+    </div>`;
 
   const privacy = channel.privacyPolicySection
     ? `<span class="pill pill--on">Datenschutzerklärung: ${escapeHtml(channel.privacyPolicySection)}</span>`
@@ -266,6 +278,7 @@ function renderChannel(status: ChannelStatus): string {
       <ul class="env-list">${envItems}</ul>
 
       ${steps}
+      ${account}
     </article>`;
 }
 
@@ -297,6 +310,52 @@ function renderHostLock(hosts: string[], currentHost: string): string {
         Überschreibbar mit <code>PUBLIC_ANALYTICS_HOSTS</code>, z. B. für einen lokalen Test:
         <code>PUBLIC_ANALYTICS_HOSTS=127.0.0.1 npm run build</code>.
       </p>
+    </div>`;
+}
+
+/**
+ * Beantwortet die Frage, die der Zustand „Aktiv" gerade NICHT beantwortet:
+ * wo man nachsieht, ob tatsächlich Daten ankommen.
+ */
+function renderVerification(origin: string, ga4Id: string | undefined): string {
+  return `
+    <div class="panel">
+      <h2>Wo die Zahlen zu sehen sind</h2>
+      <p class="panel__lead">
+        Diese Seite zeigt den Messaufbau, nicht die Messwerte. Ob GA4 wirklich etwas empfängt,
+        steht in GA4 selbst — hier die drei Wege, vom schnellsten zum genauesten.
+      </p>
+      <ol class="how-list">
+        <li>
+          <strong>Echtzeitbericht</strong> — <code>analytics.google.com</code> → Property
+          ${ga4Id ? `<code>${escapeHtml(ga4Id)}</code>` : ''} → Berichte → Echtzeit. Zeigt die
+          letzten 30 Minuten. Der schnellste Test, ob überhaupt etwas ankommt: Seite in einem
+          zweiten Fenster öffnen, „Statistik" zustimmen, im Echtzeitbericht nachsehen.
+        </li>
+        <li>
+          <strong>DebugView</strong> — die Seite mit
+          <a href="${escapeHtml(origin)}/?ga_debug=1" target="_blank" rel="noopener">?ga_debug=1</a>
+          aufrufen, dann in GA4 unter Verwaltung → DebugView nachsehen. Zeigt jedes einzelne
+          Ereignis mit allen Parametern, ohne dass eine Browser-Erweiterung nötig wäre. Das ist
+          der Weg, um zu prüfen, ob ein bestimmtes Ereignis aus dem Katalog unten wirklich feuert.
+        </li>
+        <li>
+          <strong>Netzwerk-Tab des Browsers</strong> — nach <code>collect?</code> filtern. Jedes
+          Ereignis ist ein eigener Request. Im Query-String steht <code>tid</code> (muss die
+          Mess-ID sein), <code>en</code> (der Ereignisname) und <code>ep.*</code> (die Parameter).
+          Damit lässt sich auch gegenprüfen, dass keine Kontaktdaten mitgehen.
+        </li>
+      </ol>
+      <div class="notice">
+        <strong>Die Sperre, die jede dieser Ansichten schlägt:</strong>
+        Ohne Zustimmung zur Kategorie „Statistik" wird kein Google-Skript geladen und kein
+        Ereignis gesendet — auch kein cookieloser Ping (Consent Mode läuft im Basic-Modus).
+        Wer den Banner wegklickt oder ablehnt, taucht in GA4 überhaupt nicht auf. GA4 zeigt
+        deshalb systematisch weniger als die tatsächliche Reichweite; das ist kein Fehler,
+        sondern die Bauart. Für die Gesamtreichweite ist Cloudflare Web Analytics zuständig —
+        cookiefrei, einwilligungsfrei, und im Cloudflare-Dashboard für das Pages-Projekt
+        einzuschalten (nicht aus diesem Repository heraus).
+      </div>
     </div>`;
 }
 
@@ -414,6 +473,14 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
           und der Tracker lesen. Diese Übersicht kann deshalb nicht veralten, ohne dass sich der
           Messaufbau selbst ändert.
         </p>
+        <p class="block__lead">
+          <strong>Was „Aktiv" hier heißt:</strong> der Kanal ist im Code freigeschaltet, eine ID liegt
+          vor, und der aufgerufene Host steht auf der Messliste. <strong>Nicht</strong> geprüft — und von
+          dieser Seite aus auch nicht prüfbar — ist, ob die ID zu einer echten Property gehört, ob
+          Besucher überhaupt zustimmen und ob die Einstellungen im Konto des Anbieters stimmen. Genau
+          diese drei Punkte entscheiden darüber, ob am Ende Zahlen ankommen; sie stehen je Kanal unter
+          „Nur im Konto beim Anbieter prüfbar".
+        </p>
 
         <div class="notice">
           <strong>Zwei Zeitpunkte, ein Stolperstein.</strong>
@@ -427,6 +494,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
         <div class="channel-grid">${channels.map(renderChannel).join('')}</div>
 
         ${renderHostLock(hosts, url.hostname)}
+        ${renderVerification(url.origin, channels.find((c) => c.channel.id === 'google-analytics-4')?.effectiveId)}
         ${renderEventCatalogue()}
       </section>
     </main>
@@ -707,6 +775,27 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
         font-size: 0.88rem;
         color: var(--green);
       }
+      .steps--account h4 { color: #7a5a20; }
+      .steps--account {
+        border-top: none;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: var(--radius);
+        background: rgba(200, 169, 110, 0.12);
+        border: 1px solid rgba(200, 169, 110, 0.45);
+      }
+
+      .how-list {
+        margin: 0 0 1.2rem;
+        padding-left: 1.3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        font-size: 0.92rem;
+        max-width: 84ch;
+      }
+      .how-list strong { font-family: var(--font-head); }
+      .how-list a { color: var(--ink); }
 
       .fact-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
       .fact-list li {

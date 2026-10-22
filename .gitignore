@@ -1,0 +1,20 @@
+# build output
+dist/
+# generated types
+.astro/
+# lokaler Cloudflare-Emulator (wrangler pages dev)
+.wrangler/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment secrets
+.env
+.env.production
+.dev.vars
+
+# macOS
+.DS_Store

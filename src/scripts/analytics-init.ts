@@ -16,6 +16,10 @@ import { track, trackOnce } from '../lib/analytics/tracker';
  * Abschnitts, sonst Kopf- bzw. Fußbereich.
  */
 function sectionOf(element: Element): string {
+  // Elemente außerhalb eines Abschnitts (z. B. die mobile Sticky-Leiste)
+  // benennen ihre Position selbst.
+  const named = element.closest<HTMLElement>('[data-track-section]');
+  if (named?.dataset.trackSection) return named.dataset.trackSection;
   const section = element.closest<HTMLElement>('section[id]');
   if (section) return section.id;
   if (element.closest('footer')) return 'footer';

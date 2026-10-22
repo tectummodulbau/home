@@ -41,35 +41,16 @@ function revokeAll() {
 // ---------- Banner ----------
 
 const banner = document.getElementById('tectum-consent-banner');
-const widget = document.getElementById('tectum-privacy-widget');
 
 function showBanner() {
-  syncBannerToggles();
   banner?.removeAttribute('hidden');
-  // Widget bietet dieselbe Aktion wie der Banner — Überlappung auf kleinen
-  // Viewports vermeiden, solange der Banner eingeblendet ist.
-  widget?.setAttribute('hidden', '');
-}
-
-function syncBannerToggles() {
-  if (!banner) return;
-  const accepted = new Set(getGrantedCategories());
-  banner.querySelectorAll<HTMLInputElement>('input[data-consent-category]').forEach((input) => {
-    const category = input.dataset.consentCategory as ConsentCategory;
-    input.checked = accepted.has(category);
-  });
-}
-
-function readBannerSelection(): ConsentCategory[] {
-  if (!banner) return [];
-  return [...banner.querySelectorAll<HTMLInputElement>('input[data-consent-category]:checked')].map(
-    (input) => input.dataset.consentCategory as ConsentCategory
-  );
+  // Die mobile Sticky-CTA-Leiste weicht dem Banner (siehe global.css).
+  document.documentElement.dataset.consentBanner = 'open';
 }
 
 function hideBanner() {
   banner?.setAttribute('hidden', '');
-  widget?.removeAttribute('hidden');
+  delete document.documentElement.dataset.consentBanner;
 }
 
 // ---------- Einstellungsdialog ----------
@@ -130,10 +111,6 @@ function saveDialogSelection() {
   decide(readDialogSelection());
 }
 
-function saveBannerSelection() {
-  decide(readBannerSelection());
-}
-
 // ---------- Initialisierung ----------
 
 function init() {
@@ -154,11 +131,10 @@ function init() {
     lastFocusedElement?.focus();
   });
 
-  // "Einstellungen" im Banner trägt zusätzlich [data-privacy-settings-trigger]
+  // "Einstellungen" im Banner trägt [data-privacy-settings-trigger]
   // und wird bereits vom delegierten Klick-Listener oben geöffnet.
   document.getElementById('cb-accept-all')?.addEventListener('click', acceptAll);
   document.getElementById('cb-reject-all')?.addEventListener('click', rejectAll);
-  document.getElementById('cb-save')?.addEventListener('click', saveBannerSelection);
 
   document.getElementById('pd-accept-all')?.addEventListener('click', acceptAll);
   document.getElementById('pd-reject-all')?.addEventListener('click', rejectAll);
