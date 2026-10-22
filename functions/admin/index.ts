@@ -1,7 +1,6 @@
 /**
- * /admin ohne weiteren Pfad führt auf die Analyseübersicht — sie ist die
- * Landeseite des Admin-Bereichs. Die Zugriffsprüfung übernimmt wie bei allen
- * Seiten hier functions/admin/_middleware.ts.
+ * /admin ohne weiteren Pfad führt auf die Leadliste. Die Zugriffsprüfung
+ * übernimmt wie bei allen Seiten hier functions/admin/_middleware.ts.
  */
 import { ADMIN_PAGES } from './_lib/theme';
 

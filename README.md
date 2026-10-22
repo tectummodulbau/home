@@ -12,7 +12,7 @@ bisherigen WordPress-Installation.
 | `src/pages/impressum.astro`, `datenschutz.astro` | Rechtsseiten |
 | `src/components/` | Sektionen als einzelne Komponenten (Hero, Module, Rechner, LeadForm, …) |
 | `src/assets/` | Bilder (werden beim Build automatisch optimiert, inkl. WebP) |
-| `functions/api/lead.ts` | Cloudflare Pages Function: nimmt Formular-Anfragen entgegen, speichert sie in Supabase und versendet sie per E-Mail |
+| `functions/api/lead.ts` | Cloudflare Pages Function: nimmt Formular-Anfragen entgegen, speichert sie in D1 und versendet sie per E-Mail |
 | `functions/admin/login.ts` | Login-Formular im Tectum-Design (`/admin/login`) |
 | `functions/admin/logout.ts` | Löscht das Session-Cookie |
 | `functions/admin/leads.ts` | Passwortgeschützte Leads-Übersicht im Tectum-Design (`/admin/leads`), Kartenliste mit Status-Filter |
@@ -22,7 +22,7 @@ bisherigen WordPress-Installation.
 | `functions/admin/_lib/status.ts` | Zentrale Liste der Lead-Status (neu/kontaktiert/warm/abgeschlossen/abgelehnt) |
 | `functions/admin/_lib/theme.ts` | Gemeinsame HTML-Hülle (Farben/Fonts/Header) für Login & Leads-Übersicht |
 | `public/fonts/` | Selbst gehostete Font-Dateien (Urbanist, Hanken Grotesk) für die Admin-Seiten |
-| `supabase/schema.sql` | SQL zum Anlegen der `leads`-Tabelle in Supabase |
+| `d1/schema.sql` | SQL zum Anlegen der `leads`-Tabelle in Cloudflare D1 |
 
 ## Lokal entwickeln
 
@@ -60,58 +60,41 @@ Ohne `RESEND_API_KEY` antwortet der Endpoint mit Erfolg und loggt die Anfrage
 nur (praktisch für Previews). Alternativ lässt sich in `functions/api/lead.ts`
 jeder andere Mail-Dienst anbinden.
 
-### Leads in Supabase speichern + geschützte Leads-Liste
+### Leads in D1 speichern + geschützte Leads-Liste
 
-Jede Anfrage wird zusätzlich zur E-Mail in einer Supabase-Tabelle gespeichert
-und ist unter `/admin/leads` als passwortgeschützte Übersicht abrufbar.
+Jede Anfrage wird zusätzlich zur E-Mail in einer Cloudflare-D1-Datenbank
+gespeichert und ist unter `/admin/leads` als passwortgeschützte Übersicht
+abrufbar.
 
-**1. Supabase-Projekt anlegen**
+**1. D1-Datenbank anlegen und verbinden**
 
-- Auf [supabase.com](https://supabase.com) kostenlos ein neues Projekt erstellen.
-- Im Dashboard unter **SQL Editor** den Inhalt von `supabase/schema.sql`
-  einfügen und ausführen — legt die Tabelle `leads` an (mit aktivierter Row
-  Level Security, aber ohne Policies: nur der Service-Role-Key kann zugreifen).
-- Unter **Project Settings → API** die `Project URL` und den
-  `service_role`-Key kopieren (⚠️ **nicht** den `anon`-Key verwenden — der
-  Service-Role-Key ist geheim und darf nie im Browser landen).
+- Im Cloudflare-Dashboard unter **Storage & Databases → D1** die Datenbank
+  `leads` anlegen (ist bereits geschehen).
+- Die Tabelle anlegen: `npx wrangler d1 execute leads --remote --file=d1/schema.sql`
+  oder den Inhalt von `d1/schema.sql` in der D1-Konsole ausführen.
+- In `wrangler.toml` bei `[[d1_databases]]` die echte `database_id` eintragen
+  (Dashboard → D1 → leads → UUID). Das Binding heißt `DB`.
 
 **2. Umgebungsvariablen in Cloudflare Pages setzen**
 
-Unter **Settings → Environment variables** (Production und ggf. Preview):
-
 | Variable | Beispiel | Sichtbarkeit |
 | --- | --- | --- |
-| `SUPABASE_URL` | `https://xxxxx.supabase.co` | normal |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJhbGciOi…` | **verschlüsselt/Secret** |
 | `ADMIN_USER` | `admin` (optional, Default: `admin`) | normal |
 | `ADMIN_PASSWORD` | ein starkes, einmaliges Passwort | **verschlüsselt/Secret** |
 
-Ohne `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` wird der Supabase-Insert
-übersprungen (nur geloggt) — das Formular funktioniert trotzdem weiter über
-E-Mail. Ohne `ADMIN_PASSWORD` ist `/admin/leads` komplett gesperrt (Status 503),
-es gibt also nie einen ungeschützten Zustand.
+Ohne D1-Binding wird der Insert übersprungen (nur geloggt) — das Formular
+funktioniert trotzdem weiter über E-Mail. Ohne `ADMIN_PASSWORD` ist
+`/admin/leads` komplett gesperrt (Status 503).
 
 **3. Zugriff auf die Leads-Liste**
 
 `https://tectum-modulbau.de/admin/leads` aufrufen — ohne gültige Sitzung
-leitet die Seite automatisch zu einem Login-Formular im Tectum-Design
-(`/admin/login`, gleiche Farben/Fonts/Struktur wie die Hauptseite) weiter.
-Nach Anmeldung mit `ADMIN_USER`/`ADMIN_PASSWORD` erscheint jeder Lead als
-Karte (volle Breite, Stammdaten und Vorhaben gruppiert) mit einem
-Status-Dropdown (Neuer Lead / Kontaktiert / Warm / Abgeschlossen /
-Abgelehnt) und Filter-Pins oben, die nach Status filtern. Status-Änderungen
-werden sofort in Supabase gespeichert. Die Sitzung läuft nach 12 Stunden
-automatisch ab; „Abmelden" oben rechts beendet sie sofort. Beide Seiten sind
-per `robots: noindex` von Suchmaschinen ausgeschlossen; da sie serverseitig
-(Cloudflare Pages Function) gerendert werden, sind sie zusätzlich nie im
-statischen Build enthalten.
-
-**Bereits bestehendes Supabase-Projekt (Tabelle existiert schon ohne
-`status`-Spalte):** im SQL Editor den Migrationsblock am Ende von
-`supabase/schema.sql` einmalig ausführen (fügt die Spalte `status` mit
-Default `'neu'` hinzu). Ohne diese Migration werden bestehende Leads in der
-Übersicht als „Neuer Lead" angezeigt, aber Status-Änderungen schlagen fehl,
-bis die Spalte existiert.
+leitet die Seite zum Login (`/admin/login`) weiter. Danach erscheint jeder Lead
+als Karte (Stammdaten und Vorhaben gruppiert) mit Status-Dropdown (Neuer Lead /
+Kontaktiert / Warm / Abgeschlossen / Abgelehnt) und Filter nach Status.
+Status-Änderungen werden sofort in D1 gespeichert. Die Sitzung läuft nach
+12 Stunden ab; „Abmelden" beendet sie sofort. Die Seiten sind
+per `robots: noindex` ausgeschlossen und nie im statischen Build enthalten.
 
 Die Anmeldung nutzt ein signiertes, zustandsloses Session-Cookie (HMAC mit
 `ADMIN_PASSWORD` als Schlüssel, `HttpOnly`, `Secure`, `SameSite=Lax`) statt
@@ -124,7 +107,7 @@ ungeschützter Zwischenzustand.
 ```bash
 npm run build
 npx wrangler pages dev dist   # benötigt lokale .dev.vars (siehe .gitignore) mit
-                               # ADMIN_USER, ADMIN_PASSWORD, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+                               # ADMIN_USER, ADMIN_PASSWORD; D1 lokal mit --d1=DB
 ```
 
 ## Unterschiede zur WordPress-Seite

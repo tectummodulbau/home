@@ -88,9 +88,8 @@ nur als Option bestehen.
 Zum Aktivieren genügen zwei Dinge: `enabled: true` beim betreffenden Kanal in
 `src/lib/analytics/manifest.ts` und die zugehörige Umgebungsvariable. Der
 Tracker reicht die zugeordneten Ereignisse dann von selbst weiter, ein
-Code-Umbau ist nicht nötig. Den jeweils aktuellen Stand — welche Variablen
-gesetzt sind, was noch fehlt, welcher Kanal tatsächlich sendet — zeigt die
-**Analyseübersicht unter `/admin/analyse`** (siehe unten).
+Code-Umbau ist nicht nötig. Die Analyseübersicht im Admin-Bereich wurde entfernt; den Stand der Kanäle
+zeigt `src/lib/analytics/manifest.ts`.
 
 ### Warum die Mess-ID im Quelltext steht und nicht in wrangler.toml
 
@@ -147,7 +146,7 @@ src/components/analytics/ConsentModeDefaults.astro
 **Eine Ausnahme beim `enabled`-Flag:** Für die vier Messkanäle (GA4, Google Ads,
 Meta-Pixel, GTM) steht es nicht in `registry.ts`, sondern in
 `src/lib/analytics/manifest.ts`. Grund ist die Analyseübersicht unter
-`/admin/analyse`: Sie läuft als Pages Function im Worker und kann `registry.ts`
+der früheren Analyseübersicht: Sie lief als Pages Function im Worker und kann `registry.ts`
 nicht importieren, weil dort `window`, `document` und `location` vorkommen. Das
 Flag an zwei Stellen zu pflegen wäre die schlechtere Antwort gewesen —
 `load()`/`cleanup()` bleiben in der Registry. Auch `CATEGORY_LABELS` liegt
@@ -206,7 +205,7 @@ src/lib/analytics/
   manifest.ts  Statische Beschreibung des Messaufbaus: Kanäle inkl. enabled-Flag,
                Event-Katalog, Zuordnung zu Meta-Standardereignissen. Frei von
                Importen und Browser-APIs — deshalb auch aus einer Pages Function
-               lesbar. Wird von registry.ts, tracker.ts und /admin/analyse genutzt.
+               lesbar. Wird von registry.ts, tracker.ts genutzt.
   config.ts    IDs aus Umgebungsvariablen, GA4-Parameterlimit, ?ga_debug=1
   gtag.ts      dataLayer-/gtag-Zugriff, Skript-Injektion, Cookie-Löschung
   meta.ts      fbq-Bootstrap, Standardereignisse, Aufräumen beim Widerruf
@@ -272,8 +271,8 @@ Fehler, den man erst an den Kampagnenkosten bemerkt.
 Genau diese Events, keine weiteren. `page_view` kommt zusätzlich von GA4 selbst.
 
 Die Liste unten ist die Erläuterung; die maschinenlesbare Fassung steht in
-`TRACKED_EVENTS` in `src/lib/analytics/manifest.ts` und wird von
-`/admin/analyse` gerendert. Wer ein Event hinzufügt, ändert oder entfernt,
+`TRACKED_EVENTS` in `src/lib/analytics/manifest.ts`.
+Wer ein Event hinzufügt, ändert oder entfernt,
 pflegt **beides**.
 
 **Zuordnung zu Meta-Standardereignissen** (Feld `metaEvent` im Manifest, greift
@@ -378,75 +377,25 @@ Schlüsselereignisse — sonst verwässert die Conversion-Rate.
 
 Läuft vollständig als Cloudflare Pages Functions unter `functions/admin/`,
 geschützt über ein signiertes Session-Cookie (`_middleware.ts`). Kein Astro, kein
-`Layout.astro` — und damit bewusst auch kein Cookie-Banner.
+`Layout.astro` — und damit bewusst auch kein Cookie-Banner. Es gibt nur noch die
+Leadliste; die frühere Analyseübersicht wurde entfernt.
 
 | Route | Datei | Inhalt |
 |---|---|---|
-| `/admin` | `index.ts` | Weiterleitung auf die Analyseübersicht |
-| `/admin/analyse` | `analyse.ts` | Kennzahlen und Messaufbau — die Landeseite |
-| `/admin/leads` | `leads.ts` | Kartenliste der Anfragen, Status pflegbar |
+| `/admin` | `index.ts` | Weiterleitung auf die Leadliste |
+| `/admin/leads` | `leads.ts` | Kartenliste der Anfragen, nach Status filterbar |
+| `/admin/leads/status` | `leads/status.ts` | POST: Status eines Leads ändern |
 | `/admin/login` · `/admin/logout` | `login.ts` · `logout.ts` | Anmeldung |
 
-Gemeinsame Bausteine in `functions/admin/_lib/`:
+Bausteine in `functions/admin/_lib/`: `theme.ts` (HTML-Hülle, `ADMIN_PAGES`),
+`status.ts` (Status und Bezeichnungen), `lead-source.ts` (D1-Zugriff und
+Datensatz-Typ), `session.ts`.
 
-```
-theme.ts          HTML-Hülle, Kopfleiste mit Navigation, gemeinsames CSS
-                  (ADMIN_PAGES ist die einzige Definition der Seitenliste —
-                  Navigation, /admin-Weiterleitung und das Login-Ziel lesen daraus)
-status.ts         Lead-Status und ihre Bezeichnungen
-lead-source.ts    Supabase-Zugriff und Datensatz-Typ (von analyse.ts UND leads.ts)
-lead-stats.ts     Aggregation: Zeitfenster, Verlauf, Verteilungen — reine Funktionen
-tracking-status.ts  Manifest + Runtime-Umgebung → Zustand je Messkanal
-```
-
-### Analyseübersicht (`/admin/analyse`)
-
-Zwei Blöcke, bewusst voneinander unabhängig:
-
-**Anfragen** — aus der Supabase-Tabelle `leads`: Kennzahlen mit Vergleich zum
-gleich langen Vorzeitraum, ein Verlauf über zwölf Sieben-Tage-Fenster, der
-Bearbeitungsstand nach Status und die Verteilung der Qualifizierungsangaben aus
-den Formularschritten 1–3. Kontaktdaten werden auf dieser Seite **nicht**
-ausgegeben.
-
-Der Verlauf nutzt gleitende Sieben-Tage-Fenster und keine Kalenderwochen: die
-laufende Kalenderwoche wäre angebrochen und damit systematisch niedriger als die
-davor — im Diagramm sähe das nach einem Einbruch aus, der keiner ist.
-
-**Messaufbau** — je Kanal Zustand, Kategorie, wirksame ID, gesetzte und fehlende
-Umgebungsvariablen sowie die offene Aktivierungs-Checkliste; dazu die Host-Sperre
-mit der Angabe, ob der gerade aufgerufene Host gemessen wird, und der
-vollständige Event-Katalog inklusive Meta-Zuordnung. Alles davon stammt aus
-`src/lib/analytics/manifest.ts`. Die Seite kann deshalb nicht veralten, ohne dass
-sich der Messaufbau selbst ändert.
-
-Fehlt die Supabase-Konfiguration oder antwortet die Datenbank mit einem Fehler,
-bleibt der Messaufbau-Block trotzdem nutzbar — genau dann braucht man ihn meist.
-
-**Ein Stolperstein, den die Seite auch selbst anzeigt:** Die Function liest die
-Variablen zur **Laufzeit**, das ausgelieferte JavaScript bekommt sie zur
-**Build-Zeit** von Vite eingesetzt. Beides stimmt nur überein, wenn die Variable
-unter *Cloudflare Pages → Settings → Environment variables* steht. Eine Variable
-nur in den `[vars]` der `wrangler.toml` erscheint in der Übersicht als „gesetzt",
-käme im Frontend aber nie an. Und Änderungen greifen im Frontend erst nach einem
-neuen Deployment.
-
-### Prüfen ohne Deployment
-
-Die Function lässt sich bündeln und direkt aufrufen — schneller als jeder
-Deploy und ohne Supabase:
-
-```bash
-npx esbuild functions/admin/analyse.ts --bundle --format=esm \
-  --platform=neutral --outfile=/tmp/analyse.mjs
-```
-
-Dann in Node `globalThis.fetch` durch eine Attrappe ersetzen, die eine
-Lead-Liste als JSON zurückgibt, `onRequestGet({ env, request })` aufrufen und das
-HTML prüfen. Sinnvolle Fälle: Daten vorhanden, leere Tabelle, Supabase nicht
-konfiguriert, Supabase-Fehler, Aufruf über einen `*.pages.dev`-Host.
-
----
+**Datenhaltung: Cloudflare D1.** Binding `DB` (`wrangler.toml` →
+`[[d1_databases]]`), Datenbank `leads`, Schema in `d1/schema.sql`. Geschrieben
+wird in `functions/api/lead.ts`, gelesen/geändert unter `functions/admin/`.
+Supabase wird nicht mehr verwendet. Die Tabelle einmalig anlegen:
+`npx wrangler d1 execute leads --remote --file=d1/schema.sql`.
 
 ## Suchmaschinen-Metadaten
 
@@ -597,7 +546,7 @@ Datenschutzerklärung und der Liste offener Punkte:
 | Google Consent Mode v2 | Google Ireland Ltd. | akzessorisch | – | nur lokaler `dataLayer` |
 | Einwilligungsverwaltung | selbst betrieben | notwendig | § 25 II Nr. 2 TDDDG | `localStorage` `tectum_privacy_consent`, 365 Tage |
 | Session-Marker | selbst betrieben | akzessorisch | – | `sessionStorage` `tectum_evt_*` |
-| Supabase | Supabase (Region offen) | Backend | Art. 6 I b | Lead-Datensätze |
+| Cloudflare D1 | Cloudflare, Inc. (USA) | Backend | Art. 6 I b | Lead-Datensätze |
 | Resend | Resend, Inc. (USA) | Backend | Art. 6 I b | Versand-Metadaten |
 | Rate-Limiting `/api/lead` | selbst betrieben | notwendig | Art. 6 I f | IP flüchtig, 10-Min.-Fenster |
 | Admin-Session | selbst betrieben | nicht öffentlich | Art. 6 I f | signiertes Cookie |
@@ -620,8 +569,7 @@ sind:
    `provider`, `storageInfo` (Cookie-Name **und** Laufzeit) und
    `thirdCountryNotice`. Handelt es sich um einen **Messkanal**, zusätzlich
    einen Eintrag in `MEASUREMENT_CHANNELS` in `src/lib/analytics/manifest.ts` —
-   sonst fehlt er in der Analyseübersicht, und `enabled` hätte keine
-   gemeinsame Quelle.
+   sonst hätte `enabled` keine gemeinsame Quelle.
 2. **`CONSENT_VERSION` erhöhen** — sonst behalten alle Besucher eine
    Einwilligung, die den neuen Umfang nicht abdeckt.
 3. Datenschutzerklärung in `src/pages/datenschutz.astro` ergänzen. Baustein aus
@@ -646,8 +594,8 @@ halten.
 ### Bekannte offene Punkte
 
 Die vollständige Liste steht in `docs/datenschutz-bausteine.md`, Phase 5. Die
-wichtigsten: Auftragsverarbeitungsverträge mit Cloudflare, Supabase, Resend und
-Google; Verarbeitungsregion von Supabase; Verzeichnis von
+wichtigsten: Auftragsverarbeitungsverträge mit Cloudflare (inkl. D1), Resend und
+Google; Verzeichnis von
 Verarbeitungstätigkeiten; Aufbewahrungsdauer in GA4 (Standard 2 Monate);
 Firmierung der Komplementär-GmbH fürs Impressum; ob Cloudflare Web Analytics und
 die E-Mail-Verschleierung im Dashboard tatsächlich aktiv sind.
@@ -663,7 +611,7 @@ nachweisbaren Dienst ab:
 | 4 | Cookies, Einwilligungsverwaltung, Local/Session Storage |
 | 5 | Google Analytics 4 |
 | 6 | Google Consent Mode v2 |
-| 7 | Anfrageformular, Supabase als Empfänger, Ratenbegrenzung, Löschfristen |
+| 7 | Anfrageformular, D1 als Speicher, Ratenbegrenzung, Löschfristen |
 | 8 | Resend inkl. AVV, 30 Tage Speicherdauer, Drittland |
 | 9 | Schriftarten (lokal) |
 | 10 | Videoinhalte (selbst gehostet) |

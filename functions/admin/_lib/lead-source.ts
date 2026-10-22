@@ -1,24 +1,13 @@
 /**
- * Gemeinsamer Zugriff auf die Supabase-Tabelle `leads`.
+ * Zugriff auf die D1-Tabelle `leads` (Schema: d1/schema.sql).
  *
- * Vorher lag der Fetch samt Datensatz-Typ direkt in functions/admin/leads.ts.
- * Mit der Analyseübersicht gibt es einen zweiten Leser — und damit den
- * üblichen Weg, wie zwei Kopien auseinanderlaufen: eine neue Spalte wird an
- * einer Stelle ergänzt und an der anderen vergessen. Deshalb steht der
- * Zugriff jetzt genau hier.
- *
- * Benötigte Umgebungsvariablen (Cloudflare Pages → Settings → Environment variables):
- *   SUPABASE_URL              — z. B. https://xxxxx.supabase.co
- *   SUPABASE_SERVICE_ROLE_KEY — Service-Role-Key (geheim, nur serverseitig!)
- *
- * Der Service-Role-Key umgeht Row Level Security und darf NIE im
- * Client-Bundle landen — er wird ausschließlich serverseitig verwendet.
+ * Das Binding heißt `DB` und wird in wrangler.toml unter [[d1_databases]]
+ * deklariert. Fehlt es (z. B. lokal ohne `--d1`), melden die Aufrufer 503.
  */
 import { LEAD_STATUSES, type LeadStatus } from './status';
 
 export interface LeadEnv {
-  SUPABASE_URL?: string;
-  SUPABASE_SERVICE_ROLE_KEY?: string;
+  DB?: D1Database;
 }
 
 export interface LeadRecord {
@@ -40,41 +29,20 @@ export type LeadFetchResult =
   | { ok: true; leads: LeadRecord[] }
   | { ok: false; status: number; message: string };
 
-/**
- * Lädt alle Leads, neueste zuerst. Datensätze, die vor der Status-Migration
- * angelegt wurden, haben noch kein `status`-Feld — sie werden hier auf „neu"
- * normalisiert, damit die Aufrufer nicht jeder für sich raten müssen.
- */
-export async function fetchLeads(env: LeadEnv): Promise<LeadFetchResult> {
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
-    return {
-      ok: false,
-      status: 503,
-      message: 'Supabase ist nicht konfiguriert (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY fehlen).',
-    };
-  }
+export const DB_MISSING_MESSAGE = 'Datenbank ist nicht konfiguriert (D1-Binding „DB" fehlt).';
 
-  let leads: LeadRecord[];
+/** Lädt alle Leads, neueste zuerst. */
+export async function fetchLeads(env: LeadEnv): Promise<LeadFetchResult> {
+  if (!env.DB) return { ok: false, status: 503, message: DB_MISSING_MESSAGE };
+
   try {
-    const res = await fetch(`${env.SUPABASE_URL}/rest/v1/leads?select=*&order=created_at.desc`, {
-      headers: {
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-      },
-    });
-    if (!res.ok) {
-      console.error('Supabase-Abfrage fehlgeschlagen, Status', res.status);
-      return { ok: false, status: 502, message: 'Fehler beim Laden der Leads.' };
+    const { results } = await env.DB.prepare('SELECT * FROM leads ORDER BY created_at DESC').all<LeadRecord>();
+    for (const lead of results) {
+      if (!lead.status || !LEAD_STATUSES.includes(lead.status)) lead.status = 'neu';
     }
-    leads = await res.json();
+    return { ok: true, leads: results };
   } catch (err) {
-    console.error('Supabase-Abfrage-Fehler', err);
+    console.error('D1-Abfrage-Fehler', err);
     return { ok: false, status: 502, message: 'Fehler beim Laden der Leads.' };
   }
-
-  for (const lead of leads) {
-    if (!lead.status || !LEAD_STATUSES.includes(lead.status)) lead.status = 'neu';
-  }
-
-  return { ok: true, leads };
 }

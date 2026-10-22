@@ -1,18 +1,14 @@
 /**
  * Cloudflare Pages Function: aktualisiert den Status eines einzelnen Leads
- * in Supabase (Spalte `status`, siehe supabase/schema.sql). Aufgerufen per
+ * in D1 (Spalte `status`, siehe d1/schema.sql). Aufgerufen per
  * fetch() aus dem Status-Dropdown auf /admin/leads. Durch die Lage unter
  * functions/admin/ automatisch per functions/admin/_middleware.ts
  * (Session-Cookie) geschützt.
  *
- * Benötigte Umgebungsvariablen: siehe functions/admin/leads.ts.
+ * Benötigt das D1-Binding `DB` (siehe wrangler.toml).
  */
 import { LEAD_STATUSES } from '../_lib/status';
-
-interface Env {
-  SUPABASE_URL?: string;
-  SUPABASE_SERVICE_ROLE_KEY?: string;
-}
+import { DB_MISSING_MESSAGE, type LeadEnv } from '../_lib/lead-source';
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
@@ -21,13 +17,11 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** Grobe UUID-Formprüfung — verhindert offensichtlich falsche IDs, bevor sie an Supabase gehen. */
+/** Grobe UUID-Formprüfung — verhindert offensichtlich falsche IDs vor dem Datenbankzugriff. */
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
-    return json({ error: 'Supabase ist nicht konfiguriert.' }, 503);
-  }
+export const onRequestPost: PagesFunction<LeadEnv> = async ({ request, env }) => {
+  if (!env.DB) return json({ error: DB_MISSING_MESSAGE }, 503);
 
   if (!request.headers.get('Content-Type')?.includes('application/json')) {
     return json({ error: 'Ungültige Anfrage' }, 400);
@@ -51,22 +45,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   try {
-    const res = await fetch(`${env.SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(id)}`, {
-      method: 'PATCH',
-      headers: {
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=minimal',
-      },
-      body: JSON.stringify({ status }),
-    });
-    if (!res.ok) {
-      console.error('Supabase-Status-Update fehlgeschlagen, Status', res.status);
-      return json({ error: 'Aktualisierung fehlgeschlagen' }, 502);
-    }
+    const result = await env.DB.prepare('UPDATE leads SET status = ? WHERE id = ?').bind(status, id).run();
+    if (!result.meta.changes) return json({ error: 'Lead nicht gefunden' }, 404);
   } catch (err) {
-    console.error('Supabase-Status-Update-Fehler', err);
+    console.error('D1-Status-Update-Fehler', err);
     return json({ error: 'Aktualisierung fehlgeschlagen' }, 502);
   }
 

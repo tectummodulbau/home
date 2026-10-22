@@ -1,5 +1,5 @@
 /**
- * Gemeinsame HTML-Hülle für die Admin-Seiten (Login, Analyse, Leads). Übernimmt
+ * Gemeinsame HTML-Hülle für die Admin-Seiten (Login, Leads). Übernimmt
  * Farben, Fonts und Grundformen 1:1 aus src/styles/global.css, damit der
  * Bereich optisch nicht wie ein separates Tool wirkt. Fonts werden
  * selbst gehostet aus /fonts (siehe public/fonts) — keine externen
@@ -199,7 +199,7 @@ const SHARED_STYLE = `
   }
 
   /* Seitenkopf, Kicker, Chip und .muted stehen hier und nicht in den
-     einzelnen Seiten: sie werden von /admin/analyse und /admin/leads
+     einzelnen Seiten: sie werden von /admin/leads
      gleichermaßen benutzt, und zwei Kopien wären genau die Art Duplikat,
      die beim nächsten Feinschliff auseinanderläuft. */
   .page-head {
@@ -283,7 +283,6 @@ ${opts.content}
  * steht vor den Anfragen und ist zugleich das Ziel von /admin.
  */
 export const ADMIN_PAGES = [
-  { key: 'analyse', label: 'Analyse', href: '/admin/analyse' },
   { key: 'leads', label: 'Anfragen', href: '/admin/leads' },
 ] as const;
 
