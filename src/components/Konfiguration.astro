@@ -7,19 +7,22 @@ import imgAussen from '../assets/addon-aussenanlage.jpg';
 const addons = [
   {
     img: imgFitness,
-    alt: 'Fitnesseinheit als modulare Erweiterung einer Tectum Anlage',
+    alt: 'Fitnesseinheit als modulare Erweiterung einer Modulhaus-Anlage von Tectum Modulbau',
+    imgTitle: 'Fitnesseinheit — Zusatzmodul',
     title: 'Fitnesseinheit',
     text: 'Ein eigener Fitnessbereich als direkte Erweiterung Ihrer Tectum-Einheit. Ausstattung und Größe werden individuell abgestimmt — kauf- oder leasingfähig wie alle Tectum-Produkte.',
   },
   {
     img: imgSauna,
-    alt: 'Saunaeinheit als Zusatzmodul von Tectum Modulbau',
+    alt: 'Saunaeinheit als Zusatzmodul für Glamping-Unterkünfte und Wohnparks von Tectum Modulbau',
+    imgTitle: 'Saunaeinheit — Zusatzmodul',
     title: 'Sauna & Wellness',
     text: 'Wellness als fester Bestandteil Ihres Projekts. Tectum-Einheiten sind um einen individuell konfigurierten Wellnessbereich erweiterbar — schlüsselfertig, ohne separates Gewerk, ohne zusätzliche Baustelle.',
   },
   {
     img: imgAussen,
-    alt: 'Außenanlage mit Pool von Tectum Modulbau',
+    alt: 'Außenanlage mit Pool für Campingplätze und Wohnparks von Tectum Modulbau',
+    imgTitle: 'Außenanlage mit Pool',
     title: 'Außenanlage',
     text: 'Jede Tectum-Einheit lässt sich um einen vollwertigen Außenbereich erweitern. Ob Poolanlage, Whirlpool oder gestaltete Terrasse — die Konfiguration wird individuell abgestimmt und gemeinsam mit der Haupteinheit geliefert.',
   },
@@ -42,7 +45,7 @@ const addons = [
       {addons.map((a) => (
         <article class="kf-card reveal">
           <div class="kf-card__media">
-            <Image src={a.img} alt={a.alt} widths={[400, 700]} sizes="(max-width: 920px) 100vw, 33vw" />
+            <Image src={a.img} alt={a.alt} title={a.imgTitle} widths={[400, 700]} sizes="(max-width: 920px) 100vw, 33vw" />
           </div>
           <div class="kf-card__body">
             <h3>{a.title}</h3>

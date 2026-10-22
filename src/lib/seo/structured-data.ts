@@ -13,7 +13,7 @@
 
 import { FAQS, normalizeText } from '../content/faq';
 
-export const SITE_URL = 'https://tectum-modulbau.de';
+export const SITE_URL = 'https://www.tectum-modulbau.de';
 
 /**
  * Der Name, unter dem die Website in Suchergebnissen erscheinen soll.
@@ -40,7 +40,7 @@ export const OG_IMAGE = {
   width: 1280,
   height: 720,
   type: 'image/jpeg',
-  alt: 'Schlüsselfertige modulare Wohneinheit von Tectum Modulbau',
+  alt: 'Schlüsselfertiges Modulhaus von Tectum Modulbau — modulare Wohneinheit für Campingplätze und Wohnparks',
 } as const;
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;

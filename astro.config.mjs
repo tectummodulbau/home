@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-const SITE = 'https://tectum-modulbau.de';
+const SITE = 'https://www.tectum-modulbau.de';
 
 /** Fallback, falls die Git-Historie beim Build nicht verfügbar ist. */
 const buildDate = new Date();

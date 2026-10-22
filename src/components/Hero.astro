@@ -74,7 +74,7 @@ const spots = heroSpots();
         <div class="hero__certs-track">
           {zertifikateLoop.map((z) => (
             <span class="hero__cert">
-              <Image src={z.src} alt={z.alt} height={80} densities={[1.5, 2, 3]} loading="eager" />
+              <Image src={z.src} alt={z.alt} title={z.alt} height={80} densities={[1.5, 2, 3]} loading="eager" />
             </span>
           ))}
         </div>
