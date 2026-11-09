@@ -50,6 +50,7 @@ const year = new Date().getFullYear();
 
   <div class="container site-footer__bottom">
     <p>© {year} Tectum Modulbau. Alle Rechte vorbehalten.</p>
+    <p class="site-footer__made"><a href="https://henneberg-webdesign.de" target="_blank" rel="noopener">Made by Henneberg Webdesign</a></p>
   </div>
 </footer>
 
@@ -130,8 +131,14 @@ const year = new Date().getFullYear();
     padding-block: 1.4rem;
     font-size: 0.88rem;
     color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.4rem 1.5rem;
   }
   .site-footer__bottom p { margin: 0; }
+  .site-footer__made a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .site-footer__made a:hover { color: #fff; }
 
   @media (max-width: 920px) {
     .site-footer__grid { grid-template-columns: 1fr 1fr; }
