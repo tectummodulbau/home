@@ -1,12 +1,13 @@
 /**
- * Cloudflare Pages Function: liest alle Leads aus D1 und rendert sie
+ * Cloudflare Pages Function: liest alle Leads aus Supabase und rendert sie
  * im Tectum-Design als Kartenliste (volle Breite, Stammdaten + Vorhaben
  * gruppiert, Status pflegbar, nach Status filterbar). Zugriff ist über
  * functions/admin/_middleware.ts per signiertem Session-Cookie geschützt
  * (Login unter /admin/login). Status-Änderungen laufen über
  * functions/admin/leads/status.ts.
  *
- * Datenzugriff und Datensatz-Typ liegen in _lib/lead-source.ts.
+ * Datenzugriff und Datensatz-Typ liegen in _lib/lead-source.ts, weil die
+ * Analyseübersicht (/admin/analyse) dieselbe Tabelle liest.
  */
 import { adminHeader, escapeHtml, pageShell } from './_lib/theme';
 import { LEAD_STATUSES, STATUS_LABELS, type LeadStatus } from './_lib/status';

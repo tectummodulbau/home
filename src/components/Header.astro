@@ -1,10 +1,10 @@
 ---
 const links = [
-  { href: '/#prinzip', label: 'Prinzip' },
+  { href: '/', label: 'Home' },
   { href: '/#module', label: 'Module' },
-  { href: '/#konfigurator', label: 'Konfigurator' },
-  { href: '/#rechner', label: 'Rendite' },
+  { href: '/#konfiguration', label: 'Konfiguration' },
   { href: '/#ablauf', label: 'Ablauf' },
+  { href: '/#kontakt', label: 'Kontakt' },
 ];
 ---
 
@@ -44,21 +44,11 @@ const links = [
     position: sticky;
     top: clamp(0.8rem, 2vw, 1.5rem);
     z-index: 60;
-    padding-inline: max(5%, calc((100vw - 1120px) / 2));
-    transition: transform 0.35s cubic-bezier(0.2, 0.85, 0.25, 1);
-  }
-  /* Hide on Scroll: beim Runterscrollen weg, beim Hochscrollen zurück */
-  .site-header.is-hidden { transform: translateY(calc(-100% - 2rem)); }
-
-  /* Startseite: Kopfleiste schwebt über dem Hero statt einen weißen Streifen
-     darüber zu erzeugen. */
-  :global(body:has(.hero)) .site-header { margin-bottom: -68px; }
-  @media (max-width: 920px) {
-    :global(body:has(.hero)) .site-header { margin-bottom: -54px; }
+    padding-inline: 20%;
   }
 
   @media (max-width: 1180px) {
-    .site-header { padding-inline: 5%; }
+    .site-header { padding-inline: 10%; }
   }
 
   @media (max-width: 640px) {
@@ -85,7 +75,6 @@ const links = [
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
-    white-space: nowrap;
     font-family: var(--font-head);
     font-weight: 800;
     font-size: 1.1rem;
@@ -294,42 +283,6 @@ const links = [
       setOpen(false);
     }
   });
-
-  const header = document.getElementById('site-header');
-  let lastY = scrollY;
-  let ticking = false;
-  // Beim Sprung zu einem Anker bleibt die Kopfleiste ausgeblendet, damit der
-  // Abschnitt bündig am oberen Rand beginnt (scroll-padding-top: 0) und nichts
-  // vom Abschnitt davor oder von der Leiste verdeckt wird. Ein späteres
-  // Hochscrollen blendet sie wieder ein.
-  let jumping = false;
-  let jumpTimer: number | undefined;
-  function endJump() { jumping = false; lastY = Math.max(scrollY, 0); }
-  function onScroll() {
-    const y = Math.max(scrollY, 0);
-    const open = nav?.classList.contains('is-open');
-    if (jumping) {
-      header?.classList.toggle('is-hidden', y >= 80 && !open);
-      clearTimeout(jumpTimer);
-      jumpTimer = window.setTimeout(endJump, 200);
-    } else if (open || y < 80) header?.classList.remove('is-hidden');
-    else if (Math.abs(y - lastY) > 6) header?.classList.toggle('is-hidden', y > lastY);
-    lastY = y;
-    ticking = false;
-  }
-  addEventListener('scroll', () => {
-    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
-  }, { passive: true });
-  document.addEventListener('click', (e) => {
-    const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href*="#"]');
-    if (!a || e.defaultPrevented) return;
-    const url = new URL(a.href, location.href);
-    if (url.pathname !== location.pathname || !url.hash || !document.querySelector(url.hash)) return;
-    jumping = true;
-    clearTimeout(jumpTimer);
-    jumpTimer = window.setTimeout(endJump, 1500);
-  });
-  header?.addEventListener('focusin', () => header.classList.remove('is-hidden'));
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && nav?.classList.contains('is-open')) setOpen(false);

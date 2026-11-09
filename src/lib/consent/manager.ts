@@ -4,7 +4,7 @@
  * registry.ts eingetragenen Dienste. Enthält keine dienstspezifische Logik —
  * die liegt ausschließlich in registry.ts.
  */
-import { getRuntimeServices, hasAnyActiveOptionalService, type ConsentCategory } from './registry';
+import { getRuntimeServices, type ConsentCategory } from './registry';
 import {
   OPTIONAL_CATEGORIES,
   getGrantedCategories,
@@ -43,14 +43,21 @@ function revokeAll() {
 const banner = document.getElementById('tectum-consent-banner');
 
 function showBanner() {
+  syncBannerToggles();
   banner?.removeAttribute('hidden');
-  // Die mobile Sticky-CTA-Leiste weicht dem Banner (siehe global.css).
-  document.documentElement.dataset.consentBanner = 'open';
+}
+
+function syncBannerToggles() {
+  if (!banner) return;
+  const accepted = new Set(getGrantedCategories());
+  banner.querySelectorAll<HTMLInputElement>('input[data-consent-category]').forEach((input) => {
+    const category = input.dataset.consentCategory as ConsentCategory;
+    input.checked = accepted.has(category);
+  });
 }
 
 function hideBanner() {
   banner?.setAttribute('hidden', '');
-  delete document.documentElement.dataset.consentBanner;
 }
 
 // ---------- Einstellungsdialog ----------
@@ -131,7 +138,7 @@ function init() {
     lastFocusedElement?.focus();
   });
 
-  // "Einstellungen" im Banner trägt [data-privacy-settings-trigger]
+  // "Einstellungen" im Banner trägt zusätzlich [data-privacy-settings-trigger]
   // und wird bereits vom delegierten Klick-Listener oben geöffnet.
   document.getElementById('cb-accept-all')?.addEventListener('click', acceptAll);
   document.getElementById('cb-reject-all')?.addEventListener('click', rejectAll);
@@ -139,9 +146,6 @@ function init() {
   document.getElementById('pd-accept-all')?.addEventListener('click', acceptAll);
   document.getElementById('pd-reject-all')?.addEventListener('click', rejectAll);
   document.getElementById('pd-save')?.addEventListener('click', saveDialogSelection);
-
-  // Ohne aktiven optionalen Dienst gibt es nichts, wozu man einwilligen könnte.
-  if (!hasAnyActiveOptionalService(SERVICES)) return;
 
   const consent = readConsent();
   if (isConsentValid(consent)) {

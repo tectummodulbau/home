@@ -35,38 +35,6 @@ npx astro check  # Typprüfung
 
 ---
 
-## Seitenaufbau und 3D-Szenen
-
-Die Startseite ist eine Conversion-Landingpage ohne Fotos: Alle Modulhäuser sind
-isometrische 3D-Illustrationen, die beim Build als Inline-SVG erzeugt werden.
-Reihenfolge in `src/pages/index.astro`: Hero → StatsBand → Prinzip (Scroll-Bühne)
-→ Module → Konfigurator → Zielgruppen → Vorteile → Werk → Video → Vergleich →
-Rechner → Ablauf → FAQ → Anfrage.
-
-```
-src/lib/iso/
-  engine.ts    Projektion, Flächen, box(), item() (animierbare Gruppe), svg()
-  objects.ts   Modul (schlaf/wohn/luxus), Terrasse, Pool, Sauna, Fitness, PV, Bäume
-  scenes.ts    Fertige Szenen: Hero, Prinzip, Konfigurator, Modulkarten, Werk, Zielgruppen
-src/styles/iso.css     Animationen der Szenen (enter / scroll / Schleifen)
-src/scripts/motion.ts  Reveal, Scroll-Bühnen, Zähler, Parallax, Sticky-CTA, Lesefortschritt
-```
-
-- **Neues Bauteil** = Funktion in `objects.ts` (Meter-Koordinaten, `box()`/`poly()`),
-  danach in der gewünschten Szene in `scenes.ts` einsetzen. Zeichenreihenfolge =
-  Reihenfolge im Array (hinten zuerst).
-- **Scroll-Bühne:** Ein Abschnitt mit `data-stage` und `position: sticky`-Innenteil
-  bekommt `--p` (0…1). `.iso-item[data-at="a,b"]` blendet zwischen `a` und `b` ein,
-  `[data-range="a,b"]` markiert die aktive Beschriftung (`.is-on`). Mit
-  `prefers-reduced-motion` erscheint alles sofort (Klasse `is-static`).
-- Die Szenen sind reines Markup, kein Laufzeit-JavaScript — Bewegung kommt aus CSS
-  und `motion.ts`.
-- Der Rechner (`Rechner.astro`) behält Formel, Element-IDs und Tracking; neu sind
-  Szenarien, Verlaufsdiagramm und die Vorbelegung des Formularfelds
-  „Einheiten“ über den Rechner-CTA.
-
----
-
 ## Tracking und Consent
 
 ### Eingesetzte Dienste
@@ -75,13 +43,11 @@ src/scripts/motion.ts  Reveal, Scroll-Bühnen, Zähler, Parallax, Sticky-CTA, Le
 |---|---|---|---|
 | Cloudflare Hosting/Sicherheit | notwendig | aktiv | – |
 | Cloudflare Web Analytics | notwendig | aktiv, Skript kommt von der Plattform | – |
-| Google Analytics 4 (gtag direkt) | Statistik | **abgeschaltet** (`enabled: false` im Manifest), vorher `G-ZLHWPYQ9LJ` | optional `PUBLIC_GA4_MEASUREMENT_ID` |
+| Google Analytics 4 (gtag direkt) | Statistik | aktiv, `G-ZLHWPYQ9LJ` | optional `PUBLIC_GA4_MEASUREMENT_ID` |
 | Google Tag Manager | Statistik | vorbereitet, aus | `PUBLIC_GTM_ID` |
 | Google Ads | Marketing | vorbereitet, aus | `PUBLIC_GOOGLE_ADS_ID`, `PUBLIC_GOOGLE_ADS_LEAD_LABEL` |
 | Meta-Pixel | Marketing | vorbereitet, aus | `PUBLIC_META_PIXEL_ID` |
 | Google Maps | Externe Inhalte | vorbereitet, aus | `PUBLIC_GOOGLE_MAPS_API_KEY` |
-
-**Stand: GA4 ist abgeschaltet.** Damit gibt es keinen aktiven optionalen Dienst: kein Banner, der Dialog zeigt nur Notwendiges, die Datenschutzerklärung enthält keine Abschnitte zu GA4 und Consent Mode. Beim Wiedereinschalten `enabled: true`, `CONSENT_VERSION` erhöhen und die Abschnitte aus `docs/datenschutz-bausteine.md` wieder einfügen.
 
 **Kein GTM.** Die Messung läuft direkt über `gtag.js`. Der GTM-Eintrag bleibt
 nur als Option bestehen.
@@ -90,8 +56,9 @@ nur als Option bestehen.
 Zum Aktivieren genügen zwei Dinge: `enabled: true` beim betreffenden Kanal in
 `src/lib/analytics/manifest.ts` und die zugehörige Umgebungsvariable. Der
 Tracker reicht die zugeordneten Ereignisse dann von selbst weiter, ein
-Code-Umbau ist nicht nötig. Die Analyseübersicht im Admin-Bereich wurde entfernt; den Stand der Kanäle
-zeigt `src/lib/analytics/manifest.ts`.
+Code-Umbau ist nicht nötig. Den jeweils aktuellen Stand — welche Variablen
+gesetzt sind, was noch fehlt, welcher Kanal tatsächlich sendet — zeigt die
+**Analyseübersicht unter `/admin/analyse`** (siehe unten).
 
 ### Warum die Mess-ID im Quelltext steht und nicht in wrangler.toml
 
@@ -141,14 +108,14 @@ src/lib/consent/
   state.ts      Speicherung, Gültigkeit, Benachrichtigung. Wird von manager.ts
                 UND vom Tracking gelesen.
   manager.ts    Banner-/Dialog-Logik, ruft load()/cleanup() auf.
-src/components/privacy/   Banner (kompakt, 3 Aktionen), Dialog. Kein schwebendes Widget — Wiederaufruf über Footer-Link „Datenschutz-Einstellungen“
+src/components/privacy/   Banner, Dialog, Widget (unverändertes Design)
 src/components/analytics/ConsentModeDefaults.astro
 ```
 
 **Eine Ausnahme beim `enabled`-Flag:** Für die vier Messkanäle (GA4, Google Ads,
 Meta-Pixel, GTM) steht es nicht in `registry.ts`, sondern in
 `src/lib/analytics/manifest.ts`. Grund ist die Analyseübersicht unter
-der früheren Analyseübersicht: Sie lief als Pages Function im Worker und kann `registry.ts`
+`/admin/analyse`: Sie läuft als Pages Function im Worker und kann `registry.ts`
 nicht importieren, weil dort `window`, `document` und `location` vorkommen. Das
 Flag an zwei Stellen zu pflegen wäre die schlechtere Antwort gewesen —
 `load()`/`cleanup()` bleiben in der Registry. Auch `CATEGORY_LABELS` liegt
@@ -207,7 +174,7 @@ src/lib/analytics/
   manifest.ts  Statische Beschreibung des Messaufbaus: Kanäle inkl. enabled-Flag,
                Event-Katalog, Zuordnung zu Meta-Standardereignissen. Frei von
                Importen und Browser-APIs — deshalb auch aus einer Pages Function
-               lesbar. Wird von registry.ts, tracker.ts genutzt.
+               lesbar. Wird von registry.ts, tracker.ts und /admin/analyse genutzt.
   config.ts    IDs aus Umgebungsvariablen, GA4-Parameterlimit, ?ga_debug=1
   gtag.ts      dataLayer-/gtag-Zugriff, Skript-Injektion, Cookie-Löschung
   meta.ts      fbq-Bootstrap, Standardereignisse, Aufräumen beim Widerruf
@@ -273,8 +240,8 @@ Fehler, den man erst an den Kampagnenkosten bemerkt.
 Genau diese Events, keine weiteren. `page_view` kommt zusätzlich von GA4 selbst.
 
 Die Liste unten ist die Erläuterung; die maschinenlesbare Fassung steht in
-`TRACKED_EVENTS` in `src/lib/analytics/manifest.ts`.
-Wer ein Event hinzufügt, ändert oder entfernt,
+`TRACKED_EVENTS` in `src/lib/analytics/manifest.ts` und wird von
+`/admin/analyse` gerendert. Wer ein Event hinzufügt, ändert oder entfernt,
 pflegt **beides**.
 
 **Zuordnung zu Meta-Standardereignissen** (Feld `metaEvent` im Manifest, greift
@@ -316,7 +283,7 @@ wird nicht gemeldet.
 
 | Event | Auslöser | Parameter |
 |---|---|---|
-| `click_phone` | Klick auf `a[href^="tel:"]` | `position` (ID des Abschnitts, sonst `header`/`footer`; `data-track-section` am Element hat Vorrang) |
+| `click_phone` | Klick auf `a[href^="tel:"]` | `position` (ID des Abschnitts, sonst `header`/`footer`) |
 | `click_email` | Klick auf `a[href^="mailto:"]` | – |
 | `cta_click` | Klick auf einen Link, dessen `href` auf `#anfrage` endet | `cta_label` (Linktext), `section` |
 
@@ -325,10 +292,6 @@ eine Textänderung im Marketing hängt das Tracking damit nicht stillschweigend
 ab. Erfasst sind „Unverbindliches Angebot", „Projekt anfragen", „Angebot
 anfragen", „Unverbindliche Projektprüfung" und „Jetzt kontaktieren". „Unsere
 Module" (`#module`) ist reine Navigation und bleibt außen vor.
-
-Die mobile Sticky-Leiste (`#sticky-cta` in `Layout.astro`) trägt
-`data-track-section="sticky-cta"`, damit ihre Klicks im Report als eigene Position
-erscheinen.
 
 **Ein neuer CTA wird automatisch mitgezählt, sobald er auf `#anfrage` zeigt.**
 Zeigt ein neuer Anfrage-Button woanders hin, muss `CTA_SELECTOR` erweitert
@@ -352,15 +315,13 @@ zweiten Liste — Umbenennungen im Markup schlagen automatisch durch.
 | `faq_open` | `<details>` im FAQ wird geöffnet | `frage` |
 | `video_play` | **nutzerinitiierter** Klick auf den Play-Button des Hero-Films, 1×/Sitzung | – |
 
-Beobachtet werden alle `main section[id]`: `prinzip`, `module`, `konfigurator`,
-`zielgruppen`, `vorteile`, `werk`, `video`, `vergleich`, `rechner`, `ablauf`,
-`faq`, `anfrage`. Hero und StatsBand haben keine ID und werden nicht gezählt.
-`prinzip` und `video` sind hohe Scroll-Bühnen — sie zählen über die Regel
-„füllt 50 % der Viewporthöhe“.
+Beobachtet werden alle `main section[id]`: `zielgruppen`, `vorteile`, `module`,
+`werk`, `galerie`, `konfiguration`, `vergleich`, `rechner`, `ablauf`, `faq`,
+`anfrage`. Hero und StatsBand haben keine ID und werden nicht gezählt.
 
-Der Imagefilm liegt nicht mehr im Hero, sondern im Abschnitt `#video`
-(`src/components/Video.astro`). Er lädt erst nach dem Klick (`preload="none"`),
-läuft nie von selbst, und `video_play` hängt am Klick auf den Play-Button.
+Das Hero-Video läuft mit `autoplay muted loop`. Würde man das `play`-Event des
+Elements auswerten, wäre `video_play` faktisch ein zweiter Seitenaufruf. Der
+Hook hängt deshalb am Play-Button, nicht am Video.
 
 ### GA4-Schlüsselereignisse
 
@@ -379,25 +340,75 @@ Schlüsselereignisse — sonst verwässert die Conversion-Rate.
 
 Läuft vollständig als Cloudflare Pages Functions unter `functions/admin/`,
 geschützt über ein signiertes Session-Cookie (`_middleware.ts`). Kein Astro, kein
-`Layout.astro` — und damit bewusst auch kein Cookie-Banner. Es gibt nur noch die
-Leadliste; die frühere Analyseübersicht wurde entfernt.
+`Layout.astro` — und damit bewusst auch kein Cookie-Banner.
 
 | Route | Datei | Inhalt |
 |---|---|---|
-| `/admin` | `index.ts` | Weiterleitung auf die Leadliste |
-| `/admin/leads` | `leads.ts` | Kartenliste der Anfragen, nach Status filterbar |
-| `/admin/leads/status` | `leads/status.ts` | POST: Status eines Leads ändern |
+| `/admin` | `index.ts` | Weiterleitung auf die Analyseübersicht |
+| `/admin/analyse` | `analyse.ts` | Kennzahlen und Messaufbau — die Landeseite |
+| `/admin/leads` | `leads.ts` | Kartenliste der Anfragen, Status pflegbar |
 | `/admin/login` · `/admin/logout` | `login.ts` · `logout.ts` | Anmeldung |
 
-Bausteine in `functions/admin/_lib/`: `theme.ts` (HTML-Hülle, `ADMIN_PAGES`),
-`status.ts` (Status und Bezeichnungen), `lead-source.ts` (D1-Zugriff und
-Datensatz-Typ), `session.ts`.
+Gemeinsame Bausteine in `functions/admin/_lib/`:
 
-**Datenhaltung: Cloudflare D1.** Binding `DB` (`wrangler.toml` →
-`[[d1_databases]]`), Datenbank `leads`, Schema in `d1/schema.sql`. Geschrieben
-wird in `functions/api/lead.ts`, gelesen/geändert unter `functions/admin/`.
-Supabase wird nicht mehr verwendet. Die Tabelle einmalig anlegen:
-`npx wrangler d1 execute leads --remote --file=d1/schema.sql`.
+```
+theme.ts          HTML-Hülle, Kopfleiste mit Navigation, gemeinsames CSS
+                  (ADMIN_PAGES ist die einzige Definition der Seitenliste —
+                  Navigation, /admin-Weiterleitung und das Login-Ziel lesen daraus)
+status.ts         Lead-Status und ihre Bezeichnungen
+lead-source.ts    Supabase-Zugriff und Datensatz-Typ (von analyse.ts UND leads.ts)
+lead-stats.ts     Aggregation: Zeitfenster, Verlauf, Verteilungen — reine Funktionen
+tracking-status.ts  Manifest + Runtime-Umgebung → Zustand je Messkanal
+```
+
+### Analyseübersicht (`/admin/analyse`)
+
+Zwei Blöcke, bewusst voneinander unabhängig:
+
+**Anfragen** — aus der Supabase-Tabelle `leads`: Kennzahlen mit Vergleich zum
+gleich langen Vorzeitraum, ein Verlauf über zwölf Sieben-Tage-Fenster, der
+Bearbeitungsstand nach Status und die Verteilung der Qualifizierungsangaben aus
+den Formularschritten 1–3. Kontaktdaten werden auf dieser Seite **nicht**
+ausgegeben.
+
+Der Verlauf nutzt gleitende Sieben-Tage-Fenster und keine Kalenderwochen: die
+laufende Kalenderwoche wäre angebrochen und damit systematisch niedriger als die
+davor — im Diagramm sähe das nach einem Einbruch aus, der keiner ist.
+
+**Messaufbau** — je Kanal Zustand, Kategorie, wirksame ID, gesetzte und fehlende
+Umgebungsvariablen sowie die offene Aktivierungs-Checkliste; dazu die Host-Sperre
+mit der Angabe, ob der gerade aufgerufene Host gemessen wird, und der
+vollständige Event-Katalog inklusive Meta-Zuordnung. Alles davon stammt aus
+`src/lib/analytics/manifest.ts`. Die Seite kann deshalb nicht veralten, ohne dass
+sich der Messaufbau selbst ändert.
+
+Fehlt die Supabase-Konfiguration oder antwortet die Datenbank mit einem Fehler,
+bleibt der Messaufbau-Block trotzdem nutzbar — genau dann braucht man ihn meist.
+
+**Ein Stolperstein, den die Seite auch selbst anzeigt:** Die Function liest die
+Variablen zur **Laufzeit**, das ausgelieferte JavaScript bekommt sie zur
+**Build-Zeit** von Vite eingesetzt. Beides stimmt nur überein, wenn die Variable
+unter *Cloudflare Pages → Settings → Environment variables* steht. Eine Variable
+nur in den `[vars]` der `wrangler.toml` erscheint in der Übersicht als „gesetzt",
+käme im Frontend aber nie an. Und Änderungen greifen im Frontend erst nach einem
+neuen Deployment.
+
+### Prüfen ohne Deployment
+
+Die Function lässt sich bündeln und direkt aufrufen — schneller als jeder
+Deploy und ohne Supabase:
+
+```bash
+npx esbuild functions/admin/analyse.ts --bundle --format=esm \
+  --platform=neutral --outfile=/tmp/analyse.mjs
+```
+
+Dann in Node `globalThis.fetch` durch eine Attrappe ersetzen, die eine
+Lead-Liste als JSON zurückgibt, `onRequestGet({ env, request })` aufrufen und das
+HTML prüfen. Sinnvolle Fälle: Daten vorhanden, leere Tabelle, Supabase nicht
+konfiguriert, Supabase-Fehler, Aufruf über einen `*.pages.dev`-Host.
+
+---
 
 ## Suchmaschinen-Metadaten
 
@@ -410,8 +421,6 @@ und `description`; alles andere leitet sich daraus und aus
 | `SITE_NAME` | `structured-data.ts` | `og:site_name` **und** `WebSite.name` |
 | `OG_IMAGE` | `structured-data.ts` | `og:image`/`twitter:image` inkl. Maßen |
 | `SITE_URL` | `structured-data.ts` | Basis aller absoluten URLs im Schema |
-
-**Canonical-Host ist `https://www.tectum-modulbau.de`.** `SITE_URL` (structured-data.ts) und `SITE` (astro.config.mjs) müssen übereinstimmen; daraus entstehen Canonical, og:url, Sitemap und Schema. In `public/robots.txt` steht die Sitemap-URL ebenfalls mit `www`. Die Apex-Domain gehört per Cloudflare Redirect Rule (301) auf `www`.
 
 **Warum `SITE_NAME` an genau einer Stelle steht:** Google hat den Startseiten-
 titel im Suchergebnis durch einen selbst hergeleiteten Namen ersetzt
@@ -550,7 +559,7 @@ Datenschutzerklärung und der Liste offener Punkte:
 | Google Consent Mode v2 | Google Ireland Ltd. | akzessorisch | – | nur lokaler `dataLayer` |
 | Einwilligungsverwaltung | selbst betrieben | notwendig | § 25 II Nr. 2 TDDDG | `localStorage` `tectum_privacy_consent`, 365 Tage |
 | Session-Marker | selbst betrieben | akzessorisch | – | `sessionStorage` `tectum_evt_*` |
-| Cloudflare D1 | Cloudflare, Inc. (USA) | Backend | Art. 6 I b | Lead-Datensätze |
+| Supabase | Supabase (Region offen) | Backend | Art. 6 I b | Lead-Datensätze |
 | Resend | Resend, Inc. (USA) | Backend | Art. 6 I b | Versand-Metadaten |
 | Rate-Limiting `/api/lead` | selbst betrieben | notwendig | Art. 6 I f | IP flüchtig, 10-Min.-Fenster |
 | Admin-Session | selbst betrieben | nicht öffentlich | Art. 6 I f | signiertes Cookie |
@@ -573,7 +582,8 @@ sind:
    `provider`, `storageInfo` (Cookie-Name **und** Laufzeit) und
    `thirdCountryNotice`. Handelt es sich um einen **Messkanal**, zusätzlich
    einen Eintrag in `MEASUREMENT_CHANNELS` in `src/lib/analytics/manifest.ts` —
-   sonst hätte `enabled` keine gemeinsame Quelle.
+   sonst fehlt er in der Analyseübersicht, und `enabled` hätte keine
+   gemeinsame Quelle.
 2. **`CONSENT_VERSION` erhöhen** — sonst behalten alle Besucher eine
    Einwilligung, die den neuen Umfang nicht abdeckt.
 3. Datenschutzerklärung in `src/pages/datenschutz.astro` ergänzen. Baustein aus
@@ -598,8 +608,8 @@ halten.
 ### Bekannte offene Punkte
 
 Die vollständige Liste steht in `docs/datenschutz-bausteine.md`, Phase 5. Die
-wichtigsten: Auftragsverarbeitungsverträge mit Cloudflare (inkl. D1), Resend und
-Google; Verzeichnis von
+wichtigsten: Auftragsverarbeitungsverträge mit Cloudflare, Supabase, Resend und
+Google; Verarbeitungsregion von Supabase; Verzeichnis von
 Verarbeitungstätigkeiten; Aufbewahrungsdauer in GA4 (Standard 2 Monate);
 Firmierung der Komplementär-GmbH fürs Impressum; ob Cloudflare Web Analytics und
 die E-Mail-Verschleierung im Dashboard tatsächlich aktiv sind.
@@ -615,7 +625,7 @@ nachweisbaren Dienst ab:
 | 4 | Cookies, Einwilligungsverwaltung, Local/Session Storage |
 | 5 | Google Analytics 4 |
 | 6 | Google Consent Mode v2 |
-| 7 | Anfrageformular, D1 als Speicher, Ratenbegrenzung, Löschfristen |
+| 7 | Anfrageformular, Supabase als Empfänger, Ratenbegrenzung, Löschfristen |
 | 8 | Resend inkl. AVV, 30 Tage Speicherdauer, Drittland |
 | 9 | Schriftarten (lokal) |
 | 10 | Videoinhalte (selbst gehostet) |

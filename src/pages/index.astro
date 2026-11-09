@@ -6,9 +6,8 @@ import Vorteile from '../components/Vorteile.astro';
 import StatsBand from '../components/StatsBand.astro';
 import Module from '../components/Module.astro';
 import Werk from '../components/Werk.astro';
-import Video from '../components/Video.astro';
-import Konfigurator from '../components/Konfigurator.astro';
-import Prinzip from '../components/Prinzip.astro';
+import Galerie from '../components/Galerie.astro';
+import Konfiguration from '../components/Konfiguration.astro';
 import Vergleich from '../components/Vergleich.astro';
 import Rechner from '../components/Rechner.astro';
 import Ablauf from '../components/Ablauf.astro';
@@ -17,20 +16,19 @@ import LeadForm from '../components/LeadForm.astro';
 ---
 
 <Layout
-  title="Modulbau-Hersteller: Modulhäuser & Tiny Houses | Tectum Modulbau"
-  description="Modulbau-Hersteller für schlüsselfertige Modulhäuser & Tiny Houses: Camping-Chalets, Glamping, Wohnparks, Kommunen. DGNB-zertifiziert, ab Werk. Kauf oder Leasing."
+  title="Schlüsselfertige Modulhäuser & Mobilheime | Tectum Modulbau"
+  description="Schlüsselfertige Modulhäuser, Mobilheime & Tiny Houses für Campingplätze, Wohnparks und Kommunen. DGNB-zertifiziert, ab Werk in Wochen. Kauf oder Leasing."
   faqPage
 >
   <main>
     <Hero />
-    <StatsBand />
-    <Prinzip />
-    <Module />
-    <Konfigurator />
     <Zielgruppen />
     <Vorteile />
+    <Module />
+    <StatsBand />
     <Werk />
-    <Video />
+    <Galerie />
+    <Konfiguration />
     <Vergleich />
     <Rechner />
     <Ablauf />
@@ -38,3 +36,5 @@ import LeadForm from '../components/LeadForm.astro';
     <LeadForm />
   </main>
 </Layout>
+
+<script src="../scripts/reveal.ts"></script>

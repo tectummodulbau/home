@@ -1,24 +1,32 @@
 ---
-import { zielScene, type ZielKind } from '../lib/iso/scenes';
+import { Image } from 'astro:assets';
+import imgCamping from '../assets/zielgruppe-camping.jpg';
+import imgKommunen from '../assets/zielgruppe-kommunen.jpg';
+import imgWohnpark from '../assets/zielgruppe-wohnpark.jpg';
+import imgMesse from '../assets/zielgruppe-messe.jpg';
 
-const gruppen: { kind: ZielKind; title: string; text: string }[] = [
+const gruppen = [
   {
-    kind: 'camping',
+    img: imgCamping,
+    alt: 'Modulhäuser von Tectum als Glamping-Unterkünfte auf einem Campingplatz',
     title: 'Campingplatz­betreiber',
-    text: 'Camping-Chalets und Glamping-Unterkünfte, individuell konfiguriert — ganzjährig nutzbar, anders als klassische Mobilheime. Auf Wunsch mit Sauna, Fitness oder Loungebereich.',
+    text: 'Individuell konfigurierte Camping- und Glamping-Units für Ihren Betrieb, ganzjährig nutzbar und damit mehr als ein klassisches Mobilheim. Auf Wunsch mit Sauna, Fitness oder Loungebereich.',
   },
   {
-    kind: 'wohnpark',
+    img: imgWohnpark,
+    alt: 'Wohnpark mit modularen Wohneinheiten von Tectum Modulbau',
     title: 'Wohnparks & Freizeitparks',
     text: 'Schlaf-, Wohn- und Luxuseinheiten für den Dauerbetrieb. Erweiterbar. Ertragsstark.',
   },
   {
-    kind: 'kommune',
+    img: imgKommunen,
+    alt: 'Modulhäuser als Unterkünfte für Kommunen und Arbeitnehmer',
     title: 'Kommunen & Arbeitgeber',
-    text: 'Arbeitnehmer- und Kommunalunterkünfte als Modulbau für temporäre oder dauerhafte Nutzung. Flexibel auf- und abbaubar.',
+    text: 'Funktionale Einheiten für temporäre oder dauerhafte Nutzung. Flexibel auf- und abbaubar.',
   },
   {
-    kind: 'messe',
+    img: imgMesse,
+    alt: 'Repräsentatives Modulhaus von Tectum für Messen und Ausstellungen',
     title: 'Messen & Ausstellungen',
     text: 'Repräsentative Einheiten für temporäre oder dauerhafte Präsenz, flexibel aufstellbar und wieder abbaubar.',
   },
@@ -26,25 +34,31 @@ const gruppen: { kind: ZielKind; title: string; text: string }[] = [
 ---
 
 <section class="section section--dark" id="zielgruppen">
-  <div class="container zg__container">
+  <div class="container">
     <div class="section-head section-head--center reveal">
       <span class="section-kicker">Einsatzbereiche</span>
       <h2>Ihr Projekt. Unsere Einheiten. Fertig geliefert.</h2>
       <p class="section-lead">
         Ob Campingplatz, Wohnpark, kommunale Unterkunft oder Messeauftritt: Tectum liefert
-        skalierbare Modulhäuser und Tiny Houses für den gewerblichen Einsatz, die sich exakt an Ihren Bedarf anpassen. Kein langer
+        skalierbare Modulhäuser, die sich exakt an Ihren Bedarf anpassen. Kein langer
         Planungsvorlauf. Keine Baustelle im klassischen Sinne. Fertig ab Werk.
       </p>
     </div>
 
     <div class="zg-grid">
-      {gruppen.map((g, i) => (
-        <article class="zg-card iso-card reveal" style={`--i:${i}`}>
-          <div class="zg-card__media"><Fragment set:html={zielScene(g.kind)} /></div>
+      {gruppen.map((g) => (
+        <article class="zg-card reveal">
+          <div class="zg-card__media">
+            <Image src={g.img} alt={g.alt} widths={[400, 700]} sizes="(max-width: 680px) 100vw, 50vw" />
+          </div>
           <div class="zg-card__body">
             <h3>{g.title}</h3>
-            <p>{g.text}</p>
-            <a href="#anfrage" class="zg-card__link">Projekt anfragen <span aria-hidden="true">→</span></a>
+            <div class="zg-card__more">
+              <div class="zg-card__more-inner">
+                <p>{g.text}</p>
+                <a href="#anfrage" class="zg-card__link">Projekt anfragen <span aria-hidden="true">→</span></a>
+              </div>
+            </div>
           </div>
         </article>
       ))}
@@ -53,53 +67,148 @@ const gruppen: { kind: ZielKind; title: string; text: string }[] = [
 </section>
 
 <style>
-  .zg__container { padding-inline: clamp(5%, 8vw, 12%); }
-
   .zg-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1rem, 2vw, 1.6rem);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
   }
 
   .zg-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #22201a 0%, #1a1914 100%);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    position: relative;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    transition: border-color 0.3s ease, transform 0.65s ease, opacity 0.65s ease;
+    background: #1d1b17;
+    aspect-ratio: 3 / 4;
+    isolation: isolate;
   }
-  .zg-card:hover { border-color: var(--accent); }
 
-  .zg-card__media {
-    padding: 0.8rem 0 0.8rem 0.8rem;
-    background: radial-gradient(ellipse 70% 70% at 50% 60%, rgba(200, 169, 110, 0.16), transparent 70%);
+  .zg-card__media,
+  .zg-card__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
-  .zg-card__media :global(.iso) { filter: drop-shadow(0 14px 16px rgba(0, 0, 0, 0.5)); }
+  .zg-card__media img {
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s ease;
+  }
+  .zg-card:hover .zg-card__media img,
+  .zg-card:focus-within .zg-card__media img { transform: scale(1.06); }
 
-  .zg-card__body { padding: 1.4rem 1.5rem 1.4rem 0.4rem; }
-  .zg-card__body h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
-  .zg-card__body p { font-size: 0.94rem; color: rgba(255, 255, 255, 0.72); margin-bottom: 1rem; }
+  /* Verlauf: unten dicht genug, damit weißer Text auf jedem Foto lesbar bleibt */
+  .zg-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to top,
+      rgba(14, 13, 10, 0.94) 0%,
+      rgba(14, 13, 10, 0.82) 28%,
+      rgba(14, 13, 10, 0.25) 58%,
+      transparent 78%
+    );
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  /* Beim Hover dunkelt das Bild zusätzlich ab, damit der Fließtext sicher lesbar ist */
+  .zg-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to top, rgba(14, 13, 10, 0.92) 0%, rgba(14, 13, 10, 0.86) 55%, rgba(14, 13, 10, 0.55) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .zg-card:hover::before,
+  .zg-card:focus-within::before { opacity: 1; }
+
+  .zg-card__body {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: 2;
+    padding: 1.5rem 1.5rem 1.4rem;
+    color: #fff;
+  }
+  .zg-card__body h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    line-height: 1.2;
+    color: #fff;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  }
+  .zg-card__body h3::after {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 2px;
+    margin-top: 0.7rem;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+  .zg-card:hover h3::after,
+  .zg-card:focus-within h3::after { width: 3.2rem; }
+
+  .zg-card__more {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.45s ease, opacity 0.35s ease;
+  }
+  .zg-card__more-inner { overflow: hidden; }
+  .zg-card:hover .zg-card__more,
+  .zg-card:focus-within .zg-card__more {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .zg-card__more p {
+    margin: 0.85rem 0 0.9rem;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
 
   .zg-card__link {
+    display: inline-block;
     font-family: var(--font-head);
-    font-weight: 700;
+    font-weight: 600;
     font-size: 0.92rem;
     text-decoration: none;
     color: var(--accent);
   }
-  .zg-card__link span { display: inline-block; transition: transform 0.2s ease; }
+  .zg-card__link span {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
   .zg-card__link:hover span { transform: translateX(4px); }
 
-  @media (max-width: 1100px) {
-    .zg-grid { grid-template-columns: 1fr; }
+  /* Geräte ohne Hover (Touch): Text immer sichtbar */
+  @media (hover: none) {
+    .zg-card__more { grid-template-rows: 1fr; opacity: 1; }
+    .zg-card::after {
+      background: linear-gradient(to top, rgba(14,13,10,0.95) 0%, rgba(14,13,10,0.85) 45%, rgba(14,13,10,0.2) 75%, transparent 100%);
+    }
   }
-  @media (max-width: 560px) {
-    .zg-card { grid-template-columns: 1fr; }
-    .zg-card__media { padding: 0.8rem 0.8rem 0; }
-    .zg-card__body { padding: 0.6rem 1.3rem 1.5rem; }
+
+  @media (max-width: 1080px) {
+    .zg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 680px) {
+    .zg-grid { grid-template-columns: 1fr; }
+    .zg-card { aspect-ratio: 4 / 5; }
+    .zg-card__more { grid-template-rows: 1fr; opacity: 1; }
+  }
+
+  @media (max-width: 920px) {
+    :global(#zielgruppen .section-head--center) {
+      margin-inline: 0;
+      text-align: left;
+    }
   }
 </style>
