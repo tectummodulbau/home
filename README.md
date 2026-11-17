@@ -142,3 +142,15 @@ npx wrangler pages dev dist   # benötigt lokale .dev.vars (siehe .gitignore) mi
   beim Build optimierte Bilder, minimales Vanilla-JS (Rechner, Formular,
   Akkordeon, Navigation).
 - Der Ertragsrechner übernimmt die Original-Berechnungslogik unverändert.
+
+## Lightbox und Galerie
+
+- `src/components/Lightbox.astro` (einmal auf der Seite, in `index.astro`) öffnet Bilder und Videos im Vollbild.
+  Pfeiltasten, Wischen, Escape, Klick daneben und die Buttons funktionieren, der Fokus kehrt beim Schließen zurück.
+- Ein Element wird klickbar, indem es die Attribute aus `src/lib/lightbox.ts` bekommt
+  (`{...await lightboxImage(bild, alt, caption)}` oder `lightboxVideo(...)`).
+  Die Lightbox blättert durch alle Treffer in DOM Reihenfolge, dieselbe Quelle erscheint nur einmal.
+  Aktuell angebunden: Module, Werk, Galerie, Konfiguration.
+- Das große Bild entsteht beim Build als WebP (max. 1800 px), nicht aus dem Original.
+- Originale der neuen Fotos liegen unverändert in `originale/`, ausgeliefert werden die optimierten JPGs in `src/assets/`.
+- Video: `public/video/wohnpark-campingplatz.mp4` mit Poster. Lädt erst beim Klick in der Lightbox.

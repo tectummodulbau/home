@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import { lightboxImage } from '../lib/lightbox';
 import imgFitness from '../assets/addon-fitness.jpg';
 import imgSauna from '../assets/addon-sauna.jpg';
 import imgAussen from '../assets/addon-aussenanlage.jpg';
@@ -24,6 +25,9 @@ const addons = [
     text: 'Jede Tectum-Einheit lässt sich um einen vollwertigen Außenbereich erweitern. Ob Poolanlage, Whirlpool oder gestaltete Terrasse — die Konfiguration wird individuell abgestimmt und gemeinsam mit der Haupteinheit geliefert.',
   },
 ];
+const addonsMitLb = await Promise.all(
+  addons.map(async (a) => ({ ...a, lb: await lightboxImage(a.img, a.alt, a.title) }))
+);
 ---
 
 <section class="section section--dark" id="konfiguration">
@@ -39,9 +43,9 @@ const addons = [
     </div>
 
     <div class="kf-grid">
-      {addons.map((a) => (
+      {addonsMitLb.map((a) => (
         <article class="kf-card reveal">
-          <div class="kf-card__media">
+          <div class="kf-card__media" {...a.lb}>
             <Image src={a.img} alt={a.alt} widths={[400, 700]} sizes="(max-width: 920px) 100vw, 33vw" />
           </div>
           <div class="kf-card__body">

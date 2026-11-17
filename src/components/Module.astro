@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import { lightboxImage } from '../lib/lightbox';
 import imgSchlaf from '../assets/modul-schlafeinheit.jpg';
 import imgWohn from '../assets/modul-wohnraumeinheit.jpg';
 import imgLuxus from '../assets/modul-luxuseinheit.jpg';
@@ -33,6 +34,9 @@ const module = [
     features: ['Erweiterte Fläche', 'Premium-Küche', 'Wohnbereich', 'Schlafbereich', 'Vollbad', 'Klimaanlage', 'PV optional'],
   },
 ];
+const moduleMitLb = await Promise.all(
+  module.map(async (m) => ({ ...m, lb: await lightboxImage(m.img, m.alt, m.title) }))
+);
 ---
 
 <section class="section section--dark" id="module">
@@ -47,9 +51,9 @@ const module = [
     </div>
 
     <div class="md-grid">
-      {module.map((m) => (
+      {moduleMitLb.map((m) => (
         <article class="md-card card reveal">
-          <div class="md-card__media">
+          <div class="md-card__media" {...m.lb}>
             <Image src={m.img} alt={m.alt} widths={[400, 700]} sizes="(max-width: 920px) 100vw, 33vw" />
             <span class="md-card__badge">{m.badge}</span>
           </div>
