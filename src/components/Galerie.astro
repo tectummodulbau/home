@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import { lightboxImage, lightboxVideo } from '../lib/lightbox';
 import imgWellness from '../assets/galerie-wellness.jpg';
-import imgProduktion from '../assets/galerie-produktion.jpg';
 import imgWohnraum from '../assets/galerie-wohnraum.jpg';
 import imgWohnraumHoch from '../assets/galerie-wohnraum-sofa-hochformat.jpg';
 import imgHolzwand from '../assets/galerie-wohnraum-holzwand.jpg';
@@ -27,20 +26,22 @@ const rohbilder = [
   { img: imgHolzwand, alt: 'Wohnraum mit Holzwand, Polstersofa, Küchenzeile und Essplatz in einer Tectum Moduleinheit', caption: 'Wohnraum mit Küchenzeile', wide: false },
   { img: imgWohnraum, alt: 'Innenausbau einer modularen Wohnraumeinheit von Tectum', caption: 'Wohnraumeinheit innen', wide: true },
   { img: imgWohnraumHoch, alt: 'Wohnraum einer Tectum Moduleinheit mit Sofa, Küchenzeile und Klimagerät', caption: 'Wohnen und Kochen', wide: false },
-  { img: imgProduktion, alt: 'CNC Fertigung der Modulhäuser in der Tectum Holzwerkstatt', caption: 'Fertigung im Werk', wide: false },
   { img: imgBad, alt: 'Badezimmer einer Tectum Moduleinheit mit Waschtisch, Spiegel und Marmoroptik', caption: 'Bad mit Waschtisch', wide: true },
   { img: imgDusche, alt: 'Dusche mit Glastür und Marmoroptik in einer Tectum Moduleinheit', caption: 'Dusche', wide: false },
-  { img: imgPool, alt: 'Poolanlage als Außenbereich einer Tectum Moduleinheit', caption: 'Außenanlage mit Pool', wide: true },
-  { img: imgAussen, alt: 'Tectum Modulhaus mit überdachter Holzterrasse, Glasfront und Kiesfläche auf einer Wiese', caption: 'Außenansicht mit Terrasse', wide: true },
-  { img: imgKuecheDetail, alt: 'Küchenzeile mit Kaffeemaschine, Vorratsgläsern und Bilderrahmen in einer Tectum Moduleinheit', caption: 'Küche im Detail', wide: false },
-  { img: imgKueche, alt: 'Küchenzeile mit Backofen, Waschmaschine und rundem Esstisch in einer Tectum Moduleinheit', caption: 'Küche und Essplatz', wide: true },
-  { img: imgKuehlschrank, alt: 'Geöffneter Einbaukühlschrank in der Küche einer Tectum Moduleinheit', caption: 'Einbaukühlschrank', wide: false },
-  { img: imgDurchblick, alt: 'Blick durch den Wohnraum mit Esstisch und Fernseher bis zum Bad und Schlafbereich einer Tectum Moduleinheit', caption: 'Wohnraum, Bad und Schlafbereich', wide: true },
-  { img: imgDoppelbett, alt: 'Doppelbett mit Wandleuchten und Holzwand in einer Tectum Moduleinheit', caption: 'Schlafzimmer mit Doppelbett', wide: false },
-  { img: imgZweiBetten, alt: 'Schlafbereich mit zwei Einzelbetten, Polsterpaneelen und Fernseher in einer Tectum Moduleinheit', caption: 'Schlafbereich mit zwei Betten', wide: false },
-  { img: imgSchrank, alt: 'Schrankwand in Holzoptik mit Tür und Bett in einer Tectum Moduleinheit', caption: 'Schrankwand', wide: true },
-  { img: imgBettDetail, alt: 'Bett mit Wandleuchte und Schrankwand in einer Tectum Moduleinheit', caption: 'Schlafen im Detail', wide: false },
-  { img: imgGrundriss, alt: 'Grundriss einer Tectum Moduleinheit mit Küche, Bad, Schlafbereich und Wohnbereich, 1065,5 mal 382,5 Zentimeter', caption: 'Grundriss der Moduleinheit', wide: true, plan: true },
+  { img: imgPool, alt: 'Poolanlage als Außenbereich einer Tectum Moduleinheit', caption: 'Außenanlage mit Pool', full: true },
+];
+
+const projektBilder = [
+  { img: imgAussen, alt: 'Tectum Modulhaus mit überdachter Holzterrasse, Glasfront und Kiesfläche auf einer Wiese', caption: 'Außenansicht mit Terrasse' },
+  { img: imgKuecheDetail, alt: 'Küchenzeile mit Kaffeemaschine, Vorratsgläsern und Bilderrahmen in einer Tectum Moduleinheit', caption: 'Küche im Detail' },
+  { img: imgKueche, alt: 'Küchenzeile mit Backofen, Waschmaschine und rundem Esstisch in einer Tectum Moduleinheit', caption: 'Küche und Essplatz' },
+  { img: imgKuehlschrank, alt: 'Geöffneter Einbaukühlschrank in der Küche einer Tectum Moduleinheit', caption: 'Einbaukühlschrank' },
+  { img: imgDurchblick, alt: 'Blick durch den Wohnraum mit Esstisch und Fernseher bis zum Bad und Schlafbereich einer Tectum Moduleinheit', caption: 'Wohnraum, Bad und Schlafbereich' },
+  { img: imgDoppelbett, alt: 'Doppelbett mit Wandleuchten und Holzwand in einer Tectum Moduleinheit', caption: 'Schlafzimmer mit Doppelbett' },
+  { img: imgZweiBetten, alt: 'Schlafbereich mit zwei Einzelbetten, Polsterpaneelen und Fernseher in einer Tectum Moduleinheit', caption: 'Schlafbereich mit zwei Betten' },
+  { img: imgSchrank, alt: 'Schrankwand in Holzoptik mit Tür und Bett in einer Tectum Moduleinheit', caption: 'Schrankwand' },
+  { img: imgBettDetail, alt: 'Bett mit Wandleuchte und Schrankwand in einer Tectum Moduleinheit', caption: 'Schlafen im Detail' },
+  { img: imgGrundriss, alt: 'Grundriss einer Tectum Moduleinheit mit Küche, Bad, Schlafbereich und Wohnbereich, 1065,5 mal 382,5 Zentimeter', caption: 'Grundriss der Moduleinheit', plan: true },
 ];
 
 const aufbau = [
@@ -51,6 +52,10 @@ const aufbau = [
 const bilder = await Promise.all(
   rohbilder.map(async (b) => ({ ...b, lb: await lightboxImage(b.img, b.alt, b.caption) }))
 );
+const projekt = await Promise.all(
+  projektBilder.map(async (b) => ({ ...b, lb: await lightboxImage(b.img, b.alt, b.caption) }))
+);
+const [projektHero, ...projektThumbs] = projekt;
 const aufbauBilder = await Promise.all(
   aufbau.map(async (b) => ({ ...b, lb: await lightboxImage(b.img, b.alt, b.caption) }))
 );
@@ -67,12 +72,12 @@ const wohnparkVideo = lightboxVideo(
   <div class="container">
     <div class="section-head reveal">
       <span class="section-kicker">Einblicke</span>
-      <h2>Gebaut im Werk. Gemacht für den Betrieb.</h2>
+      <h2>Ein Blick in unsere Moduleinheiten</h2>
     </div>
 
     <div class="gal-grid gal-grid--collapsed" id="gal-grid">
       {bilder.map((b) => (
-        <figure class={`gal-item reveal ${b.wide ? 'gal-item--wide' : ''} ${b.plan ? 'gal-item--plan' : ''}`} {...b.lb}>
+        <figure class={`gal-item reveal ${b.wide ? 'gal-item--wide' : ''} ${b.full ? 'gal-item--full' : ''} ${b.plan ? 'gal-item--plan' : ''}`} {...b.lb}>
           <Image src={b.img} alt={b.alt} title={b.caption} widths={[500, 900]} sizes="(max-width: 720px) 100vw, 60vw" />
           <figcaption>{b.caption}</figcaption>
         </figure>
@@ -83,6 +88,38 @@ const wohnparkVideo = lightboxVideo(
       Weitere Bilder anzeigen
     </button>
 
+    <article class="case reveal" id="projekt" aria-labelledby="case-titel">
+      <div class="case__top">
+        <figure class="case__hero gal-item gal-item--plain" {...projektHero.lb}>
+          <Image src={projektHero.img} alt={projektHero.alt} title={projektHero.caption} widths={[700, 1200]} sizes="(max-width: 920px) 100vw, 55vw" />
+          <figcaption>{projektHero.caption}</figcaption>
+        </figure>
+        <div class="case__copy">
+          <span class="section-kicker">Projektbeispiel</span>
+          <h3 id="case-titel">Eine Moduleinheit mit Terrasse, von innen und außen</h3>
+          <p>
+            Alle Bilder dieses Abschnitts gehören zu einer einzigen Einheit: Holzwand, Küchenzeile
+            mit Essplatz, Bad, Schlafbereich und überdachte Terrasse. Der Grundriss misst etwa
+            10,7 mal 3,8 Meter. Ein Klick auf ein Bild öffnet die Ansicht, in der Sie durch das
+            ganze Projekt blättern können.
+          </p>
+          <a href="#anfrage" class="btn btn--solid">Angebot anfragen</a>
+        </div>
+      </div>
+      <div class="case__thumbs">
+        {projektThumbs.map((b) => (
+          <figure class={`gal-item gal-item--plain case__thumb ${b.plan ? 'gal-item--plan' : ''}`} {...b.lb}>
+            <Image src={b.img} alt={b.alt} title={b.caption} widths={[360, 640]} sizes="(max-width: 720px) 33vw, 18vw" />
+            <figcaption>{b.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section gal-white" id="praxis">
+  <div class="container">
     <div class="gal-story gal-story--mobil reveal" id="mobil">
       <div class="gal-story__copy">
         <span class="section-kicker">Mobil bleiben</span>
@@ -92,7 +129,7 @@ const wohnparkVideo = lightboxVideo(
           Die Bilder zeigen, wie der Aufleger aufgebaut und am Trailer angebracht wird.
           So bleibt die Einheit beweglich und lässt sich an einem neuen Standort wieder aufstellen.
         </p>
-        <a href="#anfrage" class="btn btn--ghost">Projekt anfragen</a>
+        <a href="#anfrage" class="btn btn--solid">Projekt anfragen</a>
       </div>
       <div class="gal-story__media gal-story__media--pair">
         {aufbauBilder.map((b) => (
@@ -127,7 +164,7 @@ const wohnparkVideo = lightboxVideo(
           Dieser Wohnpark ist ein Beispiel dafür, wie wir Projekte begleiten: von der ersten
           Planung bis zur fertigen Anlage mit Terrassen und Außenbereich.
         </p>
-        <a href="#anfrage" class="btn btn--ghost">Unverbindliche Projektprüfung</a>
+        <a href="#anfrage" class="btn btn--solid">Unverbindliche Projektprüfung</a>
       </div>
     </div>
   </div>
@@ -147,6 +184,56 @@ const wohnparkVideo = lightboxVideo(
 <style>
   .gal-more { display: none; }
 
+  /* Schwarzer Hauptbutton, beim Hover weiß mit Outline */
+  .btn--solid {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .btn--solid:hover {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  /* Weiße Fläche für Mobil und Praxis, abgesetzt von den Einblicken */
+  .gal-white {
+    background: var(--paper);
+    padding-top: clamp(5rem, 10vw, 8.5rem);
+  }
+  .gal-white .gal-story:first-child { margin-top: 0; }
+  .gal-white .gal-story + .gal-story { margin-top: clamp(4rem, 8vw, 6.5rem); }
+
+  /* Projektbeispiel */
+  .case {
+    margin-top: clamp(3rem, 6vw, 5rem);
+    background: var(--paper);
+    border-radius: var(--radius-lg);
+    padding: clamp(1rem, 2.4vw, 1.8rem);
+    box-shadow: var(--shadow-md);
+  }
+  .case__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: clamp(1.4rem, 3.5vw, 3rem);
+    align-items: center;
+  }
+  .case .case__hero img { height: auto; aspect-ratio: 3 / 2; }
+  .case__copy { padding: 0 clamp(0rem, 1.5vw, 1rem); }
+  .case__copy h3 { margin: 0.3rem 0 0.8rem; }
+  .case__copy p { color: var(--muted); margin: 0 0 1.5rem; }
+  .case__thumbs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: clamp(0.5rem, 1vw, 0.8rem);
+    margin-top: clamp(0.8rem, 1.6vw, 1.2rem);
+  }
+  .case__thumb { border-radius: var(--radius); }
+  .case .case__thumb img { height: auto; aspect-ratio: 4 / 3; }
+  .case__thumb figcaption { display: none; }
+  .case__thumb.gal-item--plan { grid-column: span 2; border: 1px solid var(--sand); }
+  .case .case__thumb.gal-item--plan img { aspect-ratio: auto; height: 100%; }
+
   .gal-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -161,6 +248,7 @@ const wohnparkVideo = lightboxVideo(
     grid-column: span 2;
   }
   .gal-item--wide { grid-column: span 3; }
+  .gal-item--full { grid-column: 1 / -1; }
 
   .gal-item img {
     width: 100%;
@@ -229,6 +317,9 @@ const wohnparkVideo = lightboxVideo(
   .gal-item--video:hover .gal-play { transform: scale(1.08); }
 
   @media (max-width: 920px) {
+    .case__top { grid-template-columns: 1fr; }
+    .case__thumbs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .case__thumb.gal-item--plan { grid-column: span 4; }
     .gal-story,
     .gal-story--video { grid-template-columns: 1fr; }
     .gal-story--video .gal-story__copy { order: 2; }
@@ -239,8 +330,11 @@ const wohnparkVideo = lightboxVideo(
     .gal-grid--collapsed .gal-item:nth-child(n + 5) { display: none; }
     .gal-more { display: inline-flex; margin: 1.4rem auto 0; }
     .gal-more { justify-content: center; width: 100%; }
-    .gal-item, .gal-item--wide { grid-column: auto; }
+    .gal-item, .gal-item--wide, .gal-item--full { grid-column: auto; }
     .gal-item img { height: 240px; }
+    .case__thumbs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .case__thumb.gal-item--plan { grid-column: span 2; }
+    .case .case__thumb img { height: auto; }
     .gal-story__media--pair { grid-template-columns: 1fr; }
     .gal-story__media--pair .gal-item img { height: 240px; }
   }
