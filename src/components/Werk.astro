@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import { lightboxImage } from '../lib/lightbox';
 import imgProduktion from '../assets/galerie-produktion.jpg';
 
 const punkte = [
@@ -16,11 +17,16 @@ const punkte = [
     text: 'Schlüsselfertiger Transport direkt zu Ihrem Standort — keine klassische Baustelle, keine Wartezeit vor Ort.',
   },
 ];
+const lbProduktion = await lightboxImage(
+  imgProduktion,
+  'CNC Fertigung der Modulhäuser im Tectum Werk',
+  'Fertigung im Werk'
+);
 ---
 
 <section class="section section--dark werk" id="werk">
   <div class="container werk-grid">
-    <figure class="werk-visual reveal">
+    <figure class="werk-visual reveal" {...lbProduktion}>
       <Image
         src={imgProduktion}
         alt="CNC-Fertigung der Modulhäuser im Tectum Werk"
