@@ -1,0 +1,78 @@
+---
+// Mobiler Sticky Button unten. Nur bis 920 px sichtbar, blendet sich aus, sobald das Anfrageformular im Bild ist.
+---
+
+<a href="/#anfrage" class="sticky-cta is-hidden" id="sticky-cta">
+  <span>Unverbindliches Angebot</span>
+  <span class="sticky-cta__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8" /></svg>
+  </span>
+</a>
+
+<style is:global>
+  .sticky-cta { display: none; }
+
+  @media (max-width: 920px) {
+    .sticky-cta {
+      position: fixed;
+      left: 50%;
+      bottom: max(0.9rem, env(safe-area-inset-bottom));
+      z-index: 55;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      width: min(calc(100% - 2.5rem), 24rem);
+      padding: 0.8rem 0.8rem 0.8rem 1.4rem;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+      transform: translate(-50%, 0);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .sticky-cta__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--paper);
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+    .sticky-cta.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 140%);
+    }
+    /* Platz am Seitenende, damit der Button den Footer nicht verdeckt */
+    body { padding-bottom: 5.5rem; }
+  }
+</style>
+
+<script>
+  // Sichtbar nur zwischen Hero Button und Anfrageformular, dort gibt es schon eigene Anfrageknöpfe.
+  const cta = document.getElementById('sticky-cta');
+  const heroBtn = document.querySelector('.hero a[href="#anfrage"], main a.btn--primary[href="#anfrage"]');
+  const form = document.getElementById('anfrage');
+  if (cta && 'IntersectionObserver' in window) {
+    const hide = new Set<Element>();
+    const update = () => cta.classList.toggle('is-hidden', hide.size > 0);
+    const watch = (el: Element | null, margin: string) => {
+      if (!el) return;
+      new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) hide.add(el); else hide.delete(el);
+        update();
+      }, { rootMargin: margin }).observe(el);
+    };
+    watch(heroBtn, '0px');
+    watch(form, '0px 0px -25% 0px');
+    if (!heroBtn && !form) update();
+  }
+</script>

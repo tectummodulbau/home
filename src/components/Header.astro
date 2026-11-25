@@ -15,6 +15,7 @@ const links = [
     </a>
 
     <nav class="site-header__nav" id="site-nav" aria-label="Hauptnavigation">
+      <span class="site-header__nav-brand" aria-hidden="true">Tectum <em>Modulbau</em></span>
       {links.map((l) => <a href={l.href}>{l.label}</a>)}
       <a href="/#anfrage" class="site-header__nav-cta">
         Unverbindliches Angebot
@@ -108,6 +109,7 @@ const links = [
   .site-header__nav a[href="/"] { color: var(--paper); }
 
   .site-header__nav-cta { display: none; }
+  .site-header__nav-brand { display: none; }
 
   .site-header__right {
     grid-area: right;
@@ -224,6 +226,22 @@ const links = [
       visibility: visible;
       transform: translateY(0);
       transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s;
+    }
+    .site-header__nav-brand {
+      display: block;
+      position: absolute;
+      top: 1.15rem;
+      left: clamp(1.5rem, 6vw, 2.5rem);
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.01em;
+      color: var(--paper);
+    }
+    .site-header__nav-brand em {
+      font-style: normal;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.55);
     }
     .site-header__nav a {
       padding: 1.1rem 0.2rem;
