@@ -55,10 +55,27 @@ const addonsMitLb = await Promise.all(
         </article>
       ))}
     </div>
+
+    <div class="kf-cta reveal">
+      <p>Ihre Wunschausstattung steht? Wir stellen daraus ein Angebot für Ihre Anlage zusammen.</p>
+      <a href="#anfrage" class="btn btn--solid">Konfiguration anfragen</a>
+    </div>
   </div>
 </section>
 
 <style>
+  .kf-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    text-align: center;
+  }
+  .kf-cta p { margin: 0; color: var(--muted); max-width: 32rem; }
+  .btn--solid { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .btn--solid:hover { background: var(--paper); color: var(--ink); border-color: var(--ink); }
+
   .kf-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
