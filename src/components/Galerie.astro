@@ -70,7 +70,7 @@ const wohnparkVideo = lightboxVideo(
       <h2>Gebaut im Werk. Gemacht für den Betrieb.</h2>
     </div>
 
-    <div class="gal-grid">
+    <div class="gal-grid gal-grid--collapsed" id="gal-grid">
       {bilder.map((b) => (
         <figure class={`gal-item reveal ${b.wide ? 'gal-item--wide' : ''} ${b.plan ? 'gal-item--plan' : ''}`} {...b.lb}>
           <Image src={b.img} alt={b.alt} title={b.caption} widths={[500, 900]} sizes="(max-width: 720px) 100vw, 60vw" />
@@ -78,6 +78,10 @@ const wohnparkVideo = lightboxVideo(
         </figure>
       ))}
     </div>
+
+    <button type="button" class="btn btn--ghost gal-more" id="gal-more" aria-expanded="false" aria-controls="gal-grid">
+      Weitere Bilder anzeigen
+    </button>
 
     <div class="gal-story gal-story--mobil reveal" id="mobil">
       <div class="gal-story__copy">
@@ -129,7 +133,20 @@ const wohnparkVideo = lightboxVideo(
   </div>
 </section>
 
+<script>
+  const grid = document.getElementById('gal-grid');
+  const more = document.getElementById('gal-more');
+  more?.addEventListener('click', () => {
+    const open = grid?.classList.toggle('gal-grid--collapsed') === false;
+    more.setAttribute('aria-expanded', String(open));
+    more.textContent = open ? 'Weniger Bilder anzeigen' : 'Weitere Bilder anzeigen';
+    if (!open) grid?.scrollIntoView({ block: 'start' });
+  });
+</script>
+
 <style>
+  .gal-more { display: none; }
+
   .gal-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -219,6 +236,9 @@ const wohnparkVideo = lightboxVideo(
 
   @media (max-width: 720px) {
     .gal-grid { grid-template-columns: 1fr; }
+    .gal-grid--collapsed .gal-item:nth-child(n + 5) { display: none; }
+    .gal-more { display: inline-flex; margin: 1.4rem auto 0; }
+    .gal-more { justify-content: center; width: 100%; }
     .gal-item, .gal-item--wide { grid-column: auto; }
     .gal-item img { height: 240px; }
     .gal-story__media--pair { grid-template-columns: 1fr; }
