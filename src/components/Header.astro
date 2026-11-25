@@ -44,11 +44,11 @@ const links = [
     position: sticky;
     top: clamp(0.8rem, 2vw, 1.5rem);
     z-index: 60;
-    padding-inline: 20%;
+    padding-inline: 12%;
   }
 
   @media (max-width: 1180px) {
-    .site-header { padding-inline: 10%; }
+    .site-header { padding-inline: 5%; }
   }
 
   @media (max-width: 640px) {
@@ -74,6 +74,7 @@ const links = [
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    white-space: nowrap;
     text-decoration: none;
     font-family: var(--font-head);
     font-weight: 800;
@@ -92,11 +93,11 @@ const links = [
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(0.9rem, 1.6vw, 1.3rem);
+    gap: clamp(1rem, 2.4vw, 2.5rem);
   }
   .site-header__nav a {
     font-family: var(--font-head);
-    font-size: 0.88rem;
+    font-size: clamp(0.95rem, 0.6vw + 0.62rem, 1.1rem);
     font-weight: 600;
     white-space: nowrap;
     text-decoration: none;
