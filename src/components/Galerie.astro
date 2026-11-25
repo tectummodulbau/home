@@ -11,6 +11,16 @@ import imgDusche from '../assets/galerie-dusche-marmor.jpg';
 import imgPool from '../assets/addon-aussenanlage.jpg';
 import imgAufbauLuft from '../assets/aufbau-chassis-luftbild.jpg';
 import imgAufbauMontage from '../assets/aufbau-trailer-montage.jpg';
+import imgAussen from '../assets/galerie-aussen-terrasse.jpeg';
+import imgKueche from '../assets/galerie-kueche-essplatz.jpeg';
+import imgKuecheDetail from '../assets/galerie-kueche-detail.jpeg';
+import imgKuehlschrank from '../assets/galerie-kuehlschrank.jpeg';
+import imgDurchblick from '../assets/galerie-wohnraum-bad-durchblick.jpeg';
+import imgDoppelbett from '../assets/galerie-schlafzimmer-doppelbett.jpeg';
+import imgZweiBetten from '../assets/galerie-schlafzimmer-zwei-betten.jpeg';
+import imgSchrank from '../assets/galerie-schrankwand.jpeg';
+import imgBettDetail from '../assets/galerie-bett-detail.jpeg';
+import imgGrundriss from '../assets/galerie-grundriss.jpeg';
 
 const rohbilder = [
   { img: imgWellness, alt: 'Wellnessbereich einer Modulanlage von Tectum Modulbau', caption: 'Wellnessbereich', wide: true },
@@ -21,6 +31,16 @@ const rohbilder = [
   { img: imgBad, alt: 'Badezimmer einer Tectum Moduleinheit mit Waschtisch, Spiegel und Marmoroptik', caption: 'Bad mit Waschtisch', wide: true },
   { img: imgDusche, alt: 'Dusche mit Glastür und Marmoroptik in einer Tectum Moduleinheit', caption: 'Dusche', wide: false },
   { img: imgPool, alt: 'Poolanlage als Außenbereich einer Tectum Moduleinheit', caption: 'Außenanlage mit Pool', wide: true },
+  { img: imgAussen, alt: 'Tectum Modulhaus mit überdachter Holzterrasse, Glasfront und Kiesfläche auf einer Wiese', caption: 'Außenansicht mit Terrasse', wide: true },
+  { img: imgKuecheDetail, alt: 'Küchenzeile mit Kaffeemaschine, Vorratsgläsern und Bilderrahmen in einer Tectum Moduleinheit', caption: 'Küche im Detail', wide: false },
+  { img: imgKueche, alt: 'Küchenzeile mit Backofen, Waschmaschine und rundem Esstisch in einer Tectum Moduleinheit', caption: 'Küche und Essplatz', wide: true },
+  { img: imgKuehlschrank, alt: 'Geöffneter Einbaukühlschrank in der Küche einer Tectum Moduleinheit', caption: 'Einbaukühlschrank', wide: false },
+  { img: imgDurchblick, alt: 'Blick durch den Wohnraum mit Esstisch und Fernseher bis zum Bad und Schlafbereich einer Tectum Moduleinheit', caption: 'Wohnraum, Bad und Schlafbereich', wide: true },
+  { img: imgDoppelbett, alt: 'Doppelbett mit Wandleuchten und Holzwand in einer Tectum Moduleinheit', caption: 'Schlafzimmer mit Doppelbett', wide: false },
+  { img: imgZweiBetten, alt: 'Schlafbereich mit zwei Einzelbetten, Polsterpaneelen und Fernseher in einer Tectum Moduleinheit', caption: 'Schlafbereich mit zwei Betten', wide: false },
+  { img: imgSchrank, alt: 'Schrankwand in Holzoptik mit Tür und Bett in einer Tectum Moduleinheit', caption: 'Schrankwand', wide: true },
+  { img: imgBettDetail, alt: 'Bett mit Wandleuchte und Schrankwand in einer Tectum Moduleinheit', caption: 'Schlafen im Detail', wide: false },
+  { img: imgGrundriss, alt: 'Grundriss einer Tectum Moduleinheit mit Küche, Bad, Schlafbereich und Wohnbereich, 1065,5 mal 382,5 Zentimeter', caption: 'Grundriss der Moduleinheit', wide: true, plan: true },
 ];
 
 const aufbau = [
@@ -52,7 +72,7 @@ const wohnparkVideo = lightboxVideo(
 
     <div class="gal-grid">
       {bilder.map((b) => (
-        <figure class={`gal-item reveal ${b.wide ? 'gal-item--wide' : ''}`} {...b.lb}>
+        <figure class={`gal-item reveal ${b.wide ? 'gal-item--wide' : ''} ${b.plan ? 'gal-item--plan' : ''}`} {...b.lb}>
           <Image src={b.img} alt={b.alt} widths={[500, 900]} sizes="(max-width: 720px) 100vw, 60vw" />
           <figcaption>{b.caption}</figcaption>
         </figure>
@@ -148,6 +168,9 @@ const wohnparkVideo = lightboxVideo(
 
 
   .gal-item img { display: block; }
+  .gal-item--plan { background: #fff; }
+  .gal-item--plan img { object-fit: contain; }
+  .gal-item--plan:hover img { transform: none; }
 
   /* Geschichten unter dem Raster: Trailer und Wohnpark */
   .gal-story {
