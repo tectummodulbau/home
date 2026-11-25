@@ -73,7 +73,7 @@ const wohnparkVideo = lightboxVideo(
     <div class="gal-grid">
       {bilder.map((b) => (
         <figure class={`gal-item reveal ${b.wide ? 'gal-item--wide' : ''} ${b.plan ? 'gal-item--plan' : ''}`} {...b.lb}>
-          <Image src={b.img} alt={b.alt} widths={[500, 900]} sizes="(max-width: 720px) 100vw, 60vw" />
+          <Image src={b.img} alt={b.alt} title={b.caption} widths={[500, 900]} sizes="(max-width: 720px) 100vw, 60vw" />
           <figcaption>{b.caption}</figcaption>
         </figure>
       ))}
@@ -93,7 +93,7 @@ const wohnparkVideo = lightboxVideo(
       <div class="gal-story__media gal-story__media--pair">
         {aufbauBilder.map((b) => (
           <figure class="gal-item gal-item--plain" {...b.lb}>
-            <Image src={b.img} alt={b.alt} widths={[480, 900]} sizes="(max-width: 920px) 100vw, 40vw" />
+            <Image src={b.img} alt={b.alt} title={b.caption} widths={[480, 900]} sizes="(max-width: 920px) 100vw, 40vw" />
             <figcaption>{b.caption}</figcaption>
           </figure>
         ))}
@@ -105,6 +105,7 @@ const wohnparkVideo = lightboxVideo(
         <img
           src="/video/wohnpark-campingplatz-poster.jpg"
           alt="Wohnpark mit Tectum Moduleinheiten, Holzterrassen und gepflegter Außenanlage"
+          title="Wohnpark mit Tectum Einheiten"
           width="480"
           height="848"
           loading="lazy"
